@@ -1,0 +1,34 @@
+invis Server Setup 				Stand Nov. 2013
+################################################################
+
+Dieses Repository bildet die Entwicklungsbasis fuer das invis-
+Server RPM Paket für openSUSE.
+
+Es sollte lediglich zu Testzwecken als Basis fuer eine invis-
+Server Installation genutzt werden.
+
+Zur Installation eines invis-Servers wird eine rein textbasierte
+openSUSE Installation verlangt.
+
+invis Version 9.x setzt openSUSE 12.3 voraus.
+
+Nach dem Download des Repositories sind alle Dateien entsprechend
+der Pfade im Repo ins installierte openSUSE System zu kopieren.
+
+Danach kann das Script "sine" aufgerufen werden, es fuehrt durch
+die weitere Installation.
+
+Als Arbeitsverzeichnis nutzt sine /var/lib/sine, hier werden 
+Konfigurationsvariablen und der Setup-Fortschritt gespeichert.
+
+##################################################################
+
+In der hier vorliegenden Version duerfte die Installation noch
+nicht funktionieren, da sine noch nicht vollständig an die zu 
+Version 9.2 geaenderte Struktur angepasst ist.
+
+Mithilfe wird nicht abgelehnt ;-)
+
+Have a lot of fun...
+
+Stefan (stefan@invis-server.org)
