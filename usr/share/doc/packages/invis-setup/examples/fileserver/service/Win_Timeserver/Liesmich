@@ -1,0 +1,8 @@
+Windows 7 lässt das Stellen der Uhrzeit per net-Kommando aus einem Logon-Script
+heraus leider nicht mehr zu. Dumm, dass beim Domänenbeitritt auch die Möglichkeit
+einen NTP-Server für die Zeitsynchronisation zu konfigurieren verschwindet....
+
+Mit dem beiliegenden Script (es integriert die ebenfalls beiliegende Reg-Datei)
+wird die Konfiguration eines NTP-Servers wieder hergestellt.
+
+Es muss nach dem Domänenbeitritt einmalig ausgeführt werden.

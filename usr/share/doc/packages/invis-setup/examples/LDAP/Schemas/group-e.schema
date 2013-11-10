@@ -1,0 +1,49 @@
+attributetype ( 1.3.6.1.4.1.22799.666.1.200
+        NAME 'uidGroup-e'
+        EQUALITY integerMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+attributetype ( 1.3.6.1.4.1.22799.666.1.201
+         NAME 'permsGroup-e'
+         EQUALITY integerMatch
+         SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+attributetype ( 1.3.6.1.4.1.22799.666.1.202
+         NAME 'activGroup-e'
+         EQUALITY integerMatch
+         SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+objectClass     ( 1.3.6.1.4.1.22799.666.1.100
+        NAME 'groupeUser'
+        DESC 'group-e User'
+        SUP top
+        AUXILIARY
+        MUST  (
+            uidGroup-e $ permsGroup-e $ activGroup-e
+             )
+        )
+
+attributetype ( 1.3.6.1.4.1.22799.666.1.300
+        NAME 'gidGroup-e'
+        EQUALITY integerMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+objectClass     ( 1.3.6.1.4.1.22799.666.1.200
+        NAME 'groupeGroup'
+        DESC 'group-e Groups'
+        SUP top
+        AUXILIARY
+        MUST  (
+            gidGroup-e $ activGroup-e
+             )
+        ) 
+
+attributetype ( 1.3.6.1.4.1.22799.666.1.400
+        NAME 'accessSquid'
+        EQUALITY integerMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+objectClass     ( 1.3.6.1.4.1.22799.666.1.300
+        NAME 'groupeSquid'
+        DESC 'group-e Squid'
+        SUP top
+        AUXILIARY
+        MUST  (
+             accessSquid
+             )
+        )

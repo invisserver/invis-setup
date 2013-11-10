@@ -1,0 +1,7 @@
+# cronjobs for antivir
+# scan the samba profiles
+0 0 * * * root /usr/bin/avscan --allfiles --scan-in-archive --batch -r1 -lang=DE -s /var/lib/samba/profiles/
+# scan the fileserver directorys
+30 1 * * * root /usr/bin/avscan --allfiles --scan-in-archive --batch -r1 -lang=DE -s /srv/shares/
+# scan the home directorys
+30 3 * * * root /usr/bin/avscan --allfiles --scan-in-archive --batch -r1 -lang=DE -s /home/

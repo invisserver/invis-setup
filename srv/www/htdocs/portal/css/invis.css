@@ -1,0 +1,336 @@
+/*
+ * css/invis.css v1.0
+ * general portal wide style sheet
+ * (C) 2009 Daniel T. Bender, invis-server.org
+ * (C) 2012 Ingo Goeppert, invis-server.org
+ * License GPLv3
+ * Questions: forum.invis-server.org
+ */
+
+body {
+	margin: 0 auto;
+	padding: 0px;
+/*	background-color: #336699;*/
+	background-color: #e0e0e0;
+	
+	font-family: 'Arial', sans-serif;
+}
+
+.section-title {
+	margin: 0px;
+	
+	padding-top: 10px;
+	padding-left: 10px;
+	
+	border-bottom: 1px solid #c0c0c0;
+	
+	color: #b0b0b0;
+	
+	font-size: 24pt;
+	font-family: "Times New Roman", times, serif;
+	font-weight: bold;
+	
+	letter-spacing: 3pt;
+}
+
+.label {
+	color: #b0b0b0;
+	text-align: right;
+	text-transform: lowercase;
+	
+}
+
+.center {
+	text-align: center;
+}
+
+
+.site {
+	width: 850px;
+	margin: 0 auto;
+}
+
+#header_bg {
+	width: 100%;
+	padding-top: 20px;
+	border-bottom: 1px solid #c0c0c0;
+}
+
+
+#header {
+	color: #e0e0e0;
+	
+	font-size: 36pt;
+	font-weight: bold;
+	font-family: "Times New Roman", times, serif;
+}
+
+#menu {
+	padding-right: 50px;
+	
+	text-align: right;
+}
+
+#menu a {
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;
+	
+	margin-left: 8px;
+	
+	border-top: 1px solid #c0c0c0;
+	border-left: 1px solid #c0c0c0;
+	border-right: 1px solid #c0c0c0;
+	
+	color: #707070;
+	background-color: #e8e8e8;
+	
+	font-weight: bold;
+	font-family: "Times New Roman", times, serif;
+	
+	text-decoration: none;
+}
+
+#menu .active {
+	border-bottom: 1px solid #ffffff;
+	
+	color: #707070;
+	background-color: #ffffff;
+	
+	font-style: italic;
+	
+	text-decoration: underline;
+}
+
+#menu .admin {
+	color: #ff0000;
+}
+
+#content-container {
+	margin: 0px;
+	padding: 0px;
+	
+	background-color: #ffffff;
+}
+
+#content {
+	width: 100%;
+	
+	padding: 5px;
+}
+
+#footer_bg {
+	width: 100%;
+	border-top: 1px solid #c0c0c0;
+}
+
+#footer {
+	padding: 10px;	
+	
+	color: #808080;	
+	
+	font-size: 8pt;
+	font-family: "Times New Roman", times, serif;
+	
+	text-align: center;
+}
+
+/*
+ * LOGIN
+ */
+
+#login-block {}
+
+#login-block table {
+	width: 90%;
+	margin: 5px auto;
+}
+
+#login-block .label {
+	color: #b0b0b0;
+}
+
+#login-block .input {
+	width: 250px;
+}
+
+#login-block td {
+	padding: 2px;
+	
+	text-align: center;
+}
+
+#login-block input {
+	width: 100%;
+	
+	border: 1px solid #e0e0e0;
+}
+
+#login-message {
+	width: 100%;
+	
+	text-align: center;
+}
+
+.green {
+	color: #00ff00;
+}
+
+.red {
+	color: #ff0000;
+}
+
+#login-block .cancel {
+	cursor: pointer;
+	float: right;
+	
+	position: relative;
+	
+	right: 5px;
+	top: 0px;
+	
+	color: #f68010;
+	
+	font-weight: bold;
+}
+
+/*
+ * USERBLOCK
+ */
+
+#userblock {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	
+	padding: 8px;
+	
+	border-left: 1px solid #c0c0c0;
+	border-bottom: 1px solid #c0c0c0;
+	
+	background-color: #fdfdfd;
+	
+	font-size: 0.8em;
+	font-family: "Times New Roman", times, serif;
+	
+	text-align: right;
+}
+
+#userblock a {
+	color: #ff0000;
+}
+
+#userblock .spacer {
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+/*
+ * OVERLAY & LIGHTBOX
+ */
+
+#overlay {
+	position: fixed;
+	z-index: 50;
+	
+	top: 0px;
+	left: 0px;
+	
+	width: 100%;
+	height: 100%;
+	
+	margin: 0px;
+	padding: 0px;
+	
+	background-color: #000000;
+	opacity:0.60;
+	filter: alpha(opacity=60);
+}
+
+#lightbox {
+	position: fixed;
+	z-index: 100;
+	
+	top: 0px;
+	left: 0px;
+	
+/*	width: 600px; height: 400px; */
+	
+	margin: 0px;
+	padding: 0px;
+	
+	border: 2px solid #c0c0c0;
+	
+	background-color: #ffffff;
+}
+
+
+#lightbox button {
+	cursor: pointer;
+	
+	margin: 2px;
+	padding: 3px;
+	
+	border: 1px solid #b0b0b0;
+	
+	color: #000000;
+	background-color: #fafafa;
+}
+
+#lightbox-buttons {
+	padding: 5px;
+	
+	border-top: 1px solid #e0e0e0;
+	
+	text-align: center;
+}
+
+#lightbox-status {
+	padding: 2px;
+	text-align: center;
+	
+	font-size: 0.8em;
+	font-weight: bold;
+	font-family: "Times New Roman", time, serif;
+}
+
+#lightbox-wait {
+	text-align: center;
+}
+
+/*
+ * PROFILE DETAILS
+ */
+#profile-table {
+/*	display: block;*/
+	width: 100%;
+
+}
+
+#profile-table .editable {
+	width: 100%;
+	border-bottom: 1px dashed #e0e0e0;
+}
+
+#profile-table .nochange {
+	font-style: italic;
+	color: #b0b0b0;
+}
+
+#profile-table .description {
+	vertical-align: top;
+	font-family: "Times New Roman", times, serif;
+	text-align: right;
+	text-transform: lowercase;
+}
+
+#profile-table input {
+	margin: 2px;
+	padding: 3px;
+	width: auto;
+	border: 1px solid #b0b0b0;
+}
+
+#profile-table .input-description {
+	font-size: 0.6em;
+}

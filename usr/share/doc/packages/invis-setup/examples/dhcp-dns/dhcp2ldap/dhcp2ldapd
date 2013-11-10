@@ -1,0 +1,131 @@
+#! /bin/sh
+#
+# Copyright (C) 2009  invis-server.org
+#
+# Author: Stefan Schaefer stefan@invis-server.org
+#
+# /etc/init.d/dhcp2ldapd
+#
+#   and symbolic its link
+#
+# /sbin/rcdhcp2ldapd
+#
+# System startup script for the dhcp2ldapd daemon
+#
+### BEGIN INIT INFO
+# Provides:            dhcp2ldapd
+# Required-Start:      $local_fs $remote_fs $syslog $ldap
+# Required-Stop:       $remote_fs $syslog
+# Should-Start:        $named
+# Should-Stop:         
+# Default-Start:       3 5
+# Default-Stop:        0 1 6
+# Short-Description:   dhcp2ldapd daemon
+# Description:         The dhcp2ldapd daemon fetches dhcp-leases from the
+#	leases file and add corresponding dns entrys in a bind dns ldap backend.
+### END INIT INFO
+
+# Source SuSE config, only if exists with size greater zero
+test -s /etc/rc.config && \
+    . /etc/rc.config
+
+# Shell functions sourced from /etc/rc.status:
+#      rc_check         check and set local and overall rc status
+#      rc_status        check and set local and overall rc status
+#      rc_status -v     ditto but be verbose in local rc status
+#      rc_status -v -r  ditto and clear the local rc status
+#      rc_failed        set local and overall rc status to failed
+#      rc_failed <num>  set local and overall rc status to <num><num>
+#      rc_reset         clear local rc status (overall remains)
+#      rc_exit          exit appropriate to overall rc status
+
+D2L_BIN=/usr/local/sbin/dhcp2ldapd.pl
+
+test -s /etc/rc.status && \
+     . /etc/rc.status
+
+test -s /etc/sysconfig/cups && \
+     . /etc/sysconfig/cups
+
+test -x $D2L_BIN || exit 5
+
+# First reset status of this service
+rc_reset
+
+# Return values acc. to LSB for all commands but status:
+# 0 - success
+# 1 - generic or unspecified error
+# 2 - invalid or excess argument(s)
+# 3 - unimplemented feature (e.g. "reload")
+# 4 - insufficient privilege
+# 5 - program is not installed
+# 6 - program is not configured
+# 7 - program is not running
+# 
+# Note that starting an already running service, stopping
+# or restarting a not-running service as well as the restart
+# with force-reload (in case signalling is not supported) are
+# considered a success.
+
+case "$1" in
+    start)
+	echo -n "Starting dhcp2ldapd"
+	## Start daemon with startproc(8). If this fails
+	## the echo return value is set appropriate.
+
+	# NOTE: startproc return 0, even if service is 
+	# already running to match LSB spec.
+	startproc $D2L_BIN -d
+
+	# Remember status and be verbose
+	rc_status -v
+	;;
+    stop)
+	echo -n "Shutting down dhcp2ldapd"
+	## Stop daemon with killproc(8) and if this fails
+	## set echo the echo return value.
+
+	killproc -TERM $D2L_BIN
+
+	# Remember status and be verbose
+	rc_status -v
+	;;
+    try-restart)
+	## Stop the service and if this succeeds (i.e. the 
+	## service was running before), start it again.
+	## Note: try-restart is not (yet) part of LSB (as of 0.7.5)
+	$0 status >/dev/null &&  $0 restart
+
+	# Remember status and be quiet
+	rc_status
+	;;
+    restart)
+	## Stop the service and regardless of whether it was
+	## running or not, start it again.
+	$0 stop
+	$0 start
+
+	# Remember status and be quiet
+	rc_status
+	;;
+    status)
+	echo -n "Checking for dhcp2ldapd: "
+	## Check status with checkproc(8), if process is running
+	## checkproc will return with exit status 0.
+
+	# Status has a slightly different for the status command:
+	# 0 - service running
+	# 1 - service dead, but /var/run/  pid  file exists
+	# 2 - service dead, but /var/lock/ lock file exists
+	# 3 - service not running
+
+	# NOTE: checkproc returns LSB compliant status values.
+	checkproc $D2L_BIN
+	rc_status -v
+	;;
+    *)
+	echo "Usage: $0 {start|stop|status|try-restart|restart}"
+	exit 1
+	;;
+esac
+rc_exit

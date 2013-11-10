@@ -1,0 +1,546 @@
+invis 9.x-dev
+- Bug: "Windows 7 und 8 koennen keine Profilverzeichnisse anlegen" gefixt.
+- Daten des Mailproviders Strato in LDIF Vorlage für CorNAz aktualisiert.
+- Bug: "Suchen und Ersetzen beim smtp-Relayhost schlägt fehl" gefixt.
+- Bug: "passwd --stdin" gibt es nicht mehr, daher konnte dass cyrus-Passwort nicht gesetzt werden. Statt passwd wird jetzt chpasswd verwendet.
+- Bug: "Doppelter DN": Fehler in LDIF-Vorlage fuer das invis-Portal gefixt.
+- ERP waWision integriert.
+- sine (ein wenig) an systemd angepasst.
+- SuSEconfig gibt es nicht mehr -> aus sine eliminiert.
+- clamav-Setup geaendert. Das Paket clamav-db existiert nicht mehr.
+- GID der Gruppe "pkeys" auf 998 geaendert, da 499 bereits der Gruppe "messagebus" zugeordnet ist.
+- Bug: usermod -A auf usermod -a -G geaendert.
+- Die Direktiven "printer admin" und "display charset" aus der Samba Konfiguration entfernt, da sie von samba4 nicht mehr unterstuetzt werden.
+- Bug: "Zugriffs- und Besitzrechte auf .fetchmailrc sind nicht zulaessig" gefixt.
+- Bug: "shellinabox Init-Script wird von sine geloescht" gefixt.
+- lokale LDAP-Anbindung auf sssd und STARTTLS umgestellt.
+- PostgreSQL Konfiguration an V. 9.2 angepasst.
+- Firewall Setup an systemd angepasst.
+- Nagios Plugin fuer ClamAV in die Installation aufgenommen.
+- Dokuwiki: Plugin "encryptedpasswords" hinzugefuegt, Konfiguration des Authbackends angepasst, Neue Gruppe "wiki-nutzer" hinzugefuegt. "Domain Users" duerfen nicht mehr pauschal lesen- Eintrag fuer waWision in LDIF-Datei fuer invis-Portal eingefuegt.
+- Workaround fuer php5-fastcgi "php.ini" Bug in sine eingebaut.
+- Bug: "shellinabox-Link im Portal fuehrt nicht zum Ziel" gefixt. Die Apache-Module mod_proxy und mod_proxy_http muessen dafuer aktiviert werden.
+- Bug: "Etherpad-Lite" funktioniert nicht" gefixt. Fehler in Apache2-Proxy-Konfiguration.
+- Alle auf einem von 80 abweichenden Port lauschenden Webapplikationen (cups, ntop, cdwriter) hinter Apache Proxy gestellt, damit sollten sie auch via HTTPS erreichbar sein. (CUPS war problematisch...)
+- apache-mod_proxy_html integriert, wird fuer CUPS benoetigt.
+- Ingos Optimierungen der clean_* Scripts aus 7.1er Zweig uebernommen.
+- DNS-Forwarders werden jetzt von sine individuell erfragt.
+- Bug: "Kein Vorgabewert bei Zertifikasemail-Adresse in openvpn Setup" gefixt.
+- Bug: "Fatal error: Directive 'allow_call_time_pass_reference' is no longer available in PHP" gefixt.
+- invis permissions Datei gefixt
+- Bei Zarafa-Installation wird mariadb wieder gegen MySQL getauscht
+- sssd Daemon wird jetzt auch gestartet ;-)
+- Zarafa Paketauswahl an neue Version angepasst.
+- LDIF Dateien des DHCP Servers an ISC dhcpd V 4.5.x angepasst
+- Pakete sssd-tools und ldb-tools hinzugefuegt.
+- deletehome Script erweitert.
+- weitere Anpassungen an SSSD (das Mistding!)
+- bei Zarafa Installation wird junk Konto jetzt automatisch als sharedstore eingerichtet.
+- Zarafa Webapp in Portal LDIF Vorlage integriert, Horde entfernt
+- shellinabox gefixt
+- Script zum aktivieren/deaktivieren von Portaleintraegen hinzugefuegt
+- Script ZFS4invis f�r optionale Installation und Einrichtung von ZFSonLinux f�r einen invis Server
+- SOGo integriert
+
+invis 8.x-dev
+- ajax.php: Regression aus V1.6 "Bei Gruppen mit nur einem User ist die Liste der verfügbaren User leer" gefixt
+- download.php, login.php: Downloads, Anmeldungen und Fehlversuche in Apache-Log schreiben
+- index.php: Änderung damit der IE immer den standardkonformen Modus benutzt
+- admintools.js: Gruppenliste jetzt alphabetisch sortiert, Groß- und Kleinschreibung wird ignoriert
+- admintools.js: PC-Liste jetzt nach IP sortiert
+- "safebootpart" Script zur Sicherung der Bootpartition hinzugefügt.
+- sine: faxgate-cups-backend-64bit-fix wird nicht länger benötigt
+- ajax.php: Bug "Accounttyp wird in bestimmer Konstellation falsch angezeigt" gefixt.
+- ajax.php: Bug "php-error beim Anzeigen von Nicht-Groupwareusern" gefixt.
+- ajax.php: Bug "php-error beim Verwalten leerer Gruppen" gefixt.
+- ajax.php: Bug "Auch Gruppenmitglieder in Liste auf der rechten Seite beim Verwalten von Gruppen" gefixt.
+- ping.php: Nur noch mit Cookie erlaubt.
+- admintools.js: Pingerverhalten geändert, nur noch aktuell angezeigte Hosts werden gepingt. Wechsel auf Benutzer- oder
+                 Gruppenverwaltung stoppt Pings. Deaktivieren des Pingers stoppt alle Pings.
+- invis-pwdmeter.js, invis-site.js, config.php.dist, portal.xml, index.php:
+  Funktion zum Prüfen von Passwörtern auf "Komplexität" bei Änderung des Passworts durch den Benutzer eingebunden.
+- invis-site.js: Verbesserung: Passwortlebensdauer wird sofort nach Passwortänderung aktualisiert, nicht erst nach neuem Login.
+
+invis 8.0-R2
+- Bug: "sine installiert dovecot 1.2 statt 2.1" gefixt.
+- LDAP Server kann jetzt TLS-verschluesselt angesprochen werden. SLES11SP2 und openSUSE 12.2 LDAP-Clients verlangen TLS.
+- Bug: "sine-Logfile wird immer ins aktuelle working-directory geschrieben" gefixt.
+- Bug: "ntop versucht seine User-DB im nicht vorhandenen Verzeichnis /var/ntop anzulegen, statt in /var/lib/ntop." gefixt (Workaround mit symbol. Link, Bug-Report erzeugt).
+- Bug: "Zeitstempel der Dateien im Samba Papierkorb wird falsch gesetzt" gefixt. Dadurch wurden Dateien von "clean_recycle" zu früh gelöscht.
+- Das Stammzertifikat der Server-CA kann jetzt über das invis-Portal heruntergeladen werden.
+- Script zum Herunterladen des Avira Evaluationsschlüssels (fetchavkey) hinzugefügt.
+- Bug: "Ausschlussliste beim Samba Papierkorb wirkungslos" gefixt. 
+- Zusätzlich werden jetzt auch WBK-Dateien und Temp-Verzeichnisse in Unterverzeichnissen vom Papierkorb ausgeschlossen.
+- Die Dateitransferseite des invis-Portals listet jetzt nur noch Dateien auf.
+- Security: Download von Dateien außerhalb des Portal-Roots per URL-Manipulation ist jetzt ausgeschlossen.
+- Security: Datei-Upload per invis-Portal ist jetzt nur noch mit erfolgreicher Anmeldung möglich.
+- Security: Direkter Aufruf der include-Scripts des invis-Portals ist jetzt ausgeschlossen, alle anderen Scripts können nur noch nach erfolgreicher Anmeldung oder von intern aufgerufen werden.
+- Bug: clean_transfer und clean_recycle versuchen jetzt nicht mehr nicht leere Verzeichnisse zu löschen.
+- z-push 1.5.x wird nicht mehr installiert.
+- faxgate Modul in sine an zypper Paketliste angepasst.
+- Kleinere Anpassungen der Apache2 Konfiguration an Zarafa und Apache Worker, sowie den Wegfall von z-push 1.5.x vorgenommen.
+- Bug: cron liefert die Fehlermeldung "bad hour" gefixt. Auf Erden gibt es keine 30te Stunde ;-)
+- zdbump und zbackup in die Toolbox aufgenommen. Achtung zbackup benoetigt einen Zarafa-Lizensdienst und eine SMB Subskription. Es läuft auch nur in einer Sandbox.
+- DHCP-Statement "authoritative" in die DHCPD-Konfiguration hinzugefuegt
+- Nagios Plugins Paket-Liste ueberarbeitet
+- Bug: "Zarafa Webaccess und Webapp funktionieren nicht".
+- Kleine Erweiterung der Link-Seite des invis-Portals.
+
+invis 8.0-R1
+- invis Setup an openSUSE 12.2 angepasst
+- invis Server auf systemd umgestellt
+- invis Server auf grub2 umgestellt und eigenes Theme integriert
+- Zarafa auf Version 7.1 aktualisiert
+- Bug "das Script freeports liefert gelegentlich kein Ergebnis" gefixt.
+- SMB2 Protokoll aktivert
+- Madwifi Konfiguration und Repository aus cfiles entfernt
+- syslog-ng Konfiguration aus cfiles entfernt
+- optionale Zypper Repos aus cfiles entfernt
+- altes Bootsplash Theme aus cfiles entfernt
+- inetcheck.cron Datei aus cfiles entfernt, ist schon lange in invis.cron enthalten
+
+invis 7.1-R5
+- Gruppe "maildummies" wird jetzt im LDAP angelegt.
+- Vor der Installation notwendiger Software, wird jetzt ein zypper dup --from "spins_invis" durchgeführt. Das verhindert Abhängigkeitsprobleme.
+- Kleine Anpassung am Portal css.
+
+invis 7.1-R4
+- Script fixzarafaclientlib an Zarafa 7.1 angepasst
+- Bug "Hostnamen in vHost-Konfiguration werden nicht mehr korrekt gesetzt" gefixt.
+- Eigene Gruppe "maildummies" fuer reine Mailkonten eingefuehrt.
+- Bug "Kontentyp-Zuordnungen im invis-Portal fehlerhaft" gefixt.
+- Sernet-Samba Repository fuer openSUSE 12.1 hinzugefuegt.
+
+invis 7.1-R3
+- Fehler im Downloadpfad von LX-ERP behoben
+- Bug "SUID Bit für Avira avscan wird nicht gesetzt" behoben.
+- Group-e auf aktuelle Version 7.41 aktualisiert.
+- Bug "CAPI System wird nicht initialisiert" gefixt.
+- Dovecot Konfiguration an Version 2.x angepasst.
+- Bug "Groupware-Benutzer werden bei Verwendung von Group-e im invis-Portal nicht korrekt angelegt und angezeigt" gefixt.
+- Bug "z-push" funktioniert nicht mit PHP-fcgid" gefixt.
+- Pakete der Basisinstallation erweitert.
+- Installation von phpvirtualbox vorbereitet: Es kann ein Link auf phpvirtualbox im Administrationsbereich im Portal via LDAP freigeschaltet werden.
+- Bug "Address-Rewriting beim Mailversand funktioniert nicht" gefixt.
+
+invis 7.1-R2
+- Kleine Anpassungen am "afterup" Script
+- Korrektur an der Timeserver-Registry-Datei. Als erster Timeserver wird jetzt ptbtime1.ptb.de verwendet. Es kann jedoch nicht schaden statt dessen den eigenen invis Server einzusetzen.
+- Pfad zum openSUSE Handbuch in Apache Konfiguration gefixt.
+- Bug "Fehler beim Installieren notwendiger Pakete" gefixt.
+
+invis 7.1-R1
+- Apache-Konfiguration auf worker-MPM und FCGID umgestellt. -> Deutlicher Performance Schub.
+- Apache-Konfiguration vollstaendig ueberarbeitet.
+- LX-ERP auf 2.7.0 (kivitendo) aktualisiert.
+- Script: foldernames.php zur Uebersetzung von Zarafa-Ordnernamen in andere Sprachen hinzugefügt.
+- Bug: "Gruppenzuordnungen in Zarafa werden nicht dargestellt" gefixt.
+- Bug: "DHCP Bereichskonfigurationen des invis-Portals sind unwirksam" gefixt.
+- IP-Bereiche fuer DHCP und DNS im Portal um den Bereich IP-Geräte erweitert.
+- Host-Konfiguration im invis-Portal um das Attribut "Standort" erweitert.
+- JavaScript Framework Prototype im invis Portal auf Version 1.6.1 aktualisiert.
+- Bug: "CorNAz funktioniert nicht bei externem (HTTPS) Zugriff" gefixt.
+- invis-Portal an Internet Explorer 9 angepasst.
+- Erweiterung zu Wiederherstellung der Zeitserverkonfiguration in Windows 7 nach Domänenbeitritt hinzugefügt.
+- Unterstützung für den OpenVPN-Manager von JowiSoftware als OpenVPN-Client hinzugefügt.
+- Erweiterung fuer Java-Policies zum Ausfuehren des Faxgateclients unter Java7 hinzugefügt.
+- Script "umtsup" fuer Notfall-Internetzugang via Handy und T-Mobile (Teathering) hinzugefuegt.
+- Mit clean_recycle wurde der Toolbox ein Sript zum automatischen Bereinigen der Samba-Papierkoerbe hinzugefügt. Gelöscht wird darin alles, was aelter als 30 Tage ist. Diese Funktion kann in der invis.conf Datei konfiguriert werden. Sie ist normalerweise aktiviert.
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+invis-7.0-R4
+- Locales-Vorgabe fuer Zarafa integriert und auf de_DE.UTF-8 gesetzt.
+- Bug Fehler im "noSMART" Eintrag in der invis.conf Datei" gefixt.
+- Verwendete Groupware und Name der Zarafa-Datenbank werden in die invis-Konfiguration geschrieben.
+- Zarafa-Datenbank wird von allbackup von der Datensicherung ausgeschlossen, da hier mit zdbdump ein eigenes Sicherungsscript zum Einsatz kommt.
+- Zarafa-Bash-Completion funktioniert jetzt.
+- Version 1.0 des Zarafa-Webapp integriert.
+- LX-ERP wird jetzt als fcgid-Script ausgeführt, deutliche Performance-Steigerung.
+
+invis-7.0-R3
+- sine schreibt jetzt ein Logfile. Meldungen werden im lokalen Verzeichnis in der Datei sine.log abgelegt.
+- Das Paket php5-imap in die Standard-Installation des invis-Servers aufgenommen.
+- Monitoring des Servers via Icinga oder Nagios ermoeglicht.
+- invis.cron: Email-Versand fuer invis-Cronjobs deaktiviert, es sind einfach zu viele Mails.
+- addaddress: Weitere Verzeichnisse ("lost+found" & "junk") ausgeschlossen
+- Bug invis.cron: Ein "d" zu wenig beim Aufruf von addaddress
+- Bug addcn.pl, buildpostaladdress.pl: Zeilenendezeichen ist Teil der Variable beim Einlesen der Konfiguration, Zeilenende wird jetzt abgeschnitten (chomp)
+- Bug addcn.pl, buildpostaladdress.pl: Parameter adminPW sollte AdminPW sein
+- Bug addcn.pl: Variable hostname fehlt, gefixt
+- Bug addcn.pl: Variable ldaphostname sollte ldaphost sein
+- buildpostaladdress.pl: $basedn anstatt fest codiertem Namen verwenden
+- Bug sshd_config: Pfad zu sftp jetzt wieder unabhängig von 32Bit oder 64Bit
+- Bug main.cf (bzw. main.zarafa): smtp-tls Konfiguration berichtigt damit Zertifikat der Gegenseite überprüft werden kann, eigene keys auskommentiert. Sie werden nur fuer gegenseitige Ueberpruefung benoetigt.
+- z-push wird jetzt auch in Kombination mit Zarafa als Apache vHost angelegt. Er lauscht auf Port 443 auf https-Verbindungen
+- Die Benutzerverwaltung via invis-Portal ermöglicht jetzt das direkte Anlegen von Groupware-Benutzern inkl. aller notwendigen LDAP-Attributen für Zarafa & Group-e
+- Bug "Zarafa-Pakete aus dem network:mail:zarafa Repository sind nicht kompatibel mit der unter invis verwendeten PHP-Version." gefixt. Wir haben die Pakete in unser Repository gebrancht.
+
+invis-7.0-R2
+- Systemstart wieder auf klassischen SysV init umgestellt. Bin mit Systemd noch unzufrieden
+- Dummy-Eintrag wird in der fetchmailrc Datei erzeug, so dass der Dienst auch ohne echte Eintraege startet.
+- fetchmail liefert Mails jetzt immer an "user@localdomain" statt an "user@localhost.localdomain" aus. Das vermeidet Fehler in der weiteren Mail-Zustellung.
+- provisorische Installation von Roundcubemail integriert (muss noch als vhost konfiguriert werden, da ansonsten das invis Portal nicht erreichbar ist)
+- Weitere Anpassungen an der Dovecot & Postfix Konfiguration vorgenommen.
+- Anpassungen an den UTF8 Voreinstellungen in my.cnf (MySQL) vorgenommen.
+- Fehler im Script "amacheck" behoben. Es hat immer das korrekte PID-File eines laufenden AMaViS geloescht.
+- Konfiguration des Avira Kommandozeilenscanners so geaendert, dass er standardmaessig im Batchmode laeuft.
+- Der Dienst "freshclam" wird jetzt auch gestartet, wenn Avira Antivir als Virenscanner installiert wird. Da ClamAV in Abhängigkeit zu AMaViS immer installiert wird, und amvavis diesen immer als secondary Scanner nutzt, sollte er auch regelmaessig aktualisiert werden.
+- Bug "Es wird immer die Grub-Konfiguration fuer Ein-Platten-Setups eingerichtet" gefixt. Es wird jetzt automatisch erkannt, ob /boot auf einem RAID-Device liegt.
+- sine erlaubt bei der Eingabe des SMTP-Relays jetzt die Auswahl zwischen SMTP und Submission.
+- Bug "PhpPgAdmin Konfiguration wird nicht gefunden" gefixt
+- Bug "sine bleibt beim Start des Avira AVGuards haengen" gefixt.
+- Bug "sine bleibt beim Start des CDWservers haengen" gefixt.
+- Bug "Group-e & z-push Dateien werden nach Download mit wget nicht gefunden" gefixt.
+
+invis-7.0-R1
+- Script an openSUSE 12.1 angepasst.
+- Bug "postgresql Server startet nicht" gefixt. 
+- Kleines Script zum Erstellen eines symbolischen Links auf die Zarafa-Client-Library hinzugefügt.
+- Zarafa-Paketliste erweitert
+- Kleinere Anpassungen am Script afterup.
+- Datei menu.lst an aktuelle Version angepasst
+- Die Scripts addzag und manipgroups hinzugefügt (siehe folgenden Eintrag)
+- Gruppen im LDAP werden jetzt an die jeweils installierte Groupware angepasst.
+- Zarafa sieht jetzt nicht mehr automatisch jeden Benutzer als Zarafa-Benutzer an.
+- Das Script extzu hinzugefügt. Macht Systembenutzer zu Zarafa-Benutzern. Es werden entsprechende Attribute im LDAP-DIT gesetzt.
+- Bug "FritzCard Treiber wurden nicht mehr herunter geladen" gefixt.
+
+invis-6.9-R1-alpha11
+- Kleine Anpassung am diskchecker-Script, der "noSMART" String kann jetzt in der invis-Konfiguration vorgegeben werden.
+- Bug "Link zu OpenERP stimmte nicht" gefixt.
+- Das Paket "sensors" zur Überwachung von Temperaturen un Lüftern auf dem Mainboard hinzugefügt. Konfiguration folgt...
+
+invis-6.9-R1-alpha10
+- Bug "Besitzrechte der Group-e Verzeichnisse werden nicht korrekt gesetzt" gefixt.
+- Anpassung in der Paketliste fuer Zarafa vorgenommen.
+- LX-ERP Paketliste fuer zypper vervollstaendigt.
+
+invis6.9-R1-alpha9
+- Tippfehler im Setupscript beseitigt, LDAP-Verzeichnis wurde nicht aufgebaut.
+- Anpassung an PostgreSQL > V7 in der LX-ERP Installation vorgenommen.
+- Erläuterungstexte im Setup-Script Modul Quest vorgenommen.
+- LX-Office Installation überarbeitet.
+
+invis6.9-R1-alpha8
+- Bug "Kartenleser werden vom diskchecker-Script berücksichtigt" gefixt. Kartenleser reagieren nicht auf SMART-Anfragen, was zu irreführenden Fehlermeldungen im invis-Portal führte.
+- Kleine Änderungen an der Basis-LDIF-Datei für den LDAP DIT. Der Organisationsknoten wird jetzt dynamisch erzeugt.
+- Indices für Zarafa zur Optimierung von Suchvorgängen im LDAP-Verzeichnis hinzugefügt.
+- Bug "Ändern der Passwörter von Maildummies im Portal nicht möglich" gefixt.
+- Bug "DNS-Zonen-Konfiguration im invis Portal noch auf altem Stand" gefixt. Dies führte dazu, dass neue Hosts nicht ins DNS eingetragen wurden.
+ 
+invis6.9-R1-alpha7
+- Das Script "scanleases" in die Toolbox aufgenommen. Es hilft beim Identifizieren unbekannter IP-Geräte im Netz.
+- Tippfehler in der Fileserver-Paketliste gefixt.
+- PostgreSQL wird installiert und konfiguriert. Der Eintrag in die Runlevel erfolgt aber nur auf Nachfrage oder wenn LX-ERP bzw. OpenERP installiert werden.
+- Bug "Group-e Installation nicht möglich" gefixt.
+- Für Group-e wird jetzt z-push 2.1 installiert.
+- Grub Konfiguration angepasst.
+- OpenERP Paketliste bereinigt.
+- Script "dwdatasnapshot" zur Erstellung eines Snapshots des Dokuwiki-Datenverzeichnisses hinzugefügt, Script wird per cronjob regelmäßig ausgeführt.
+- Kleine Veränderungen am allbackup-Script
+
+invis6.9-R1-alpha1-6
+- phpLDAPAdmin auf Version 1.2.1.1 aktualisiert
+- phpLDAPAdmin: Template-Abfrage deaktiviert.
+- Nameserver bind auf DLZ-Treiber umgestellt, es wird jetzt das DLZ-LDAP-Schema verwendet, LDIF-Dateien fuer DLZ hinzugefuegt, alte Dateien entfernt.
+- Das invis-Portal wurde auf die DLZ-LDAP-Struktur des Nameservers bind angepasst. Server der Versionen bis 6.8. dürfen damit NICHT aktualisiert werden.
+- OpenLDAP-Konfiguration dür DLZ-Schema optimiert.
+- Der Login am Portal wurde so geaendert, dass bei externen Login über die Mitgliedschaft in der Gruppe "mobilusers" entschieden wird ob eine Anmeldung erlaubt wird.
+- Die von sine via zypper zu installierenden Pakete stehen ab sofort nicht mehr im Script sondern werden Listen entnommen, die unter cfiles/zypper-package-lists zu finden sind.
+- Die Liste zu installierender Pakete wurde entrümpelt
+- Zarafa wurde als alternativer IMAP & Groupware Server hinzugefügt
+- Es kann jetzt zwischen LX-ERP und OpenERP gewählt werden
+- Alternativ zu den Samba-Paketen des Repositories openSUSE-Samba:stable können jetzt wieder die Pakete von Sernet installiert werden.
+- Das Tool dhcp2ldap wurde aus dem Setup entfernt.
+- fix fuer Bug in der chroot-Umgebung von bind hinzugefuegt.
+- Script mkdbsilent zum "stillen" anlegen neuer MySQL-Datenbanken hinzugefügt. 
+- Bug in "aschenputtel" Script gefix. Es funktioniert jetzt auch wieder mit avira antivir.
+- Zarafa Helfer-Scripts runzarafa und mkzarafakey hinzugefuegt.
+
+-------- SPLIT --------
+Ab Version 6.8-R9 wird es darauf basierend ggf. noch kleine Erweiterungen und Bugfixes geben. Ab 6.9-R1 werden wesentliche Teile des invis-Server Setups umstrukturiert
+und sind nicht mehr abwärtskompatibel zu 6.8. 
+
+invis6.8-R9
+- Dovecot Konfiguration so erweitert, dass IMAP-ACLs und shared folders funktionieren.
+- Faxgate-Setup wieder aufgenommen und aktualisiert
+- Bug "Hoher Loglevel (264) in slapd.conf eingestellt" gefixt. Loglevel ist jetzt auf 0 voreingestellt.
+- Bug "Der Deeplink-Schutz ist auch nach anmelden am invis-Portal aktiviert" gefixt.
+- LX-ERP auf Version 2.6.3 akutalisiert.
+
+invis6.8-R8
+- Bug "Smartfehler im Portal" in Script diskchecker gefixt
+- Dovecot Konfigurationsdatei an aktuelle Gegebenheiten angepasst (Version 1.2 und Dovecot SASL fuer Postfix)
+- Postfix Konfigurationsvorlage fuer Dovecot an aktuelle Gegebenheiten angepasst. Siehe oben.
+- Im invis-Portal können in der Sektion "local" auch HTTPS Links angegeben werden.
+- Bug "Anmeldung am Portal klappt nur einmal" gefixt. Ursache war ein Fehler in der php.ini
+- Speicherbegrenzungen erhoeht
+- Bug "clamd Socket wird nicht gefunden" gefixt.
+- Die Kompressionstools p7zip und cabextract wurden in die Installation aufgenommen.
+- Bug "invis Portal zeigt Download-Dateien in der Transfer Sektion nicht an" gefixt.
+- Bug "Template Datei fuer Win7 Bibliotheken in Links umwandeln wird nicht kopiert" gefixt.
+- Zweites disckcher-Script "diskcheckerhpsmart" von Markus Benedikt fuer HP-Smart arrays hinzugefügt.
+
+invis6.8-R7
+- Bug "Bei Installationen ohne Software-Raid sorgt die Verwendung des Scripts "afterup" für eine Fehlerhafte Bootmanager Konfiguration" gefixt.
+- Die Scripts "webserverkeys" und "mailserverkeys" wurden durch das neue Script "serverkeys" ersetzt. Dies vereinfacht das Erzeugen von Web- und Mail-Server Schlüsseln erheblich.
+- Das Script "serverkeys" wird auch von sine verwendet. Die alten Code-Zeilen wurden entfernt.
+- Die Postfix-Konfiguration wurde so geaendert, dass auch der Mailversand verschluesselt und Passwort-geschuetzt erfolgt. Praktischer Nebeneffekt: Thunderbird 3 kann Mailkonten des invis Servers weitgehend automatisch einrichten.
+- Bug "invis-Setup Paket loesst Virenalarm aus" gefixt. Die Eicar-Testsignaturen wurden wieder aus dem invis-Setup-Paket entfernt. Statt dessen ist im entsprechenden Verzeichnis ein Download-Script zu finden.
+- Da mein PHP5 PTS-Patch jetzt Einzug in die offiziellen PHP-Pakete gehalten hat, wurden alle PHP5 Pakete aus dem invis-Buildservice-Repo entfernt und statt dessen das PHP5:Server Repo hinzugefügt.
+- Quota-Vorgabe fuer IMAP-Postfaecher unter Cyrus auf 6GB vergroessert.
+- sine an LX-ERP 2.6.2 angepasst.
+- Die Passwortlaufzeit kann jetzt in der Konfiguration des Portals ueber die Variable $USER_PW_EXPIRE fest vorgegeben werden.
+- Das Paket libpng12-0 wird zusaetzlich zur aktuellen Version libpng14-0 installiert.
+
+invis6.8-R6
+- Faxgate/Capisuite Installation voruebergehend deaktiviert
+- z-push Installation ueberarbeitet, z-push wird jetzt in einem eigenen VHost ausgefuehrt.
+- Die alten smart-Repositories wurden entfernt
+- Fehler mit dem Mailkonto "junk" behoben
+- Ein wenig Kosmetik am Script
+
+invis6.8-R5
+- Vollständige Integration von Avira Antivir in Version 3.x
+- Aktualisierung und Anpassung der Amavis-Installation
+- Es wird ein Benutzerkonto "junk" eingerichtet an welches zukünftig alle Spam, BadHeader- und Banned-Mails gesendet werden. Quarantäne nur noch für Virus-Mails.
+- Kleinere Aufräumarbeiten im Setup-Script
+- SUID-Bit für mount.cifs wird nicht mehr gesetzt.
+- Bug Die Rootpartition wird jetzt in /boot/grub/menu.lst wieder automatisch richtig gesetzt, wenn /boot auf einem Software-RAID liegt.
+
+invis6.8-R4
+- In der Datei named.conf wurde die Zeile "allow-query" um die Adresse "::1" erweitert, da sonst keine lokalen DNS-Abfragen mehr möglich sind.
+- Bug "Alle User bekommen UID 0" gefixt. In der Konfigurationsdatei des Portals war eine Testkonfiguration in den Produktivzweig gerutscht.
+- Fehler in der Software-Installation für LX-ERP behoben.
+- Bug "Es koennen mit dem Portal keine Admins angelegt werden" gefixt.
+- Bug "Es koennen mit dem Portal keine Maildummies angelegt werden" gefixt.
+- Bug "Der Kontentyp Gast wird im Portal nicht angezeigt" gefixt.
+
+invis6.8-R3
+- Exit-Code von zypper Aufrufen werden jetzt abgefragt und führen im Fehlerfall zum Abbruch des Script-Laufs. Es wird eine entsprechende Fehlermeldung eingeblendet.
+- Antivir in Version 3 wird jetzt unterstuetzt.
+- Fehler in der DNS-Vorbereitung behoben.
+- Weitere Anpassung an geaenderte Paketnamen vorgenommen.
+
+invis6.8-R2
+- faxgate Repository an 11.3 angepasst.
+- Tippfehler bei den zu installierenden Software-Paketen behoben.
+- phpLDAPAdmin auf Version 1.2.0.5 aktualisiert.
+
+invis6.8-R1
+- An openSUSE 11.3 angepasst
+- Für Linux Clients wird jetzt NFSv4 (noch ohne gssapi) unterstützt. Der NFS-Kernelserver wird vorkonfiguriert, aber nicht gestartet.
+- Windows 7 wird jetzt weitgehend unterstützt - Fragen hierzu sind im Forum erwuenscht.
+- Skeleton-Directory um die Ordner Dokumente, Downloads, Bilder, Musik und Videos erweitert (Hilft bei der Windows7 Unterstützung)
+- Das diskchecker-Script bezieht jetzt auch die email-Adresse des Administrators aus der invis-Konfigurationsdatei.
+- Das invis LDAP-Schema ist für den kommenden IMAP-Client "mmail" um Attribute erweitert worden.
+
+invis6.7-R10
+- Kleine Veränderung an den Dokuwiki ACLs
+- Die Linkseite des Portals kann jetzt auch auf Https-Seiten mit beliebigen Ports verlinken.
+- In der Datei /etc/apache2/vhosts.d/i7ssl.conf wird jetzt auch lokale Name des Servers korrekt gesetzt.
+- Einige Tippfehler im Script behoben.
+- Weitere Probleme mit der Software-Installation und zypper beseitigt.
+
+invis6.7-R9
+- Kleinen Fehler in der Dokuwiki LDAP-Konfiguration behoben. Es musste im Gruppen Suchfilter "posixGroup" und nicht "posixAccount" heissen.
+- zypper-Kommandozeilen um eine weiteres -n Erweitert: zypper -n install -n. Damit  ist zypper nicht case-sensitive.
+- Aufgrund von Widersprüchlichkeiten zwischen von Group-e gesetzten ACLs und dem SGIT-Bit auf den Samba-Freigaben wurden allgemeine Arbeitsfreigabe "Aktuell" und Projektfreigabe "Projekte" auf zwei Samba-Freigaben aufgeteilt.
+- Group-e und LX-Office werden jetzt auf Wunsch automatisch heruntergeladen.
+- Group-e Installation an Version 1.720RC3 angepasst.
+- z-push (Microsoft ActiveSync) Erweiterung für Group-e ins Setup-Script integriert.
+- OpenVPN Server- und Client-konfiguration überarbeitet.
+- ACLs für Dokuwiki vorgefertigt.
+
+invis6.7-R8
+- In Vorbereitung auf amavisd-new 2.6.4 haben wir schon eine angepasste amavisd.conf unter cfiles/mailserver/amavis/amavisd/amavisd-new_2.6.4 abgelegt. Liesmich-Datei beachten.
+- Cyrus und Ntop-Admin Passwörter werden jetzt im Questmodul abgefragt und unterbrechen damit später den Scriptlauf nicht mehr.
+- Ein paar Tippfehler "2>&1" statt "2>$1" behoben
+- Paketnamen angepasst, damit der zypper nicht mehr über Groß- und Kleinschreibung stolpert.
+- Tipp-Fehler im Modul openVPN behoben. Jetzt wird in der Serverkonfiguration die lokale Domain richtig gesetzt.
+
+invis6.7-R7
+- Im Quest-Modul eingegebene Daten werden jetzt auch dann wieder richtig übernommen, wenn sie Leerzeichen enthalten.
+- Für die SSL-Daten wird jetzt auch der Name des Administrators abgefragt.
+- openVPN-Setup funktioniert wieder
+- lxerp-Paket wird jetzt wieder korrekt installiert. 
+- Alle smbldap-passwd Aufrufe sind jetzt gegen Fehleingaben gesichert. Fehleingaben erzwingen jetzt eine Wiederholung der Passwortabfrage.
+
+invis6.7-R6
+- Dokuwiki an LDAP-Benutzerverwaltung angeschlossen und vorkonfiguriert.
+- Die Status-Seite des invis Portals wurde leicht überarbeitet, vor allem um die Datensicherung besser zu überwachen.
+- fetchmail-Daemon wird jetzt wieder ins Runlevel-Konzept einbezogen. (Sorry)
+- Der Ping-Test im Portal ist jetzt über eine Checkbox schaltbar. In der Voreinstellung ist er abgeschaltet, da er je nach Anzahl der Hosts in einem Netz zu viel Traffic erzeugt.
+- Die Host-Liste im Portal zeigt jetzt nur noch max 10 Einträge pro Seite an.
+- Im Header des Portals wird jetzt immer der jeweilige Servername eingeblendet. Ist ganz praktisch, wenn man als Admin an mehreren invis-Servern gleichzeitig arbeitet.
+- Der Footer des Portals ist jetzt in /srv/www/htdocs/portal/config.php frei konfigurierbar.
+- Ab sofort wird der amavisd-Daemon regelmäßig geprüft (amacheck). Es hat sich gezeigt, dass der Daemon nach einem Server-Absturz nicht mehr startet, wenn ein verwaistes PID-File vorhanden ist.
+- Die dialog-Masken für den DDNS-Namen des Webservers und die SMTP-Relay Zugangsdaten können jetzt mit "cancel" abgebrochen werden.
+
+invis6.7-R5
+- Der SSL Apache2-VHost hat jetzt eigene Log-Dateien.
+- Der Hostname des SSL-VHosts wird jetzt korrekt gesetzt.
+- Im Script wurde das Verzeichnis für die Freigabe "Projekte" noch unter dem Namen "aktuell" angelegt, dies passte nicht mehr zur bereits geänderten smb.shares.conf.
+- Bootmenü angepasst.
+- Tippfehler im Script "createhome" behoben. Downloadverzeichnisse für Benutzer werden jetzt angelegt.
+- Fehlerhafte Konstruktion der SambaSID beim Anlegen neuer Gruppen durch das Portal gefixt.
+- Fehler in der DNS-Zone für das lokale Netz behoben. "ns" ist jetzt kein CNAME mehr sondern ein A-Record.
+- Putty wird jetzt auf dem Webserver zum Download vorgehalten.
+- Name Service Cache Daemon (nscd) wird jetzt eliminiert. Das Ding macht nur Ärger!
+- diskchecker an neue smartctl-Version angepasst.
+
+invis6.7-R4
+- Syntax-Fehler im Portal gefixt.
+- Umstellung der Ein- und Ausgaben des Scripts auf "dialog/ncurses".
+- Jetzt werden auch die notwendigen Software-Patterns wie file_server, mail_server usw. vom Script installiert.
+- Samba-Freigabe "Aktuell" wieder in "Projekte" umbenannt. Dies dient der besseren Zusammenarbeit mit dem Group-e Projektmanagement.
+- Tippfehler bei der umask-Vorgabe im Portal gefixt.
+- fcinst so geändert, dass es ALLE Spirenzchen in den Pfaden zu den AVM-Treibern auf der Foehr-IT Downloadseite ausbügelt.
+- Es wird eine gepatchte PHP5-Version installiert, die Pseudoterminals (PTY) unterstützt, dies ermöglicht die Verwendung von smbclient für den Samba-Dateimanager in Group-e.
+- Diverse kleine Änderungen die den Fluß des Scripts verbessern.
+
+invis6.7-R3
+- Angepasst an openSUSE 11.2
+- WebCDWriter wird jetzt aus dem invis Repository des openSUSE Buildservice installiert.
+- Werden Benutzer über das Portal angelegt, erhalten diese eine vorgegebene umask (002). Diese ist in der Portal-Konfiguration editierbar. Siehe wiki.invis-server.org
+- $PATH Variable in /etc/cron.d/invis.cron gesetzt.
+
+invis6.7-R2
+- A fist full of bugfixes
+- Dokuwiki wird wieder mit monobook-Template installiert.
+
+invis6.7-R1
+- Das inetcheck-Script wird jetzt alle 10 Minuten ausgeführt.
+- Es wird jetzt eine Cronjob-Datei für alle zeitgesteuerten Aufgaben unter /etc/cron.d/invis.cron angelegt.
+- Das Paket cifs-mount wird jetzt auch mitinstalliert.
+- Zentrales Konfigurationsverzeichnis /etc/invis eingeführt.
+- Im Konfigurationsverzeichnis werden die Dateien invis.conf und invis-pws.conf erzeugt.
+- Die Helperscripts der Toolbox beziehen Ihre Konfigurationsdaten so benötigt aus /etc/invis.
+- Das Setup-Script wurde ein wenig gegen Falscheingaben bei Ja/nein Fragen gesichert.
+- Da zukünftig definitiv ein LDAP-Adressbuch eingeführt wird, ist die Vorbereitung desselben nicht mehr optional, sondern wird im Rahmen der LDAP-Einrichtung vorbereitet.
+- Aus der Benutzerdatenbank wird jetzt automatisch ein internes LDAP-Adressbuch erzeugt bzw. rudimentär vorbereitet.
+- Zur Sicherung aller Datenbanken (LDAP, MySQL, PostgreSQL) wurde das Script "alldump" in die Toolbox aufgenommen und während des Setups nach /etc/cron.daily kopiert. Die fertigen Sicherungen werden unter /srv/shares/archiv/datenbanksicherungen abgelegt.
+- Der Zwang während des Setups mindestens einen User anzulegen wurde entfernt.
+- User-Namen müssen jetzt mindestens 3 Zeichen lang sein.
+- Das Tool "addgeg" zur Erweiterung der Gruppen-Objekte um die Group-e Attribute erzeugt jetzt keine Fehler mehr bei sehr langen Gruppen-DNs.
+
+invis6.6-R8
+- Fehler im "inetcheck" Script behoben - jetzt werden DSL-Verbindungen die per DSL-Modem eingerichtet sind, wirklich nach einer DSL-Störung wiederbelebt.
+- Das "afterup" Script wurde so erweitert, dass es auch die SUID-Bits auf mount- & umount.cifs nach einem Update wiederherstellt.
+- Kleinere Veränderungen an der Samba Profiles Freigabe
+- Das Script "fixpearchannel" zur Reparatur fehlerhafter PHP-Pear Channels wurde hinzugefügt und im Script ausgeführt um das PHP-Paket MIME_Type fehlerfrei zu installieren.
+
+invis6.6-R7
+- Das SUID-Bit wird für mount.cifs und umount.cifs jetzt wirklich gesetzt, damit funktioniert dann auch der Samba-Dateimanager in Group-e.
+- Wir haben die Funktion "PC suchen" vorerst wieder aus dem Portal entfernt, da sie fehlerhaft ist und deren Überarbeitung komplexer ist als gedacht.
+- Die LDAP-Klassendefinitionsdatei von Group-e wird jetzt nicht mehr gepatcht, da sie überarbeitet wurde und wie es aussieht keine vorhandenen Werte mehr überschreibt. Muss noch vollends getestet werden.
+- Einen Download-Link für Putty ins Portal integriert. Putty wird jetzt direkt auf dem Webserver vorgehalten.
+- Vorlagen der Samba-Logon-Scripts so erweitert, dass auch die Freigaben "gruppen" und "portal" als Laufwerke gemappt werden.
+- "browseable = no" für die Freigaben "profiles" und "netlogon" in smb.shares.conf gesetzt.
+- Deeplink-Verhinderung jetzt auch für Dokuwiki
+
+invis6.6-R6
+- Das Script "inetcheck" prüft jetzt beim DDNS-Update per dig gegenüber dem zuständigen Nameserver, ob sich die IP seit dem letzten Update geändert hat.
+- Fehler beim Hinzufügen der Faxgate-Printer Freigabe für Samba gefixt.
+- Fehler in CorNAz behoben. Die fetchmailrc Datei wurde nicht immer korrekt erzeugt.
+- Eingegebene Daten-Strings werden jetzt auch dann korrekt in Konfigurationsdateien übernommen, wenn sie Leerzeichen enthalten.
+- Kleine Verbesserung der Scriptstruktur. Der Umgang mit der Kontrolldatei "prepstat" wird jetzt durch eine Funktion geregelt.
+- Das Helferscript "aschenputtel" ist jetzt WIRKLICH nach Installation ausführbar.
+- Script und LDAPClass-Patch an Group-e 1.706 angepasst.
+- ein bisschen Feinschliff am Script.
+
+invis6.6-R5
+- Die Fehler die schon in R2 waren erneut gefixt :-( (ich muss besser aufpassen!)
+
+invis6.6-R4
+- Deeplinks auf Server-Applikationen werden verhindert, wenn via Internet darauf zugegriffen wird.
+- Dokuwiki-Installationsmodul hinzugefügt. Downloads erfolgen automatisch. Das monobook-Template wird mit installiert.
+- Der Webmin-Link auf der Administrationsseite wurde standardmaessig deaktiviert.
+
+invis6.6-R3
+- Das Tool "addgeg" zur Erweiterung der Gruppen-Attribute im LDAP für Group-e wurde hinzugefügt.
+- Neben der geänderten Group-e LDAP Klassendefinitionsdatei liegt auch ein entsprechender Patch bei. Beides ist für Group-e 1.705 gedacht.
+
+invis6.6-R2
+- syslog-ng Konfiguration so geändert, dass cyrus in die Logdateien des Mail-Systems schreibt und die messages in Ruhe lässt.
+- mehrere Loglevel-Varianten für openLDAP (slapd) eingefügt
+- DDNS-Update des DHCP-Servers gegen einen Bind DNS Server mit LDAP Backend wurde endgültig begraben. Es funktioniert nicht!
+- dhcp2ldapd als Alternative zu DDNS-Updates hinzugefügt. (Harmoniert noch nicht vollständig mit dem invis Portal)
+- provisorisches invis Bootsplash-Theme hinzugefügt.
+- Das Script "afterup" der Toolbox hinzugefügt. Es bereinigt evtl. durch Online-Updates entstehende Probleme.
+
+invis6.6-R1
+- Die Software-Installation mit zypper wurde am Beginn des Scripts zusammengefasst. Ausgenommen ist die von optionalen
+  Modulen benötigte Software.
+- CorNAz wurde in die Server-Installation integriert
+- LX-Office 2.6 ist da ;-)
+- Script an Group-e 1.705 angepasst.
+- Workaround für Group-e Samba-Dateimanager hinzugefügt.
+- Generelle Passwortlaufzeit auf 720 Tage erhöht.
+- Mininmale UID, GID und RID auf 3000 gesetzt - besser für Group-e.
+- phpLDAPAdmin 1.2 integriert
+
+invis6.5-R13
+- sambaHomePath und sambaProfilePath werden jetzt vom invis Portal korrekt gesetzt.
+- invis Portal ruft exterene Seiten im Adminbereich jetzt auch mit abweichenden Ports korrekt auf.
+- invis-Setup-Script an Veränderung in der invis Portal Konfiguration angepasst.
+
+invis6.5-R12
+- Firewall-Konfiguration an openVPN angepasst.
+- openVPN-Client-Konfigurationsdatei hinzugefügt.
+- openVPN-Server-Konfiguration optimiert
+
+invis6.5-R11
+- kleinere Verbesserungen am inetcheck Script.
+
+invis6.5-R10
+- Liegt /boot auf einem RAID1 Verbund tauscht das Script die Datei menu.lst des Bootmanagers grub aus. In dieser war bisher ein statischer Pfad zur Root-Partition gesetzt, was unter Umständen ein Starten des Servers
+  verhindert hat. Dieser Pfad wird jetzt automatisch anhand der fstab auf den richtigen Wert gesetzt.
+- Weiterhin wurde die die Boot-Option "resume" mit "noresume" ersetzt - Bei einem Server macht ein Suspend-to-disk keinen Sinn.
+
+invis6.5-R9
+- Zugriffsrechte auf "/etc/cron.hourly/aschenputtel" auf Ausführbar gesetzt.
+- Besitz- und Zugriffsrechte auf "/var/lib/samba/drivers" und Unterverzeichnisse so gestetzt, dass sie der Gruppe "Domain Admins" gehören und diese darin schreiben dürfen.
+- Fehler im Script "diskchecker" behoben - es werden jetzt die korrekten Festplattentemperaturen angezeigt.
+- Fehler im invis Portal behoben. Auch bei Smart-Fehlern einer Festplatte wird deren Temperatur noch angezeigt.
+- Das Script inetcheck so erweitert, dass es dynamische DNS-Updates (ddns-sec) durchführen kann. (Beachten Sie die Liesmich-Datei des Setup-Scripts).
+
+invis6.5-R8a
+- Jetzt funktioniert die automatische Portal-Konfiguration. Zwei kleine Tippfehler im Script behoben. Ich sollte auf korrekte Groß- und Kleinschreibung achten.
+
+invis6.5-R8
+- Da sich in aktuellen Samba Versionen (vermutlich ab 3.3 die Voreinstellung der Option "ldap ssl" auf "start tls" geändert hat, funktionierte die 
+  User-Anmeldung unter Windows nicht mehr. Da die LDAP-Zugriffe nur via localhost erfolgen, wurde der Wert auf "Off" geändert.
+- Durch einen Fehler im Script, wurde der Wert "FW_MASQ_NETS" in der Firewall-Konfiguration nicht korrekt geschrieben.
+- Ebenfalls durch Fehler im Script wurde die Konfigurationsdate des invis-Portals nicht korrekt geschrieben.
+- Es wurde ein Patch zum Ersatz der fehlenden php5-mhash Bibliothek in Group-e eingefügt.
+- Tippfehler im Script fcinst beseitigt.
+- Am Anfang des Scripts wurde die Zeile "zypper dup" hinzugefügt um auch die LDAP-unterstützenden "bind" Pakete aus dem invis-Server Repository zu installieren.
+
+invis6.5-R7
+- Konfigurationsdatei für Apache SSL-VHost (i7ssl.conf) erweitert. Alias Einträge funktionieren jetzt auch via Internet.
+- Logischen Fehler im Modul "check" behoben. Wenn das Script im Modul abgebrochen wird, wird check jetzt beim Neustart erneut abgearbeitet.
+- Fehlendes Paket smpppd wird installiert.
+- Das Script freeports deutlich beschleunigt.
+- In der Toolbox befinden sich jetzt kleine Scripts (webserverkeys und mailserverkeys) zum erneuern der Web- und Mailserver Schlüssel.
+  Diese werden nach /usr/local/sbin kopiert.
+
+invis6.5-R6
+- SSH und HTTPS Port werden per Zufallsgenerator aus freien Bereichen der /etc/services bestimmt.
+- Für diesen Zweck ist das Script "freeports" in die Toolbox gewandert.
+- Das invis-Portal kann jetzt auch Backups überwachen und daran erinnern.
+- Weiterhin scannt es jetzt nach ip-Geräten, die eine dynamische IP vom DHCP-Server erhalten haben.
+- Kosmetik am invis-Portal
+- Fehler in der invis-Portal LDIF-Datei wurden behoben.
+- Kleinere Fehler im Setup-Script behoben. (Es wurden fehlerhafte Konfigurationen in der Webserver und Portalkonfiguration eingetragen).
+
+invis6.5-R5
+- Faxgate für Single- oder Multi-User-Betrieb vorbereiten.
+- openVPN Konfiguration inkl. easy-RSA integriert.
+- quest Bereich für Vorkonfiguration der openSSL-Installation erweitert.
+- openSSL wird jetzt individuell vorkonfiguriert.
+- neues invis-Portal integriert.
+- neue Scripts in die Werkzeugkiste gepackt.
+- printer admin in smb.conf wieder aktiviert.
+

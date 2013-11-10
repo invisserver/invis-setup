@@ -1,0 +1,7 @@
+# cronjobs for clamscan
+# scan the samba profiles
+0 0 * * * root /usr/bin/clamscan -r -i --log=/var/log/clamscan --move=/var/spool/infected /var/lib/samba/profiles/
+# scan the fileserver directorys
+30 1 * * * root /usr/bin/clamscan -r -i --log=/var/log/clamscan --move=/var/spool/infected /srv/shares/
+# scan the home directorys
+0 3 * * * root /usr/bin/clamscan -r -i --log=/var/log/clamscan --move=/var/spool/infected /home/

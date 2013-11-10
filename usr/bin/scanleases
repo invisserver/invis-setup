@@ -1,0 +1,62 @@
+#!/bin/bash
+# Script zur Infosammlung zu dynamischen DHCP Leases
+# (c) 2011 -- Stefan Schäfer -- invis-server.org
+# Version 1.1
+# License: GPLv3
+
+# Bildschirm putzen
+clear
+
+# Ergebnisverzeichnis
+resultdir="/var/spool/results/dhcpscan"
+resultfile="leases-scan.txt"
+
+# Verzeichnis anlegen, wenn nicht vorhanden
+if [[ ! -d $resultdir ]];then
+    mkdir -p $resultdir
+fi
+
+# Leases Datei auswerten
+leasefile="/var/lib/dhcp/db/dhcpd.leases"
+leaseips=(`cat $leasefile | grep lease|cut -d " " -f2|sort  -u|grep -v [A-Z,a-z]`)
+
+# Neue Ergebnisdatei erstellen
+datum=`date "+%d.%B.%Y %H:%M Uhr"`
+echo "Testlauf vom $datum" > $resultdir/$resultfile
+
+# Ausgabe
+echo -e "Alle dynamischen DHCP-Leases werden jetzt überprüft."
+echo -e "\nDas dauert eine Weile\t\c"
+
+# Ergebnisse testen und in Ergebnis-Datei eintragen
+for ip in ${leaseips[*]}; do
+    echo -e ".\c"
+    arpingresult=`arping -c1 -I eth1 $ip|grep Unicast|cut -d " " -f4-5`
+    portscanresult=`nmap $ip`
+    line=`cat $leasefile| grep -n $ip| cut -d ":" -f1`
+    line=`echo $line|cut -d " " -f1`
+    closinglines=(`grep -n "}" $leasefile|cut -d ":" -f1`)
+    echo -e "\n------------------------------------------------------------------------------------\n" >> $resultdir/$resultfile
+    if [[ -n `echo $portscanresult|grep "Nmap scan report"` ]]; then
+	echo "Host: $arpingresult" >> $resultdir/$resultfile
+	echo -e "$portscanresult" >> $resultdir/$resultfile
+	for endline in ${closinglines[*]}; do
+	    if (( $endline > $line )); then
+		#echo "$line,$endline"
+		hostname=`sed -n "$line","$endline"p $leasefile|grep "client-hostname"|cut -d "\"" -f2`
+	if [[ -n $hostname ]]; then
+		    echo -e "\nDer Host gibt sich selbst mit den Namen \"$hostname\" zu erkennen."  >> $resultdir/$resultfile
+		fi
+		break
+	    fi
+	done
+    else
+	echo "Der Host $ip antwortet nicht" >> $resultdir/$resultfile
+	(( line= $line + 1 ))
+	americandate=`sed -n "$line"p /var/lib/dhcp/db/dhcpd.leases|tr -s " "|cut -d " " -f4`
+	inactdate=`date --date=$americandate +%d.%B.%Y`
+	echo -e " Die DHCP-Lease dieses Hosts wurde zuletzt am $inactdate aktualisiert." >> $resultdir/$resultfile
+    fi
+done
+# ende
+echo -e "\nDie Ergebnisse des Scans wurden in die Datei \"$resultdir/$resultfile\" geschrieben."

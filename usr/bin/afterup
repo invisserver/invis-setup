@@ -1,0 +1,53 @@
+#!/bin/bash
+# Kleines Script welches potentielle Probleme nach einem Update behebt.
+# (C) 2009,2011,2012 Stefan Schaefer -- invis-server.org
+# Questions: stefan@invis-server.org
+# License: GPLv3
+# V 1.2
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+# Samba Updates verändern die Rechte an Verzeichnissen unter /var/lib/samba
+chown -R ."Domain Admins" /var/lib/samba/drivers
+chown -R ."Domain Users" /var/lib/samba/profiles
+chmod 1777 /var/lib/samba/profiles
+
+if [[ -f /sbin/mount.cifs ]]; then
+    chmod u+s /sbin/mount.cifs
+    #chmod u+s /sbin/umount.cifs
+fi
+
+# Link zur Zarafa-Client-Library erneuern
+if [[ -d /etc/zarafa ]]; then
+    fixzarafaclientlib
+fi
+
+# fetchmail Updates verändern das init-Script des fetchmail Daemons
+path="/etc/init.d"
+file="fetchmail"
+strings="/etc/fetchmailrc%/var/cornaz/inuse/.fetchmailrc"
+changevalues $path $file $strings
+
+strings="/etc/sysconfig/fetchmail%/var/cornaz/sysconfig/fetchmail"
+changevalues $path $file $strings
+
+chmod a+x $path/$file
+
+# Fuer den Fall eines Kernel-Updates wird die Grub Konfigurationsdatei wieder
+# hergestellt
+mv /boot/grub/menu.lst /boot/grub/menu.lst.afterup
+cp /boot/grub/menu.lst.invis /boot/grub/menu.lst

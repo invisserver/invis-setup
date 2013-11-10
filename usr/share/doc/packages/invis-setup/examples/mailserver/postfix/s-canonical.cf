@@ -1,0 +1,8 @@
+server_host = ldap://localhost:389
+search_base = ou=Users,ou=Benutzerverwaltung,dc=i5-net,dc=loc
+version = 3
+bind = yes
+bind_dn = uid=admin,ou=Benutzerverwaltung,dc=i5-net,dc=loc
+bind_pw = admin-secret
+query_filter = (fspLocalMailAddress=%u@%d)
+result_attribute = fspMainMailAddress

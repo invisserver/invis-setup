@@ -1,0 +1,78 @@
+#!/bin/bash
+# Script zum Anlegen von MySQL-Datenbanken
+# Das Script gibt lediglich das fuer den Datenbank-Benutzer erzeugte Passwort zurueck
+# Version: 0.1
+# (C) 2010 invis-server.org
+# Author: Stefan Schaefer <stefan@invis-server.org>
+# Questions: http://forum.invis-server.org
+# License: GPLv3
+
+# Globale Einstellungen
+confdir="/etc/invis"
+invisconfig="$confdir/invis.conf"
+passfile="$confdir/invis-pws.conf"
+
+usage() {
+    echo -e "Übergeben Sie diesem Script einen Namen für Datenbank, den Benutzernamen des Besitzers\nund den Umfang an Rechten, die er an der Datenbank haben soll an.";
+    echo -e "a = Alle Rechte, r = Reduzierte Rechte"
+    echo -e "Reduzierte Rechte:\"SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER\""
+    echo -e "Beispiel: \$> mkdbsilent drupaldb web7 a"
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+getconfvalue() {
+    cat $invisconfig | grep "$1:" | cut -d ":" -f 2
+}
+
+getpass() {
+    cat $passfile | grep "$1:" | cut -d ":" -f 2
+}
+
+# Alle Angaben korrekt?
+if [[ -z $1 || -z $2 || -z $3 ]]; then
+    usage
+    exit
+else
+    database=$1
+    dbowner=$2
+    privs=$3
+fi
+
+
+## MySQL
+# root PW einlesen
+mysqlrootpw=$(getpass "MySQLroot")
+loginstring="-u root --password=$mysqlrootpw"
+
+# Testen, ob die Datenbank bereits existiert, wenn nicht -> dann anlegen.
+if [[ -n $(mysqlshow  $loginstring | grep $database) ]]; then
+    #echo -e "Die Datenbank \"$database\" existiert bereits"
+    exit 5
+else
+    # Testen, ob der Benutzer bereits existiert
+    dboexist=$(echo "SELECT User, Host, Password FROM mysql.user"|mysql $loginstring|tr "\t" " "|tr -s " "|cut -d " " -f 1| grep ^$dbowner\$)
+
+    # Datenbank anlegen
+    echo "create database $database" | mysql --batch $loginstring
+    
+    # Benutzerrechte vergeben
+    if [[ $privs == "a" ]];then
+	echo "grant all privileges on $database.* to $dbowner@localhost"| mysql --batch $loginstring
+    else
+	echo "grant select, insert, update, delete, create, drop, index, alter on $database.* to $dbowner@localhost"| mysql --batch $loginstring
+    fi
+    
+    # Passwort vergeben
+    if [[ -z $dboexist ]]; then
+        dbpass=$(pwgen -cn 8 1)
+        echo "set password for $dbowner@localhost = password('$dbpass')"|mysql --batch $loginstring
+	#echo -e "Da der Benutzer \"$dbowner\" noch nicht existierte, wurde für ihn das Passwort \"$dbpass\" vergeben.\nNotieren Sie sich Benutzernamen, Datenbanknamen und Passwort, sie werden diese Daten\nfür die Einrichtung von Datenbankapplikationen dieses Kunden benötigen.\nBenutzername und Passwort gelten für alle Datenbanken dieses Benutzers."
+	echo $dbpass
+    fi
+fi

@@ -1,0 +1,10 @@
+    # Papierkorb
+	vfs object = /usr/lib/samba/recycle.so
+	vfs object = recycle:repository=.recycle
+	    recycle:versions=True
+	    recycle:touch=True
+	    recycle:keeptree=True
+	    recycle:exclude=*.tmp|*.TMP|*.temp|*.TEMP|*.o|*.obj|~$*
+	    recycle:exclude_dir=/tmp|/temp|/cache
+
+	

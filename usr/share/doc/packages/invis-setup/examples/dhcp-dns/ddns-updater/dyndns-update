@@ -1,0 +1,11 @@
+#!/bin/bash
+# DNS Auto-Updater
+# Sicherheitshalber erst mal den NS pingen
+ping -c 3 ns.nameserver.de
+# jetzt updaten
+(
+    echo "server ns.nemeserver.de"
+    echo "update delete host.ihredomain.de A"
+    echo "update add host.ihredomain.de 60 A $1"
+    echo "send"
+) | nsupdate -k /etc/ppp/Khost.ihredomain.de.+157+00000.private

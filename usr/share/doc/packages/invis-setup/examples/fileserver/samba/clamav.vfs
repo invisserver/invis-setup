@@ -1,0 +1,4 @@
+    # Virenscanner
+	vfs object = vscan-clamav
+	vscan-clamav: config-file = /etc/samba/vscan-clamav.conf
+	

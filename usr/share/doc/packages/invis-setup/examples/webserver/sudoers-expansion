@@ -1,0 +1,6 @@
+Cmnd_Alias CREATEHOME  = /usr/local/sbin/createhome
+wwwrun ALL=NOPASSWD:CREATEHOME
+Cmnd_Alias DELETEHOME = /usr/local/sbin/deletehome
+wwwrun ALL=NOPASSWD:DELETEHOME
+Cmnd_Alias CREATEGROUPSHARE = /usr/local/sbin/creategroupshare
+wwwrun ALL=NOPASSWD:CREATEGROUPSHARE

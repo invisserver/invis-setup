@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+# 
+use MIME::Base64;
+
+$usage = "Aufruf:\n".
+    "$0 [<ldif-file>]\n".
+    "  decodiert alle base64-codierten Eintraege in <ldif-file> und\n".
+    "  druckt die Eintraege auf STDOUT.\n";
+
+if ($ARGV[0] =~ m/--?he?l?p?/) {
+    print $usage; exit;
+}
+
+$/="\n\n"; # LDIF Record Separator
+
+my $do_decode = 0;
+while (<>) {
+    s/\n //g;
+    s/([-.\;\w]+:): *(.+)/$1." ".decode_base64($2)/ge;
+    print or die "$0: Fehler: $!\n";
+}
+

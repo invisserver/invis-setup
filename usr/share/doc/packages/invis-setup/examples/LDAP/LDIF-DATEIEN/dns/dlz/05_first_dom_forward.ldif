@@ -1,0 +1,147 @@
+# Vorärts Auflösung der Domain invis-net.loc
+# Drei PCs + Server + Klappkiste
+
+dn: dlzHostName=@,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: @
+
+# SOA-Record
+dn: dlzRecordID=1,dlzHostName=@,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzSOARecord
+dlzRecordID: 1
+dlzHostname: @
+dlzType: soa
+dlzSerial: 2011170742
+dlzRefresh: 3600
+dlzRetry: 1800
+dlzExpire: 604800
+dlzMinimum: 86400
+dlzAdminEmail: root.invis-net.loc.
+dlzPrimaryns: ns.invis-net.loc.
+dlzTTL: 3600
+
+# MX-Record
+dn: dlzRecordID=2,dlzHostName=@,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzMXRecord
+dlzRecordID: 2
+dlzHostname: @
+dlzType: mx
+dlzData: mail
+dlzPreference: 10
+dlzTTL: 3600
+
+# NS-Record
+dn: dlzRecordID=3,dlzHostName=@,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzNSRecord
+dlzRecordID: 3
+dlzHostname: @
+dlzType: ns
+dlzData: ns.invis-net.loc.
+dlzTTL: 3600
+
+# Host Knoten des Servers
+dn: dlzHostName=invis5,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: invis5
+
+# A-Record des Servers
+dn:dlzRecordID=10,dlzHostName=invis5,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzARecord
+dlzRecordID: 10
+dlzHostName: invis5
+dlzType: a
+dlzIPAddr: 192.168.220.10
+dlzTTL: 86400
+
+# A-Record des Servers
+dn:dlzRecordID=11,dlzHostName=invis5,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzCNameRecord
+dlzRecordID: 11
+dlzHostName: invis5
+dlzData: www
+dlzType: cname
+dlzTTL: 86400
+
+# Host Knoten des DNS Servers
+dn: dlzHostName=ns,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: ns
+
+# A-Record des DNS-Servers
+dn:dlzRecordID=15,dlzHostName=ns,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzARecord
+dlzRecordID: 15
+dlzHostName: ns
+dlzType: a
+dlzIPAddr: 192.168.220.10
+dlzTTL: 86400
+
+# Host Knoten des Mail-Servers
+dn: dlzHostName=mail,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: mail
+
+# A-Record des Mail-Servers
+dn:dlzRecordID=20,dlzHostName=mail,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzARecord
+dlzRecordID: 20
+dlzHostName: mail
+dlzType: a
+dlzIPAddr: 192.168.220.10
+dlzTTL: 86400
+
+# Host Knoten PC1
+dn: dlzHostName=pc1,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: pc1
+
+# A-Record PC1
+dn: dlzRecordID=50,dlzHostName=pc1,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzARecord
+dlzRecordID: 50
+dlzHostName: pc1
+dlzType: a
+dlzIPAddr: 192.168.220.120
+dlzTTL: 86400
+
+# Host Knoten PC2
+dn: dlzHostName=pc2,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: pc2
+
+# A-Record PC2
+dn: dlzRecordID=55,dlzHostName=pc2,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzARecord
+dlzRecordID: 55
+dlzHostName: pc2
+dlzType: a
+dlzIPAddr: 192.168.220.121
+dlzTTL: 86400
+
+# Host Knoten PC3
+dn: dlzHostName=pc3,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: pc3
+
+# A-Record PC3
+dn: dlzRecordID=60,dlzHostName=pc3,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzARecord
+dlzRecordID: 60
+dlzHostName: pc3
+dlzType: a
+dlzIPAddr: 192.18.220.122
+dlzTTL: 86400
+
+# Host Knoten Klappkiste
+dn: dlzHostName=klappkiste,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: klappkiste
+
+# A-Record Klappkiste
+dn: dlzRecordID=65,dlzHostName=klappkiste,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzARecord
+dlzRecordID: 65
+dlzHostName: klappkiste
+dlzType: a
+dlzIPAddr: 192.168.220.150
+dlzTTL: 86400

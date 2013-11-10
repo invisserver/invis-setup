@@ -1,0 +1,4 @@
+Alternativ zu OpenVPN im Original unterstützen invis-Server jetzt auch
+den OpenVPN-Manager von openvpn.jowisoftware.de als OpenVPN-Client.
+
+Anbei das Setup, sowie eine Beispielkonfiguration.

@@ -1,0 +1,74 @@
+#!/bin/bash
+# Script zur Erweiterung der posixAccount-Objekte im LDAP-DIT um Zarafa Attribute
+# und Objektklassen
+# (C) 2009,2011 invis-server.org
+# Author: Stefan Schäfer <stefan@invis-server.org>
+# License: GPLv3
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+# Aufrufparameter
+if [[ -n $1 && -n $2 && $2 =~ [0,1] ]]; then
+    uid=$1
+    zsso=$2
+else
+    echo -e "Usage: extzu username sharedstore"
+    echo -e "Für \"sharedstore\" werden nur die Werte 0 oder 1 akzeptiert"
+    exit
+fi
+# echo $uid $zsso
+
+# Basis-Variablen
+basedn=`getconfdata $conffile "baseDN" "2"`
+binddn="uid=admin,$basedn"
+
+bindpw=`getconfdata $passfile "MasterPW" "2"`
+ldaphost=`getconfdata $conffile "ldapHost" "2"`
+
+function lds { 
+    ldapsearch -LLL -x -h $ldaphost -D $binddn -w $bindpw -b $1 $2
+}
+# IFS so aendern, dass die nachfolgende for-Schleife nur noch "newlines" als Listentrenner akzeptiert.
+searchbase="ou=Users,ou=Benutzerverwaltung,$basedn"
+filter="(&(uid=$uid)(objectclass=posixAccount))"
+
+# Ist das Konto bereits fuer Zarafa bekannt
+iszu=`lds $searchbase $filter|grep "zarafaAccount: 1"|cut -d " " -f2`
+echo $iszu
+
+# DN des zu aendernden Benutzerknotens 
+udn="uid=$uid,$searchbase"
+
+# Wenn die Eintraege noch nicht vorhanden sind, jetzt anlegen
+if [[ $iszu == "" ]]; then
+    line1="dn: $udn\n"
+    line2="changetype: modify\n"
+    line3="add: objectclass\n"
+    line4="objectclass: zarafa-User\n"
+    line5="-\n"
+    line6="add: zarafaAccount\n"
+    line7="zarafaAccount: 1\n"
+    line8="\n"
+    line9="add: zarafaAdmin\n"
+    line10="zarafaAdmin: 0\n"
+    line11="\n"
+    line12="add: zarafaSharedStoreOnly\n"
+    line13="zarafaSharedStoreOnly: $zsso\n"
+    line14="\n"
+    echo -e $line1$line2$line3$line4$line5$line6$line7$line8$line9$line10$line11$line12$line13$line14 |ldapmodify -x -h $ldaphost -D $binddn -w $bindpw 
+fi

@@ -1,0 +1,6 @@
+cyrus-sasl-saslauthd
+cyrus-sasl-crammd5
+cyrus-sasl-digestmd5
+cyrus-sasl-ldap-auxprop
+cyrus-sasl-otp
+cyrus-sasl-plain

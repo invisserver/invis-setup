@@ -1,0 +1,161 @@
+## Path:	Network/SOGo
+## Description:	sogod configuration
+## Type:	integer
+## Default:	"1"
+## Config:	sogod
+#
+# The number of processes that should be spawned (Default: 1)
+#
+SOGO_PREFORK="1"
+
+## Type:	string
+## Default:	"sogo"
+## Config:	sogod
+#
+# The name of the account under which SOGo will be running (Default: sogo)
+#
+SOGO_USER="sogo"
+
+## Type:        string
+## Config:      sogod
+## Default:     "/var/run/SOGo"
+#
+# The location of the PID dir for SOGo (Default: /var/run/SOGo)
+#
+SOGO_PIDDIR="/var/run/SOGo"
+
+## Type:	string
+## Default:	"/var/run/SOGo/sogod.pid"
+## Config:	sogod
+#
+# The location of the PID file for SOGo (Default: /var/run/SOGo/sogod.pid)
+#
+SOGO_PIDFILE="/var/run/SOGo/sogod.pid"
+
+## Type:	string
+## Default:	"/var/log/SOGo/sogod.log"
+## Config:	sogod
+#
+# The location of the log file for SOGo (Default: /var/log/SOGo/sogod.log)
+#
+SOGO_LOGFILE="/var/log/SOGo/sogod.log"
+
+## Type:        string(0,1)
+## Default:     1
+## Config:	sogod
+#
+# The SOGo database is on this host? 1=yes, 0=no
+#
+SOGO_DB_RUNNING="1"
+
+## Type:        string(0,1)
+## Default:     1
+## Config:	sogod
+#
+# The IMAP Server is on this host? 1=yes, 0=no
+#
+SOGO_IMAP_RUNNING="1"
+
+## Type:        string(0,1)
+## Default:     1
+## Config:	sogod
+#
+# The SOGo web server is on this host? 1=yes, 0=no
+#
+SOGO_HTTP_RUNNING="1"
+
+## Type:        string(0,1)
+## Default:     1
+## Config:	sogod
+#
+# The SOGo mail server is on this host? 1=yes, 0=no
+#
+SOGO_SMTP_RUNNING="1"
+
+## Type:	string(MySQL,PostgreSQL)
+## Default:	"MySQL"
+## Config:	sogod
+# 
+# Used database. 
+#
+SOGO_USED_DB="MySQL"
+
+## Type:        string(rcmysql,rcpostgresql)
+## Default:     rcmysql
+## ServiceRestart: sogod
+#
+# Init script to control database.
+#
+SOGO_USED_DB_RCSCRIPT="rcmysql"
+
+## Type:	string(Cyrus,Dovecot)
+## Default:	"Cyrus"
+## Config:	sogod
+# 
+# Used IMAP.
+#
+SOGO_USED_IMAP="Dovecot"
+
+## Type:        string(rccyrus,rcdovecot)
+## Default:     rccyrus
+## ServiceRestart: sogod
+#
+# Init script to control IMAP server.
+#
+SOGO_USED_IMAP_RCSCRIPT="rcdovecot"
+
+## Type:        string
+## Default:     rcsaslauthd
+## ServiceRestart: sogod
+#
+# Init script to control SASL auth server.
+#
+SOGO_USED_SASL_RCSCRIPT="rcsaslauthd"
+
+## Type:        string
+## Default:     apache
+## ServiceRestart: sogod
+#
+# Used webserver
+#
+SOGO_USED_HTTP="Apache"
+
+## Type:        string
+## Default:     rcapache2
+## ServiceRestart: sogod
+#
+# Init script to control the webserver
+#
+SOGO_USED_HTTP_RCSCRIPT="rcapache2"
+
+## Type:        string(Postfix,Courier,Sendmail,QMail)
+## Default:     Postfix
+## ServiceRestart: sogod
+#
+# Used mailserver
+#
+SOGO_USED_SMTP="Postfix"
+
+## Type:        string
+## Default:     rcpostfix
+## ServiceRestart: sogod
+#
+# Init script to control the mailserver
+#
+SOGO_USED_SMTP_RCSCRIPT="rcpostfix"
+
+## Type:        string
+## Default:     memcached
+## ServiceRestart: sogod
+#
+# Used cache Daemon.
+#
+SOGO_USED_MEMCACHE="memcached"
+
+## Type:        string
+## Default:     rcmemcached
+## ServiceRestart: sogod
+#
+# Init script to control memcached.
+#
+SOGO_USED_MEMCACHE_RCSCRIPT="rcmemcached"

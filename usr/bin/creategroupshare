@@ -1,0 +1,15 @@
+#!/bin/bash
+# Mini Script zum automatischen Anlegen eines Gruppenverzeichnisses
+# (c) Daniel T. Bender invis-server.org
+# License: GPLv3
+# Questions: daniel@invis-server.org
+
+if [ $# -eq 1 ]; then
+	GRP=$1;
+	DIR=/srv/shares/gruppen/$GRP;
+	mkdir $DIR;
+	chmod g+rwxs,o-rwx $DIR;
+	chgrp $GRP $DIR;
+else
+	echo "Usage: $0 {groupname}";
+fi

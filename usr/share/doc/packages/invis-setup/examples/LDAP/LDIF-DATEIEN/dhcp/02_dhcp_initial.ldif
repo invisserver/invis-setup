@@ -1,0 +1,32 @@
+# DHCP Server Objekt
+# DDNS Update gegen einen Bind Server mit LDAP-Backend funktioniert nicht!
+# Daher wurde das Einbinden der Datei named.keys auskommentiert.
+
+dn: cn=invisfqdn,ou=DHCP-Server,dc=invis-net,dc=loc
+cn: invisfqdn
+objectClass: top
+objectClass: dhcpServer
+dhcpServiceDN: cn=DHCP Config,ou=DHCP-SERVER,dc=invis-net,dc=loc
+
+# Basis Konfiguration
+dn: cn=DHCP Config,ou=DHCP-Server,dc=invis-net,dc=loc
+cn: DHCP Config
+objectClass: top
+objectClass: dhcpService
+objectClass: dhcpOptions
+dhcpPrimaryDN: cn=invisfqdn,ou=DHCP-Server,dc=invis-net,dc=loc
+dhcpStatements: ddns-update-style interim
+dhcpStatements: ignore client-updates
+#dhcpStatements: include "/etc/named.keys"
+dhcpStatements: default-lease-time 86400
+dhcpStatements: max-lease-time 604800
+dhcpStatements: authoritative
+dhcpOption: domain-name "invis-net.loc"
+dhcpOption: domain-name-servers 192.168.220.10
+dhcpOption: broadcast-address 192.168.220.255
+dhcpOption: routers 192.168.220.10
+dhcpOption: netbios-name-servers 192.168.220.10
+dhcpOption: netbios-node-type 8
+dhcpOption: subnet-mask 255.255.255.0
+dhcpOption: smtp-server 192.168.220.10
+dhcpOption: ntp-servers 192.168.220.10

@@ -1,0 +1,53 @@
+## Path:	   Network/Monitors/Ntop
+## Description:	   ntop startup parameters
+## Type:	   string(eth0)
+## Default:	   eth0
+## Config:
+## ServiceRestart: ntop
+#
+# Specifies the network interface used by ntop
+#
+NTOPD_IFACE='eth1'
+
+## Type:	ip
+## Default:	127.0.0.1:3000
+#
+# Supposing to start  ntop  at  the port  3000,
+# the  URL  to  access  is http://hostname:3000/
+#
+# Please note that an HTTP server is NOT needed  in
+# order to use the program in interactive mode.
+#
+NTOPD_PORT="192.168.220.10:3000"
+
+## Type:	integer(0:65535)
+## Default:	
+#
+# define SSL port. Please note, that you have to generate 
+# a certificate to run run ntop with this option.
+# This may be done with the commands:
+# openssl req -new -x509 -sha1 -extensions v3_ca -nodes -days 365 -out cert.pem
+# cat privkey.pem cert.pem > /etc/ntop/ntop-cert.pem
+# /bin/rm -f privkey.pem cert.pem
+#
+# NTOPD_SSL_PORT="3001"
+#
+NTOPD_SSL_PORT="3001"
+
+## Type:	string
+## Default:	"wwwrun"
+#
+# define the user to run ntop. This should not be root!
+#
+NTOP_USER="wwwrun"
+
+## Type: string
+## Default: ""
+## ServiceRestart: ntop
+#
+# Additional arguments when starting ntop with the init script
+# /etc/init.d/ntop or rcntop.
+#
+# See man 8 ntop for all available commandline options.
+#
+NTOP_ARGS=""

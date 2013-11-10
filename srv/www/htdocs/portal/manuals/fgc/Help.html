@@ -1,0 +1,419 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<!--Thanks to Sven Bonaus <bone@boneproduction.de> for the template for this html-document!-->
+<!--This document can be used or modified under any license you like.-->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Anleitung zum Faxgate Client</title>
+<style type="text/css">
+<!--
+body, td, li {font-family: sans-serif; font-size: 12px; color:#000000; background-color: #FFFFFF; }
+a:link { text-decoration:none; font-weight:bold; color:#0000FF; background-color: #FFFFFF; font-size: 12px; font-family: sans-serif; }
+a:visited { text-decoration:none; font-weight:bold; color:#0000FF; background-color: #FFFFFF; font-size: 12px; font-family: sans-serif; }
+a:hover { text-decoration:none; font-weight:bold; color:#0000FF; background-color: #D0D0D0; font-size: 12px; font-family: sans-serif; }
+a:active { text-decoration:none; font-weight:bold; color:#0000FF; background-color: #FFFFFF; font-size: 12px; font-family: sans-serif; }
+p { text-align: left; }
+.headl1 { text-decoration:none; font-weight:bold; font-family: sans-serif; font-size: 24px; }
+.headl2 { text-decoration:none; font-weight:bold; font-family: sans-serif; font-size: 20px; }
+.headl3 { text-decoration:none; font-weight:bold; font-family: sans-serif; font-size: 16px; }
+/* jEditorPane hack to display links without underline */
+.link {text-decoration: none; font-weight: bold; color:#0000FF; background-color: #FFFFFF; font-size: 12px; font-family: sans-serif;  }
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" alink="#0000FF" vlink="#8b008b">
+<table cellpadding="5" cellspacing="0" border="0">
+<tr>
+  <td colspan="3"><a name="content"></a><div class="headl1">Faxgate Client Hilfe</div></td>
+</tr>
+<tr>
+  <td valign="top">&nbsp;</td>
+<td valign="top">
+<table cellpadding="5" cellspacing="0" border="0" >
+  <tr><td valign="top"><div class="headl2">Allgemein</div></td></tr>
+  <tr><td><ul>
+    <li><a href="#allgemein" class="link">Allgemeine Informationen</a></li>
+    <li><a href="#installt" class="link">Druckertreiberinstallation</a></li>
+    <li><a href="#installs" class="link">Softwareinstallation</a></li>
+  </ul></td></tr>
+
+  <tr><td valign="top"><div class="headl2">Hauptfenster</div></td></tr>
+  <tr><td><ul>
+   <li><a href="#toolbar" class="link">Toolbar</a></li>
+   <li><a href="#shortinfo" class="link">Kurzinfo Tab</a></li>
+   <li><a href="#pic_log" class="link">Log Tab</a></li>
+   <li><a href="#log_kontext" class="link">Kontextmen&uuml;</a></li>
+   <li><a href="#sftp_browser" class="link">SFTP Browser</a></li>
+  </ul></td></tr>
+  <tr><td valign="top"><div class="headl2">Datei - Optionen</div></td></tr>
+  <tr><td><ul>
+   <li><a href="#funct_buttons" class="link">Funktion der Buttons</a></li>
+   <li><a href="#opt_general" class="link">Ansicht Allgemein</a></li>
+   <li><a href="#opt_net" class="link">Ansicht Netzwerk</a></li>
+   <li><a href="#opt_helpers" class="link">Ansicht Hilfsprogramme</a></li>
+   <li><a href="#opt_dialogs" class="link">Ansicht Standard Dialoge</a></li>
+   <li><a href="#opt_ext_dialogs" class="link">Ansicht Weitere Dialoge</a></li>
+  </ul></td></tr>
+  <tr><td valign="top"><div class="headl2">Men&uuml;referenz</div></td></tr>
+  <tr><td><ul>
+   <li><a href="#file" class="link">Datei</a></li>
+   <li><a href="#view" class="link">Ansicht</a></li>
+   <li><a href="#net" class="link">Netzwerk</a></li>
+   <li><a href="#help" class="link">Hilfe</a></li>
+  </ul></td></tr>
+
+  <tr><td valign="top"><div class="headl2">Dialogreferenz</div></td></tr>
+  <tr><td><ul>
+   <li><a href="#ask_num" class="link">Nummernabfrage</a></li>
+   <li><a href="#info" class="link">Infodialoge</a></li>
+   <li><a href="#warn" class="link">Fehlermeldungen/Warnungen</a></li>
+   <li><a href="#wav_play" class="link">Wavplayer</a></li>
+   <li><a href="#txt_view" class="link">Textviewer</a></li>
+  </ul></td></tr>
+
+  </table>
+
+  <hr>
+
+  <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><div class="headl2">Allgemein</div></td></tr>
+    <tr><td valign="top"><a name="allgemein"></a><div class="headl3">Allgemeine Informationen</div></td></tr>
+    <tr><td>Der Faxgate Client dient dazu die auf dem Faxserver gespeicherten Faxe und
+    Anrufe herunterzuladen und zu &ouml;ffnen. Au&szlig;erdem wird beim Senden von Faxen, wenn keine Faxnummer im
+    Dokument vorhanden ist, ein Dialog zur Abfrage der Nummer angezeigt. Eingehende Faxe, Anrufe und
+    optional einige andere Statusmeldungen k&ouml;nnen ebenfalls angezeigt werden.<br>
+    S&auml;mtliche Screenshots wurden unter WindowsXP im XP-Design erstellt. Je nach Platform und gew&auml;hltem
+    Look&Feel passt sich die Oberfl&auml;che des Programmes an und unterscheidet sich dann von den Abbildungen
+    in dieser Anleitung.</td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+  </table>
+
+  <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><a name="installt"></a><div class="headl3">Druckertreiberinstallation</div></td></tr>
+    <tr><td>Bei Windows-Clients erhalten beim ersten Zugriff auf den Netzwerkdrucker &quot;Faxgate&quot;
+    automatisch den auf dem Smaba-Server bereitgestellten Treiber. Andere Clients (Linux/MacOSX), mit
+    CUPS-Drucksystem das sich im Poll-Betrieb befindet,
+    erhalten die zum Drucken notwendigen Informationen direkt vom CUPS-Server auf dem Faxserver.</td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+  </table>
+
+  <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><a name="installs"></a><div class="headl3">Softwareinstallation</div></td></tr>
+    <tr><td>Die Software wird im Quelltext, jar-Archiv und als Packet mit Installer angeboten.<ul>
+    <li><b>Quelltext:</b> Vorraussetzung zum Compilieren ist ein JSDK &gt;= 1.4.0, der Borland-JBuilder mit dem das Programm entwickelt wurde
+    ist nicht zum
+    Compilieren notwendig.</li>
+    <li><b>jar-Archiv:</b>  Zum Betrieb des Clients muss eine Javalaufzeitumgebung (JRE) ab Version 1.4.0 installiert sein.
+    Erh&auml;ltlich ist die aktuelle Version unter <a href="http://www.java.com" class="link">http://www.java.com</a>. Ist die JRE
+    korrekt installiert kann der Faxgate Client mit "java -jar FaxgateClient.jar" oder auch per Doppel-/Einzelklick
+    gestartet werden</li>
+    <li><b>Installer:</b> Laden Sie sich im Downloadbereich die f&uuml;r ihre Plattform passende Version herunter. Wenn sich kein
+    JRE &gt;= 1.4.0 auf ihrem System befindet w&auml;hlen Sie bitte die Version mit integrierter VM bzw. installieren Sie vorher ein
+    JRE &gt;= 1.4.0</li>
+    </ul>
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+  </table>
+
+  <hr>
+
+  <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><div class="headl2">Hauptfenster</div></td></tr>
+
+    <tr><td valign="top"><a name="toolbar"></a><div class="headl3">Toolbar</div></td></tr>
+    <tr><td><img src="toolbar.png" width="118" height="27" border="0"></td></tr>
+    <tr><td>Die Toolbar enth&auml;lt folgende Buttons:</td></tr>
+    <tr><td><ul>
+    <li><img src="edit.png" width="16" height="16" align="bottom" border="0">&nbsp;Schaltet das Log Tab w&auml;hrend der Laufzeit des
+    Programms um zwischen sichtbar und unsichtbar und zeigt den aktuellen Status an.</li>
+    <li><img src="folder_inbox.png" width="16" height="16" align="bottom" border="0">&nbsp;&Ouml;ffnet oder schlie&szlig;t die Verbindung zum
+    Empfangen von Nachrichten vom Faxserver und zeigt den Status der Verbindung an.</li>
+    <li><img src="ftp.png" width="16" height="16" align="bottom" border="0">&nbsp;Stellt die SFTP-Verbindung zum Downloaden von
+    Faxen und Anrufen her oder trennt sie und zeigt den Status der Verbindung an.</li>
+    <li><img src="help.png" width="16" height="16" align="bottom" border="0">&nbsp;Ruft diese Hilfe auf.</li>
+    </ul>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+    <tr><td valign="top"><a name="shortinfo"></a><div class="headl3">Kurzinfo Tab</div></td></tr>
+    <tr><td><img src="shortinfo.png" width="558" height="405" border="0"></td></tr>
+    <tr><td>Nach dem ersten Start des Programms wird dieses Tab angezeigt. Darin sind die wichtigsten Schritte
+    zur Inbetriebnahme des Clients zusammengefasst. Wenn sie dieses Tab nicht mehr ben&ouml;tigen, k&ouml;nnen sie es mit
+    einem Klick auf <b>&quot;Ausblenden&quot;</b> dauerhaft ausblenden. Um es erneut anzuzeigen m&uuml;ssen sie unter
+    <a href="#opt_general" class="link">Optionen - Allgemein</a> &quot;Kurzinfo anzeigen&quot; wieder aktivieren und das
+    Programm neustarten. <b>&quot;Hilfe&quot;</b> ruft diesen Hilfetext auf.
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+    <tr><td valign="top"><a name="pic_log"></a><div class="headl3">Log Tab</div></td></tr>
+    <tr><td><img src="log_pic.png" width="558" height="405" border="0"></td></tr>
+    <tr><td>In diesem Tab sehen Sie die seit dem letzten Start des Programmes aufgelaufenen Meldungen.
+    Jede Nachricht die vom/zum Faxserver empfangen/gesendet wurde und aufgetretene Fehler werden
+    protokolliert. Das abgebildete Kontextmen&uuml; bietet verschiedene M&ouml;glichkeiten die Meldungen zu speichern.<br>
+    Das Log Tab l&auml;sst sich mit dem Button&nbsp;<img src="edit.png" width="16" height="16" align="bottom" border="0">&nbsp;in
+    der Toolbar oder dem Eintrag &quot;Log anzeigen&quot; im Men&uuml; &quot;Ansicht&quot; tempor&auml;r ein-/ausschalten. Dauerhaft
+    wirkt sich nur die Einstellung &quot;Log anzeigen&quot; unter <a href="#opt_general" class="link">Optionen - Allgemein</a> aus.
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+    <tr><td valign="top"><a name="log_kontext"></a><div class="headl3">Kontextmen&uuml;</div></td></tr>
+    <tr><td>Das Kontextmen&uuml; biete an dieser Stelle folgende M&ouml;glichkeiten:
+    <ul>
+    <li><b>Kopieren:</b> Mit &quot;Kopieren&quot; wird die aktuelle Auswahl in die Zwischenablage kopiert.
+    Von dort kann der Text in andere Anwendungen eingef&uuml;gt werden</li>
+    <li><b>Alles kopieren:</b> Der komplette Inhalt des Logfensters wird mit &quot;Alles kopieren&quot; ausgew&auml;hlt und in die
+    Zwischenablage kopiert. Von dort kann der Text in andere Anwendungen eingef&uuml;gt werden</li>
+    <li><b>Log Speichern als &quot;FaxgateClient.txt&quot;:</b> Der komplette Inhalt des Logfensters wird hiermit im Profilpfad/Homelaufwerk
+    des Benutzers unter dem der Client gestartet wurde unter dem Namen &quot;FaxgateClient.txt&quot; gespeichert.</li>
+    <li><b>Speicher unter...:</b> Es &ouml;ffnet sich ein Dateiauswahldialog indem Sie eine Datei ausw&auml;hlen oder einen
+    neuen Dateinamen eingeben k&ouml;nnen unter dem der gesamte Inhalt des Logfensters gespeichert werden soll.</li>
+    <li><b>Hilfe:</b> Ruft diese Hilfe auf.</li>
+    </ul>
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+    <tr><td valign="top"><a name="sftp_browser"></a><div class="headl3">SFTP Browser</div></td></tr>
+    <tr><td><img src="sftp_browser.png" width="558" height="405" border="0"></td></tr>
+    <tr><td>    Nach erfolgreichem Login auf dem Server werden die Tabs &quot;Eingang&quot;, &quot;Warteschlange&quot;, &quot;Gesendet&quot;
+    und &quot;Fehlgeschlagen&quot; angezeigt.<ul>
+    <li>Um eine Datei vom Server auf den Arbeitsplatzrechner zu kopieren, muss die Datei markiert und dann auf <b>&quot;Download&quot;</b>
+    geklickt werden. Es muss dann ein Pfad angegeben werden, in den die gew&auml;hlte Datei gespeichert werden soll. Diese Pfadangabe wird
+    f&uuml;r zuk&uuml;nftige Downloads gespeichert.</li>
+    <li>Ein <b>Doppelklick</b> auf eine Datei l&auml;dt die Datei in das vorher angegebene Verzeichnis und &ouml;ffnet sie sofort.
+    *.txt und *.la Dateien werden im internen Viewer ge&ouml;ffnet. *.sff Dateien werden im unter
+    <a href="#opt_helpers" class="link">Optionen - Hilfprogramme</a> angegebenen, externen Viewer ge&ouml;ffnet.</li>
+    <li><b>&quot;Neu laden&quot;</b> aktualisiert die Liste, damit neu hinzugekommene Dateien angezeigt werden.</li>
+    <li><b>&quot;L&ouml;schen&quot;</b> entfernt die gew&auml;hlte Datei vom Server.</li>
+    </ul>
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+  </table>
+
+  <hr>
+
+  <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><div class="headl2">Datei - Optionen</div></td></tr>
+    <tr><td valign="top"><a name="funct_buttons"></a><div class="headl3">Funktion der Buttons</div></td></tr>
+    <tr><td><img src="opt_buttons.png" width="398" height="141" border="1"></td></tr>
+    <tr><td>Mit Ausnahme des Buttons &quot;Alles als Systemvorgabe speichern&quot; sind alle Buttons auf jedem Tab vorhanden.</td></tr>
+    <tr><td><ul>
+    <li><b>OK:</b> Speichert alle vorgenommenen Einstellungen und schlie&szlig;t den Dialog.</li>
+    <li><b>&Uuml;bernehmen:</b> Speichert alle vorgenommenen Einstellungen, Dialog bleibt ge&ouml;ffnet.</li>
+    <li><b>Abbrechen:</b> Verwirft alle nicht gespeicherten &Auml;nderungen und schlie&szlig;t den Dialog.</li>
+    <li><b>Letzte Einstellung:</b> Setzt die Einstellungen auf dem jeweiligen Tab auf die zuletzt gespeicherten Werte zur&uuml;ck.</li>
+    <li><b>Standard Einstellung:</b> Setzt die Einstellungen auf dem jeweiligen Tab auf die Systemvorgaben zur&uuml;ck.</li>
+    <li><b>Hilfe:</b> Ruft diese Hilfe auf (Kontextsensitiv).</li>
+    <li><b>Alles als Systemvorgabe speichern:</b> Speichert s&auml;mtliche Einstellungen als Vorgabe f&uuml;r alle Benutzer im System.
+    </li></ul></td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+   </table>
+
+   <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><a name="opt_general"></a><div class="headl3">Ansicht Allgemein</div></td></tr>
+    <tr><td><img src="opt_general.png" width="508" height="434" border="0"></td></tr>
+    <tr><td>Hier k&ouml;nnen folgende Einstellungen vorgenommen werden:
+    <tr><td>
+    <ul>
+    <li><b>Aussehen der Programmoberfl&auml;che:</b> Hier kann das Design s&auml;mtlicher Komponenten des Programms umgeschaltet werden.</li>
+    <li><b>Log anzeigen:</b> Log Tab ist bei jedem Programmstart sichtbar, aktueller Status bleibt unver&auml;ndert.</li>
+    <li><b>Toolbar anzeigen:</b> Toolbar ist bei jedem Programmstart sichtbar, aktueller Status bleibt unver&auml;ndert.</li>
+    <li><b>Kurzinfo anzeigen:</b> Kurzinfo Tab ist bei jedem Programmstart sichtbar, aktueller Status bleibt unver&auml;ndert.</li>
+    </ul>
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+   </table>
+
+   <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><a name="opt_net"></a><div class="headl3">Ansicht Netzwerk</div></td></tr>
+    <tr><td><img src="opt_net.png" width="508" height="434" border="0"></td></tr>
+    <tr><td>Hier k&ouml;nnen folgende Einstellungen vorgenommen werden:
+    <tr><td>
+    <ul>
+    <li><b>Faxserver-IP/Hostname:</b> Hier die IP oder den Hostnamen des Faxservers eingeben.</li>
+    <li><b>Testen (IP):</b> Testet die Erreichbarkeit des Servers.</li>
+    <li><b>Port:</b> Hier den Port f&uuml;r die Nachrichtenverbindung einstellen.</li>
+    <li><b>Testen (Port):</b> Pr&uuml;fen ob der Port noch frei ist.</li>
+    <li><b>Benachrichtigungsverbindung herstellen:</b> W&auml;hlen ob Port f&uuml;r Nachrichten automatisch beim Programmstart
+    ge&ouml;ffnet werden soll.</li>
+    <li><b>Am Server anmelden:</b>  W&auml;hlen ob SFTP-Verbindung automatisch beim Programmstart hergestellt werden soll.</li>
+    </ul>
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+   </table>
+
+   <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><a name="opt_helpers"></a><div class="headl3">Ansicht Hilfsprogramme</div></td></tr>
+    <tr><td><img src="opt_helpers.png" width="508" height="434" border="0"></td></tr>
+    <tr><td>Hier k&ouml;nnen folgende Einstellungen vorgenommen werden:
+     <ul>
+    <li><b>Faxviewer:</b> Hier Programm angeben das *.sff-Datein anzeigen kann, z.B. IrfanView.</li>
+    <li><b>Parameter:</b> Zus&auml;tzliche Optionen zum Starten des Viewer, selten notwendig.</li>
+    <li><b>Webbrowser:</b> Hier den Browser angeben der zum &Ouml;ffnen der CUPS-Homepage und Produkthomepage benutzt werden soll.</li>
+    <li><b>URL-Parameter:</b> Zus&auml;tzlcihe Option zum Starten des Browsers, selten notwendig.</li>
+    </ul>
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+   </table>
+
+   <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><a name="opt_dialogs"></a><div class="headl3">Ansicht Standard Dialoge</div></td></tr>
+    <tr><td><img src="opt_dialogs.png" width="508" height="434" border="0"></td></tr>
+    <tr><td>Hier k&ouml;nnen folgende Einstellungen vorgenommen werden:
+    <ul>
+    <li><b>Folgende Dialogfenster anzeigen:</b> Schaltet die Anzeige des jeweiligen Meldungstyps vom Server ein. Die Dialoge auf diesem
+    Tab sollten eingeschaltet sein.</li>
+    </ul>
+    </td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+   </table>
+
+   <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><a name="opt_ext_dialogs"></a><div class="headl3">Ansicht Weitere Dialoge</div></td></tr>
+    <tr><td><img src="opt_ext_dialogs.png" width="508" height="434" border="0"></td></tr>
+    <tr><td>Hier k&ouml;nnen folgende Einstellungen vorgenommen werden:
+    <ul>
+    <li><b>Folgende Dialogfenster anzeigen:</b> Schaltet die Anzeige des jeweiligen Meldungstyps vom Server ein. Die Dialoge auf diesem
+    Tab sollten nur eingeschaltet sein wenn detailierte Informationen vom Server gew&uuml;nscht sind.</li>
+    </ul></td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+   </table>
+
+   <hr>
+
+  <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><div class="headl2">Men&uuml;referenz</div></td></tr>
+    <tr><td valign="top"><a name="file"></a><div class="headl3">Datei</div></td></tr>
+    <tr><td>Das Men&uuml; Datei enth&auml;lt folgende Unterpunkte:</td></tr>
+    <tr><td><ul>
+    <li><b>Optionen:</b> &Ouml;ffnet den Dialog zum Einstellen des Programms.</li>
+    <li><b>Beeenden:</b> Schlie&szlig;t das Programm ohne R&uuml;ckfrage.</li>
+    </ul>
+    <tr><td valign="top"><a name="view"></a><div class="headl3">Ansicht</div></td></tr>
+    <tr><td>Das Men&uuml; Ansicht enth&auml;lt folgende Unterpunkte:</td></tr>
+    <tr><td><ul>
+    <li><b>Toobar anzeigen:</b> Schaltet die Toolbar w&auml;hrend der Laufzeit des Programms um zwischen sichtbar oder unsichtbar
+    und zeigt den aktuellen Status an.</li>
+    <li><b>Log anzeigen:</b> Schaltet das Log Tab w&auml;hrend der Laufzeit des Programms um zwischen sichtbar und unsichtbar
+    und zeigt den aktuellen Status an.</li>
+    </ul>
+
+    <tr><td valign="top"><a name="net"></a><div class="headl3">Netzwerk</div></td></tr>
+    <td>Das Men&uuml; Netzwerk enth&auml;lt folgende Unterpunkte:</td></tr>
+    <tr><td><ul>
+    <li><b>Benachrichtigungsverbindung aktiv:</b> &Ouml;ffnet oder schlie&szlig;t die Verbindung zum Empfangen von Nachrichten
+    vom Faxserver und zeigt den Status der Verbindung an.</li>
+    <li><b>Dateiverbindung aktiv:</b> Stellt die SFTP-Verbindung zum Downloaden von Faxen und Anrufen her oder trennt sie und
+    zeigt den Status der Verbindung an.</li>
+    </ul>
+
+    <tr><td valign="top"><a name="help"></a><div class="headl3">Hilfe</div></td></tr>
+    <tr><td>Das Men&uuml; Hilfe enth&auml;lt folgende Unterpunkte:</td></tr>
+    <tr><td><ul>
+    <li><b>Anleitung:</b> Zeigt diese Anleitung an.</li>
+    <li><b>CUPS-Server:</b> Ruft die Startseite des CUPS-Druckservers im Intranet mit dem unter <a href="#opt_helpers" class="link">Optionen -
+    Hilfsprogramme</a> angegebenen Browser auf.</li>
+    <li><b>Produkthomepage:</b> Ruft die Startseite der f&uuml;r dieses Produkt bereitgestellten Website im Internet mit Updates und
+    weiteren Informationen mit dem unter <a href="#opt_helpers" class="link">Optionen - Hilfsprogramme</a> angegebenen Browser auf.</li>
+    <li><a name="help_proginfo"></a><b>Programminfo:</b> Zeigt den nachfolgend dargestellten Dialog mit Informationen zur Programmversion
+    und dem Author an.
+    <p><img src="info_dialog.png" width="309" height="147" vspace="10" border="0"></p></li>
+    </ul></td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+   </table>
+
+  <hr>
+
+  <table cellpadding="5" cellspacing="0" border="0" >
+    <tr><td valign="top"><div class="headl2">Dialogreferenz</div></td></tr>
+    <tr><td valign="top"><a name="ask_num"></a><div class="headl3">Nummernabfrage</div></td></tr>
+    <tr><td><img src="ask_dialog.png" width="352" height="164" border="0"></td></tr>
+    <tr><td>Dieser Dialog erscheint wenn in einem Dokument keine Faxnummer gefunden werden konnte. Es muss dann eine Faxnummer
+    eingegeben werden, wird keine Faxnummer eingegeben muss der Versand des Faxes mit &quot;Abbrechen&quot; abgebrochen werden.
+    Buchstaben und Sonderzeichen werden aus der Eingabe gefiltert. Ein &quot;+&quot; zu Beginn der Eingabe wird zu &quot;00&quot;,
+    Leerzeichen werden entfernt.<br>
+    Wenn das H&auml;kchen bei &quot;Diesen Dialog wieder anzeigen&quot; entfernt wurde, erscheint diese Abfrage nichtmehr. Sie l&auml;sst
+    sich unter <a href="#opt_dialogs" class="link">Optionen - Dialoge</a> wieder einschalten.</td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+    <tr><td valign="top"><a name="info"></a><div class="headl3">Infodialoge</div></td></tr>
+    <tr><td>Die folgenden Infodialoge k&ouml;nnen je nach gew&auml;hlter Konfiguration erscheinen.
+    Wurde bei einem Dialog das H&auml;kchen bei &quot;Diesen Dialog wieder anzeigen&quot; entfernt, erscheint der jeweilige Dialog nichtmehr.
+    Einschalten lassen sich alle Dialoge wieder unter <a href="#opt_dialogs" class="link">Optionen - Dialoge</a>
+    bzw. <a href="#opt_ext_dialogs" class="link">Optionen - Weitere Dialoge</a>.</td></tr>
+    <tr><td><ul>
+    <li><a name="snd"></a>Das Ergebnis des Versuchs ein Fax der Warteschlange hinzuzuf&uuml;gen sieht bei Erfolg wie hier dargestellt
+    aus. Fehler beim Hinzuf&uuml;gen zur Warteschlange werden mit entsprechend anderem Text signalisiert.
+    <p><img src="snd_dialog.png" width="615" height="188" vspace="10" border="0"></p></li>
+    <li><a name="suc"></a>Die Benachrichtigung &uuml;ber das erfolgreiche Versenden eines Faxes kann so aussehen:
+    <p><img src="suc_dialog.png" width="615" height="163" vspace="10" border="0"></p></li>
+    <li><a name="fem"></a>Wird gemeldet das eben ein Fax empfangen wurde, erscheint ein solcher Dialog in dem mit
+    &quot;Fax &ouml;ffnen&quot; das empfangene Fax ge&ouml;ffnet werden kann:
+    <p><img src="fem_dialog.png" width="615" height="171" vspace="10" border="0"></p>
+    </li>
+    <li><a name="vem"></a>Wird gemeldet das eben ein Anruf aufgezeichnet wurde, erscheint ein solcher Dialog in dem mit &quot;Anruf
+    abspielen&quot; der aufgezeichnete Anruf abgespielt werden kann:
+    <p><img src="vem_dialog.png" width="615" height="171" vspace="10" border="0"></p></li>
+    </ul>
+    Weitere Meldungen ohne Screenshot sind:
+    <ul>
+    <li><a name="ini"></a>Information das der Faxserver augenblicklich versucht die Gegenstelle anzuw&auml;hlen.</li>
+    <li><a name="fwa"></a>Information das augenblicklich ein Faxanruf eingeht.</li>
+    <li><a name="fan"></a>Information das eben ein Faxanruf angenommen wurde.</li>
+    <li><a name="ign"></a>Information das ein ankommender Anruf abgewiesen wurde weil die angrufene Nummer nicht f&uuml;r
+    Anrufbeantworter oder Faxbetrieb konfiguriert ist (nur f&uuml;r Faxserveradministrator).</li>
+    <li><a name="vwa"></a>Information das augenblicklich ein Sprachanruf eingeht.</li>
+    <li><a name="van"></a>Information das eben ein Sprachanruf angenommen wurde.</li>
+    </ul></td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+    <tr><td valign="top"><a name="warn"></a><div class="headl3">Fehlermeldungen/Warnungen</div></td></tr>
+    <tr><td>Die folgenden Warnungen k&ouml;nnen je nach gew&auml;hlter Konfiguration erscheinen.
+    Wurde bei einem Dialog das H&auml;kchen bei  Diesen Dialog wieder anzeigen  entfernt, erscheint der jeweilige Dialog nichtmehr.
+    Einschalten lassen sich alle Dialoge wieder unter <a href="#opt_dialogs" class="link">Optionen - Dialoge</a>
+    bzw. <a href="#opt_ext_dialogs" class="link">Optionen - Weitere Dialoge</a>.</td></tr>
+    <tr><td><ul>
+    <li><a name="del"></a>Die Warnung das ein Fax nicht gesendet werden konnte mit Angabe des Zeitpunkts des n&auml;chsten
+    Sendeversuchs erscheint in einem solchen Dialog:<p><img src="del_dialog.png" width="615" height="171" vspace="10" border="0"></p></li>
+    <li><a name="fai"></a>Die Fehlermeldung das ein Fax nicht gesendet werden konnte und der Versandt abgebrochen wurde
+    sieht wie folgt aus:
+    <p><img src="fai_dialog.png" width="615" height="171" vspace="10" border="0"></p></li>
+    <li><a name="res"></a><a name="fbr"></a><a name="vbr"></a>
+    Diese Warnung erscheint beim Abbruch einer Verbindung mit den decodierten CAPI-Meldungen:
+    <p><img src="res_fbr_vbr_dialog.png" width="615" height="205" vspace="10" border="0"></p></li>
+    </ul></td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+    <tr><td valign="top"><a name="wav_play"></a><div class="headl3">Wavplayer</div></td></tr>
+    <tr><td><img src="wav_play.png" width="371" height="169" border="0"></td></tr>
+    <tr><td>Dieser Dialog erscheint kurz nachdem im Dateibrowser auf eine *.la doppelgeklickt wurde. Die la-Datei wird auf dem Server in das
+    Wav-Format konvertiert und in das zuletzt f&uuml;r Downloads mit dem FaxgateClient benutzte Verzeichnis downgeloadet. Nach Abschlu&szlig;
+    des Downloads wird versucht die Datei abzuspielen.<br>
+    Mit <b>&quot;Stop&quot;</b> kann die Wiedergabe jederzeit angehalten werden, mit
+    <b>&quot;Start/Weiter&quot;</b> wird die Wiedergabe am gleichen Punkt wieder fortgesetzt. <b>&quot;Neu Laden/Von vorne&quot;</b>
+    l&auml;dt die Datei neu von der lokalen Festplatte und spielt sie von Beginn an ab.<br>
+    Sollte es nicht m&ouml;glich sein die Datei wiederzugeben wird die Fehlerursache am oberen Rand des Fensters angezeigt.</td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+
+    <tr><td valign="top"><a name="txt_view"></a><div class="headl3">Textviewer</div></td></tr>
+    <tr><td><img src="txt_view.png" width="480" height="211" border="0"></td></tr>
+    <tr><td>Dieser Dialog erscheint kurz nachdem im Dateibrowser auf eine *.txt doppelgeklickt wurde. Die txt-Datei wird in das
+    zuletzt f&uuml;r Downloads mit dem FaxgateClient benutzte Verzeichnis downgeloadet. Nach Abschlu&szlig;
+    des Downloads wird versucht die Datei zu &ouml;ffnen.<br>
+    Die in der Datei enthaltenen Informationen werde decodiert und tabellarisch dargestellt. Mit einem Klick auf <b>&quot;Fax
+    &ouml;ffnen&quot;</b> wird das zur Textdatei geh&ouml;rende Fax vom Server downgeloadet und mit dem unter
+    <a href="#opt_helpers" class="link">Optionen - Hilfprogramme</a> eingestellten Faxiewer ge&ouml;ffnet. Handelt es sich um eine
+    Infodatei f&uuml;r einen Anruf wird die zugeh&ouml;rige Datei mit einem Klick auf <b>&quot;Anruf abspielen&quot;</b> vom Server
+    downgeloadet und im oben beschriebenen <a href="#wav_play" class="link">Wavplayer</a> abgespielt.<br>
+    Sollte es nicht m&ouml;glich sein die Textdatei zu &ouml;ffnen und zu decodieren wird der Viewer wieder geschlossen und im
+    <a href="#pic_log" class="link">Logfenster</a> eine Meldung ausgegegeben.</td></tr>
+    <tr><td><a href="#content" class="link">Inhalt</a></td></tr>
+
+  </table>
+
+  </td>
+  <td valign="top">&nbsp;</td>
+</tr>
+</table>
+</body>
+</html>

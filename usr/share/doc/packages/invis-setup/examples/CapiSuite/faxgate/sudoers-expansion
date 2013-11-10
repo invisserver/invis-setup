@@ -1,0 +1,14 @@
+
+# Host alias specification
+Host_Alias	FAXSERVER=invis5.invis-net.loc, 192.168.220.10, 127.0.0.1, localhost
+
+# User alias specification
+User_Alias	SPOOLSYSTEM=lp
+
+# Cmnd alias specification
+Cmnd_Alias	FAXSENDING=/usr/bin/capisuitefax
+Cmnd_Alias	FAXCHECK=/usr/bin/faxgate.py
+
+# cups can run the scripts as root without password
+SPOOLSYSTEM	FAXSERVER=NOPASSWD:FAXSENDING
+SPOOLSYSTEM	FAXSERVER=NOPASSWD:FAXCHECK 

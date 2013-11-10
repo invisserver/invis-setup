@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Script to scan all Homedirectories and call
+# a script for each user except of info and
+# domadmin.
+# (C) 2008 Stefan Schaefer -- invis-server.org
+# (C) 2012 Ingo Goeppert -- invis-server.org
+# Questions: http://forum.invis-server.org
+# License GPLv3
+
+script="addcn.pl"
+
+for x in /home/*; do 
+    if [[ -d $x ]]; then
+	x=`basename $x`
+	if [[ $x != "domadmin" && $x != "info" && $x != "lost+found" && $x != "junk" ]]; then	
+	    $script $x
+	fi
+    fi
+done

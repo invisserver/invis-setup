@@ -1,0 +1,3127 @@
+#!/bin/bash
+# invis 9.0 Server Setup Script
+# Version R1
+# (c) August 2008 by Stefan Schäfer / FSP Computer & Netzwerke
+# (c) 2009, 2010, 2011, 2012 by Stefan Schäfer / invis-server.org / stefan@invis-server.org
+# License: GPLv3
+# Questions: http://forum.invis-server.org
+# Dieses Script führt alle zur Installation eines invis Servers notwendigen 
+# Konfigurationsschritte aus.
+
+# Wenn nicht bereits geschehen wird ein Setup-Verzeichnis angelegt. Darein
+# wird das Archiv mit den Konfigurationsdateien entpackt und dessen Unterverzeichnis 
+# in /cfiles umbenannt.
+# Wenn alles funktioniert hat, wird im Setup-Verzeichnis eine Kontrolldatei mit dem 
+# Inhalt "check" angelegt. Die Kontrolldatei enthält immer den nächsten auszuführenden
+# Setup-Schritt.
+
+# Setup-Verzeichnis einlesen
+setupdir="/var/lib/sine"
+cfilesdir="/usr/share/doc/packages/invis-setup/examples"
+
+# Setup-Dialog Titel
+dialogtitle="invis Server 9.0 Release 2 Setup"
+dialogshorthelp="Cursor- ([Auf]/[Ab]) und Tabulatortaste zur Navigation, Leertaste zum auswählen und Enter-Taste zum Bestätigen verwenden."
+
+# zentrales invis Konfigurationsverzeichnis anlegen & Konfig-Datei kopieren
+confdir="/etc/invis"
+if [[ ! -d $confdir ]]; then
+    mkdir -p $confdir/templates
+    cp $cfilesdir/invis/invis.conf $confdir
+    chown -R root:root $confdir/invis.conf
+    chmod 0640 $confdir/invis.conf
+
+    cp $cfilesdir/invis/invis-pws.conf $confdir
+    chown root:root $confdir/invis-pws.conf
+    chmod 0600 $confdir/invis-pws.conf
+fi
+
+if [[ -d $cfilesdir ]]; then
+    if [[ ! -f $setupdir/prepstat ]]; then
+	echo "check" > $setupdir/prepstat
+    fi
+else
+	echo "Die Konfigurationsdateien sind nicht vorhanden!"
+	exit
+fi
+
+# Testen, ob es sich um ein 64Bit-System handelt.
+if [[ -d /usr/lib64 ]]; then
+    libdir="/usr/lib64"
+else
+    libdir="/usr/lib"
+fi
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+getconfdata() {
+    cat $setupdir/invis_confdata |grep "$1:" | cut -d ":" -f $2
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+writeprepstat() {
+	read -a prepstat < $setupdir/prepstat
+	if [[ $prepstat != "ready" ]]; then
+		echo "$1" > $setupdir/prepstat
+	fi
+}
+# Strings in Kleinschreibung umwandeln
+tolower() {
+    echo $1 | tr [:upper:] [:lower:]
+}
+
+yesno() {
+    # Argument $1 = Fragetext $2 = Dialogtitel
+    dialog --backtitle "$dialogtitle" --title "$2" --yesno "$1" 0 0
+}
+
+textbox() {
+    # Argument $1 = Ausgabedatei $2 = Dialogtitel $3 = Exit-Label
+    if [[ -z $3 ]]; then
+        dialog --backtitle "$dialogtitle" --title "$2" --textbox "$1" 0 0
+    else
+	dialog --backtitle "$dialogtitle" --title "$2" --exit-label "$3" --textbox "$1" 0 0
+    fi
+}
+
+msgbox() {
+    # Argument $1 = Ausgabedatei $2 = Dialogtitel
+    dialog --backtitle "$dialogtitle" --title "$2" --msgbox "$1" 0 0
+}
+
+pgbox() {
+    dialog --sleep 2 --backtitle "$dialogtitle" --title "$windowtitle" --progressbox  "$pgsubtitle" 25 110
+}
+
+waitbox() {
+    # Fortschrittsbalken
+    i=0
+
+    { while [ $i -lt 50 ]; do
+	(( i=$i+1 ))
+	echo $(( $i * 100 / 50 ))
+	sleep 0.1
+    done } | dialog --backtitle "$dialogtitle" --title "Modul \"$1\" abgeschlossen" --gauge "Sie haben ca. 5 Sekunden Zeit um das Setup-Script mit \"Strg+C\" abzubrechen. Beim nächsten Aufruf wir es mit Modul \"$2\" fortgesetzt." 8 70 0
+}
+
+waitinfobox() {
+    # Fortschrittsbalken
+    i=0
+
+    { while [ $i -lt 70 ]; do
+	(( i=$i+1 ))
+	echo $(( $i * 100 / 70 ))
+	sleep 0.1
+    done } | dialog --backtitle "$dialogtitle" --title "$2" --gauge "$1" 8 70 0
+}
+
+zyppercheck() {
+    # Argument $1 = Exit Corde
+    if (( $1 == 104 )); then
+	textbox "./infofiles/zypper104.txt" "Zypper hat einen Fehler bei der Software-Installation gemeldet"
+	exit 1
+    elif (( $1 != 0 )); then 
+	textbox "./infofiles/zypperunex.txt" "Zypper hat einen Fehler bei der Software-Installation gemeldet"
+	exit 1
+    fi
+}
+
+chkservice() {
+    systemctl --system daemon-reload
+    if [[ -n $2 ]]; then
+	    pgsubtitle="$1-Daemon wird aus der Runlevelkonfiguration entfernt"
+	    if [[ ! -f "/etc/init.d/$1" ]]; then
+		systemctl disable $1.service 2>&1| tee -a sine.log | pgbox
+	    else
+    		chkconfig --del "$1" 2>&1| tee -a sine.log | pgbox
+    	    fi
+	    pgsubtitle="$1-Daemon wird gestoppt"
+    	    service "$1" stop 2>&1| tee -a sine.log | pgbox
+    else
+	if [[ `chkconfig $1|tr -s " "|cut -d " " -f2` != "on" ]];then 
+    	    pgsubtitle="$1-Daemon wird in die Runlevelkonfiguration eingetragen"
+	    if [[ ! -f "/etc/init.d/$1" ]]; then
+		systemctl enable $1.service 2>&1| tee -a sine.log | pgbox
+	    else
+    		chkconfig --add "$1" 2>&1| tee -a sine.log | pgbox
+    	    fi
+	fi
+    	pgsubtitle="$1-Daemon wird neu gestartet"
+    	# Dank des sonderbaren init-Scripts von Avira, laesst sich die Ausgabe nicht mit dialog wiedergeben, daher klassisch.
+    	if [[ $1 != "avguard" ]]; then
+    	    service "$1" restart 2>&1|pgbox
+    	else
+    	    service "$1" restart
+    	fi
+    fi
+}
+
+# Passwoerter sicher aendern
+smbldappw() {
+    exitcode=1
+    clear
+    while [[ $exitcode != 0 ]]; do
+	/usr/sbin/smbldap-passwd $1
+	exitcode=${?}
+    done
+}
+
+# Installationsvoraussetzungen prüfen
+check() {
+    dialog --backtitle "$dialogtitle" --title "Installationvoraussetzungen" --exit-label "Weiter" --textbox "./infofiles/setuprequires.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "Installationvoraussetzungen"  --defaultno --yesno "Sind alle Voraussetungen erfüllt?" 0 0
+    prepok=${?}
+
+    if [[ $prepok == "0" ]]; then
+	windowtitle="Software Installation"
+	msgbox "Es werden neue Software-Repositories hinzugefügt und alle für den invis Server benötigte Software installiert." "Software Installation"
+	cp $cfilesdir/zypper_repos/*.repo /etc/zypp/repos.d/
+	# Schlüssel der neuen Repositories importieren
+	./bin/rpmkeyimporter
+        ## zypper repo-Cache aktualisieren und Update fahren
+        pgsubtitle="Repository-Cache wird aktualisiert"
+        zypper refresh 2>&1| tee -a $setupdir/sine.log | pgbox
+        zyppercheck ${PIPESTATUS[0]}
+        pgsubtitle="Online Update wird durchgeführt" 
+        zypper -n up --type package 2>&1| tee -a $setupdir/sine.log | pgbox
+        zyppercheck ${PIPESTATUS[0]}
+
+#        zypper -n dup --from spins_invis 2>&1 | tee -a $setupdir/sine.log | pgbox
+#        zyppercheck ${PIPESTATUS[0]}
+
+	# Exim wird gegen postfix ausgetauscht
+	pgsubtitle="Der vorinstallierte Exim wird durch postfix ersetzt"
+	zypper -n install -n --force-resolution postfix  2>&1| tee -a $setupdir/sine.log | pgbox 25 110
+	chkservice "postfix"
+	
+	# Patterns
+	pgsubtitle="Software-Gruppen werden installiert" 
+	zypper -n install -t pattern `cat $cfilesdir/zypper-package-lists/invis_schemes` 2>&1 | tee -a $setupdir/sine.log | pgbox
+        zyppercheck ${PIPESTATUS[0]}
+        # Basis Software
+	pgsubtitle="Basis Software wird installiert" 
+	zypper -n install -n `cat $cfilesdir/zypper-package-lists/invis_base` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+        zyppercheck ${PIPESTATUS[0]}
+
+        # Printserver
+	pgsubtitle="Print-Server-Pakete werden installiert" 
+	## force-resolution wieder rausnehmen, wenn dependency bug gefixt ist!
+	zypper -n install -n --force-resolution `cat $cfilesdir/zypper-package-lists/cups` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+        zyppercheck ${PIPESTATUS[0]}
+
+	# Neuere Pakete aus aktuelleren Repos beziehen
+        pgsubtitle="Distributions-Upgrade wird durchgeführt" 
+        zypper -n dup --from spins_invis 2>&1| tee -a $setupdir/sine.log | pgbox
+        zyppercheck ${PIPESTATUS[0]}
+
+	windowtitle="Grundkonfiguration"
+	pgsubtitle="Die Systemuhr wird gestellt und Zeit-Server wird gestartet." 
+	file="config"
+	path="/etc/sysconfig/network"
+	strings="NETCONFIG_DNS_POLICY=\"auto\"%NETCONFIG_DNS_POLICY=\"\""
+	changevalues $path $file "$strings"
+	strings="NETCONFIG_NTP_POLICY=\"auto\"%NETCONFIG_NTP_POLICY=\"\""
+	changevalues $path $file "$strings"
+	cp $cfilesdir/System/sysconfig/network/servers-netconfig /var/run/ntp
+	chkservice "ntp"
+        /sbin/hwclock --systohc
+
+        # cron & at-Daemon in Runlevel integrieren und starten
+	chkservice "cron"
+	chkservice "atd"
+
+        # Grub2-Konfiguration
+        # Eigenes Grub2 Theme installieren
+        tar -xf $cfilesdir/grub/invis8.tar.gz -C /boot/grub2/themes/
+        
+        # Grub2 Konfiguration erstellen
+        mv /etc/default/grub /etc/default/grub.opensuse
+        cp $cfilesdir/grub/grub /etc/default/
+        grub2-mkconfig -o /boot/grub2/grub.cfg  2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+
+	# Modul check beendet
+        writeprepstat "quest"
+	waitbox "check" "quest"
+
+    else
+    	msgbox "Erfüllen Sie zunächst alle Voraussetzungen und starten Sie das Script dann erneut" "Installationsvoraussetzungen"
+	exit
+    fi
+}
+
+# Umgebungsdaten abfragen
+quest() {
+    cd $setupdir
+    clear
+
+    # Trennzeichen für Arrays auf \n (Zeilenumbruch setzen.
+    oldifs=$IFS
+    IFS=$'\n'
+
+    # zentrales invis Konfigurationsverzeichnis anlegen
+    #mkdir -p /etc/invis
+    textbox "./infofiles/setupquestions.txt" "Wir hätten da ein paar Fragen an Sie." "Weiter"
+
+    # Vorgaben ermitteln
+    vhn=`hostname -s`
+    vdomname=`hostname -d`
+    vipaddr=`ifconfig eth1|grep "Bcast:"| cut -d ":" -f 2| cut -d " " -f 1`
+    vlongnmask=`ifconfig eth1|grep "Mask"| cut -d ":" -f 4`
+    country="DE"
+
+#---# openSSL
+    ok=0
+    while (( $ok != "6" ));do
+	dialog --backtitle "$dialogtitle" --title "Fragen zur openSSL Umgebung" --form "$dialogshorthelp\n\n
+Die eingegebenen Daten sollten der Realität entsprechen, da sie beim Bau von SSL-Zertifikaten verwendet werden.
+Vor allem die email-Adresse des für die Zertifikate Verantwortlichen (Feld: Name) muss erreichbar sein.\n\n
+Alle Eingaben werden auf Plausibilität geprüft, fehlerhaft ausgefüllte Felder werden geleert." 26 80 10 \
+	"Staat:" 2 2 "$country" 2 16 2 2\
+	"Bundesland:" 2 24 "$region" 2 38 33 0\
+	"Stadt:" 4 2 "$city" 4 16 55 0\
+	"Organisation:" 6 2 "$organisation" 6 16 55 0\
+	"email:" 8 2 "$admail" 8 16 55 0\
+	"Name:" 10 2 "$admin" 10 16 55 0\
+	2>$0_temp
+	opensslvalues=(`cat "$0_temp"`)
+	# Werte prüfen und zuordnen
+	if (( ${#opensslvalues[0]} == 2 ));then
+	    country="${opensslvalues[0]}"
+	    ok=1
+	fi
+
+	if (( ${#opensslvalues[1]} >= 3 ));then
+	    region="${opensslvalues[1]}"
+	    (( ok=$ok + 1 ))
+	fi
+
+	if (( ${#opensslvalues[2]} >= 3 ));then
+	    city="${opensslvalues[2]}"
+	    (( ok=$ok + 1 ))
+	fi
+
+	if (( ${#opensslvalues[3]} >= 3 ));then
+	    organisation="${opensslvalues[3]}"
+	    (( ok=$ok + 1 ))
+	fi
+	
+	if [[ ${opensslvalues[4]} =~ ^[a-zA-Z0-9-]+([._a-zA-Z0-9.-]+)*@[a-zA-Z0-9.-]+\.([a-zA-Z]{2,4}) ]];then
+	    admail="${opensslvalues[4]}"
+	    (( ok=$ok + 1 ))
+	fi
+
+	if (( ${#opensslvalues[5]} >= 5 ));then
+	    admin="${opensslvalues[5]}"
+	    (( ok=$ok + 1 ))
+	fi
+	
+    done
+
+
+#---# Netzwerk
+    ok=1
+    while (( $ok != "0" ));do
+	dialog --backtitle "$dialogtitle" --title "Fragen zur Netzwerkumgebung" --form "$dialogshorthelp\n\n
+Die Vorgabewerte wurden aus der Systemkonfiguration ermittelt und sollten somit richtig sein. \nPrüfen Sie vor allem,
+ob der angezeigte Domänenname aus Domain und Top-Level-Domain besteht; also zweiteilig ist. Domänennamen wie der bei
+openSUSE vorgegebene \"site\" bereiten im weiteren Verlauf der invis Server Installation Probleme.\nVerwenden Sie 
+keinesfalls eine real existierende Top-Level-Domain wie \".de\" oder \".com\". Statt dessen eigenet sich beispielsweise
+\".loc\" (für local).\n\n 
+Wenn Sie hier Änderungen vornehmen, müssen Sie diese nachträglich in Ihre Systemkonfiguration übernehmen.\n\n
+Achtung: Fehlerhafte Eingaben sind nach der vollständigen Installation nur sehr schwer zu korrigieren." 29 80 5 \
+	"Hostname:" 2 2 "$vhn" 2 13 20 0\
+	"Domain:" 2 35 "$vdomname" 2 43 27 0\
+	"IP (eth1):" 4 2 "$vipaddr" 4 13 20 0\
+	"Netzwerkmaske:" 4 35 "$vlongnmask" 4 50 20 0\
+	2>$0_temp
+	netvalues=(`cat $0_temp`)
+	
+	# Alle Daten ermitteln.
+	hn="${netvalues[0]}"
+	domain="${netvalues[1]}"
+	ipaddr="${netvalues[2]}"
+	longnmask="${netvalues[3]}"
+	shortnmask=`/usr/bin/netcalc $longnmask`
+	netaddr=`ipcalc -bn ${netvalues[2]}/$longnmask | grep "^Network:"|tr -s " "| cut -d " " -f2|cut -d "/" -f1`
+	bcastaddr=`ipcalc -bn ${netvalues[2]}/$longnmask | grep "^Broadcast:"|tr -s " "| cut -d " " -f2`
+	dp1=`echo "$domain" | cut -d "." -f 1`
+	dp2=`echo "$domain" | cut -d "." -f 2`
+	ldapbase="dc=$dp1,dc=$dp2"
+	# Testweise auf volle Domain geaendert -- noch nicht
+        smbdomain=`echo $dp1 | tr [a-z] [A-Z]`
+        #smbdomain=`echo $domain | tr [a-z] [A-Z]`
+        
+        # Umgekehrte Netzwerkadresse bilden
+        i=0
+        while (( $i < 4 )); do
+    	    (( feld=$i + 1 ))
+    	    if [[ `echo "$longnmask" | cut -d "." -f $feld` != "0" ]];then
+		revd[$i]=`echo "$netaddr" | cut -d "." -f $feld`
+	    fi
+	i=$feld
+	done
+	
+	imax=${#revd[*]}
+	i=0
+	while (( $i < $imax )); do
+	    if (( $i == 0));then
+		revnet="${revd[$i]}"
+	    else
+		revnet="${revd[$i]}.$revnet"
+	    fi
+	    (( i=$i + 1 ))
+	done
+	
+	yesno "Prüfen Sie bitte genau ob die folgenden Angaben korrekt sind.\n
+	\nIP-Adresse(eth1):     $ipaddr
+	\nNetzwerkbasis:        $netaddr
+	\nNetzwerkmaske (lang): $longnmask / (kurz): $shortnmask
+	\nBroadcast-Adresse:    $bcastaddr
+	\nFQDN:                 $hn.$domain
+	\nLDAP Base:            $ldapbase
+	\nSamba-Domäne:         $smbdomain
+	\n\nSind alle Angaben korrekt?" "Netzwerkdaten"
+	
+	ok=${?}
+    done
+
+# DNS Forwarder
+    ok=3
+    while (( $ok != "0" ));do
+	dialog --backtitle "$dialogtitle" --title "Forward DNS Server" --form "$dialogshorthelp\n\n
+Auf Ihrem invis Server wird ein DNS-Dienst eingerichtet. Zur Beschleunigung von DNS Anfragen ist es sinnvoll
+diesem bis zu drei \"Forward Nameserver\" zu nennen. Dies können beispielsweise der DNS eines vorgeschalteten
+Routers, DNS Server des Internet Zugangs Providers oder unabhängige DNS-Server im Internet sein.\n\n
+Achtung:
+Prüfen Sie bitte, ob die angegebenen DNS-Server auf Anfragen antworten, da ansonsten sowohl die weitere
+Installation, als auch der Betrieb des invis-Servers beeinträchtigt wird.\n\n
+Geben Sie midestens eine IP-Adresse ein.\n\n" 28 70 7 \
+	"DNS 1:" 2 2 "${fdns[0]}" 2 10 30 0\
+	"DNS 2:" 4 2 "${fdns[1]}" 4 10 30 0\
+	"DNS 3:" 6 2 "${fdns[2]}" 6 10 30 0\
+	2>$0_tmp
+	fdns=(`cat $0_tmp`)
+	
+	if (( ${#fdns[@]} == 0 )); then
+	    continue
+	else
+	    ok=${#fdns[@]}
+	fi
+	i=0
+	# Pruefen ob die eingegebenen Werte korrekte IP-Adressen sind.
+	for dns in ${fdns[@]}; do
+	    if [[ ! $dns =~ ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
+		fdns[$i]=""
+		((ok=$ok - 1))
+	    fi
+	    ((i=$i + 1))
+	done
+	((ok=${#fdns[@]} - $ok))
+    done
+    # Forward-String erzeugen
+    forwarders=`echo ${fdns[@]} | sed s/" "/"; "/g`";"
+    #echo $forwarders
+#---#System Passwörter
+    ok=0
+    while (( $ok != "3" ));do
+	dialog --backtitle "$dialogtitle" --title "LDAP Passworte" --insecure --passwordform "$dialogshorthelp\n\n
+Für den Umgang mit dem zentralen LDAP-Verzeichnis werden drei administrative Benutzerkonten mit unterschiedlichen Berechtigungen
+angelgt. Es ist aus Sicherheitsgründen sinnvoll für alle drei Konten unterschiedliche Passwörter zu vergeben.\n\n
+Die vergebenen Passwörter müssen mindestens 6 Zeichen lang sein." 22 80 6 \
+	"LDAP-Manager:" 2 2 "${ldapsecrets[0]}" 2 30 10 0\
+	"Kontrolle:" 2 44 "${ldapsecrets[1]}" 2 56 10 0\
+	"LDAP-Administrator:" 4 2 "${ldapsecrets[2]}" 4 30 10 0\
+	"Kontrolle:" 4 44 "${ldapsecrets[3]}" 4 56 10 0\
+	"LDAP-Sektionsadministrator:" 6 2 "${ldapsecrets[4]}" 6 30 10 0\
+	"Kontrolle:" 6 44 "${ldapsecrets[5]}" 6 56 10 0\
+	2>$0_temp
+	ldapsecrets=(`cat $0_temp`)
+	i=0
+	while (( $i < 6 ));do
+		if [[ $i =~ [0,2,4] ]];then
+		    (( k=$i + 1 ))
+		    if [[ ${ldapsecrets[$i]} == ${ldapsecrets[$k]} ]] && (( ${#ldapsecrets[$i]} >= 6 ));then
+			(( ok=$ok + 1 ))
+		    else
+			ldapsecrets[$i]=""
+			ldapsecrets[$k]=""
+			ok=0
+		    fi
+		fi
+		(( i= $i + 1 ))
+	done
+    done
+    # LDAP Passwoerter zuordnen
+    manpass="${ldapsecrets[0]}"
+    masterpass="${ldapsecrets[2]}"
+    adminpass="${ldapsecrets[4]}"
+
+    # MySQL root-Passwort 
+    ok=0
+    while (( $ok != "1" ));do
+	dialog --backtitle "$dialogtitle" --title "MySQL-Root Passwort" --insecure --passwordform "$dialogshorthelp\n\n
+Für die Administration des MySQL-Servers muss ein Passwort für den MySQL-Root Zugang gesetzt werden.\n\n
+Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
+	"MySQL-Root-Passwort:" 2 2 "" 2 23 10 0\
+	"Kontrolle:" 2 36 "" 2 47 10 0\
+	2>$0_temp
+	mysqlsecrets=(`cat $0_temp`)
+
+	    if [[ ${mysqlsecrets[0]} == ${mysqlsecrets[1]} ]] && (( ${#mysqlsecrets[0]} >= 6 ));then
+		ok=1
+	    fi
+    done
+    mysqlpw="${mysqlsecrets[0]}"
+
+    # Ntop Admin-Passwort 
+    ok=0
+    while (( $ok != "1" ));do
+	dialog --backtitle "$dialogtitle" --title "ntop-Admin Passwort" --insecure --passwordform "$dialogshorthelp\n\n
+Für die Administration des ntop-Netzwerkanlysators muss ein Passwort für den ntop-Admin Zugang gesetzt werden.\n\n
+Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
+	"ntop-Admin Passwort:" 2 2 "" 2 23 10 0\
+	"Kontrolle:" 2 36 "" 2 47 10 0\
+	2>$0_temp
+	ntopsecrets=(`cat $0_temp`)
+
+	    if [[ ${ntopsecrets[0]} == ${ntopsecrets[1]} ]] && (( ${#ntopsecrets[0]} >= 6 ));then
+		ok=1
+	    fi
+    done
+    ntoppw="${ntopsecrets[0]}"
+
+#---# MAIL & Groupware Server
+    ## Dovecot, Cyrus oder Zarafa?
+    ## Hier wird es zukuenftig lustig:
+    # - Dovecot laesst sich bedingt mit Group-e kombinieren
+    # - Dovecot laesst sich mit der Software "Mailbridge" als IMAP-Cache fuer Zarafa verwenden, wird auf jeden Fall getestet
+    # - Cyrus und Group-e sind ein gutes Team
+    # - Zarafa schließt Cyrus und Group-e aus
+    dialog --backtitle "$dialogtitle" --title "MAIL & Groupware Server" --radiolist "$dialogshorthelp\n\n
+Wählen Sie den von Ihnen bevorzugten IMAP-Server aus. Wenn Sie Group-e verwenden sollten Sie \"cyrus\" auswählen. Zarafa verhindert die Installation
+von Group-e." 16 80 5 \
+	cyrus "Das Monster in Kombination mit Group-e" on\
+	dovecot "Der Schlanke in Kombination mit SOGo" off\
+	zarafa "Mailserver/Groupware Kombination für Outlook-Junkies" off\
+	2>$0_temp
+	whichimap=`cat $0_temp`
+    
+    if [[ $whichimap == "cyrus" ]]; then
+	ok=0
+	while (( $ok != "1" ));do
+	    dialog --backtitle "$dialogtitle" --title "cyrus Admin Passwort" --insecure --passwordform "$dialogshorthelp\n\n
+Für die Administration des IMAP-Servers Cyrus muss ein Passwort für den cyrus-Admin Zugang gesetzt werden.\n\n
+Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
+	    "cyrus Passwort:" 2 2 "" 2 23 10 0\
+	    "Kontrolle:" 2 36 "" 2 47 10 0\
+	    2>$0_temp
+	    cyrussecrets=(`cat $0_temp`)
+
+		if [[ ${cyrussecrets[0]} == ${cyrussecrets[1]} ]] && (( ${#cyrussecrets[0]} >= 6 ));then
+		    ok=1
+		fi
+	done
+	cyruspw="${cyrussecrets[0]}"
+    fi
+
+	#Sernet "Konstante Version (3.5), hart getestet, Long Term Support" off\
+
+
+#---# Samba Pakete
+    # Es kann entschieden werden, welche Samba-Pakete verwendet werden.
+    # Zur Auswahl stehen Pakete des openSUSE-Samba:Stable Repos oder die Pakete von Sernet
+    dialog --backtitle "$dialogtitle" --title "Samba File Server" --radiolist "$dialogshorthelp\n\n
+Wählen Sie die von Ihnen bevorzugten Samba Pakete aus." 14 85 5 \
+	openSUSE-Stable "Immer aktuelle Versionen, kürzere Maintenance." on\
+	Sernet "Samba LTS-Pakete für openSUSE 12.3 von Sernet." off\
+	2>$0_temp
+	whichsamba=`cat $0_temp`
+	whichsamba=`tolower $whichsamba`
+	
+#---# ERP-Software
+    # Es kann zwischen LX-ERP, OpenERP oder keiner ERP-Software entschieden werden
+    dialog --backtitle "$dialogtitle" --title "Enterprise Ressource Planning Software" --radiolist "$dialogshorthelp\n\n
+Wählen Sie die von Ihnen bevorzugte ERP-Software (Warenwirtschaftssystem) aus." 14 85 5 \
+	OpenERP "Modern und Modular" off\
+	LX-ERP "Konzentriert sich auf Handel und Finazbuchhaltung, wenig modular." off\
+	waWision "Moderne ERP Lösung für Handel und Dienstleistung inkl. Webshop-Schnittstelle." on\
+	Keine "Sie verwenden ein eigenes System" off\
+	2>$0_temp
+	whicherp=`cat $0_temp`
+	whicherp=`tolower $whicherp`
+	
+#---# Virenscanner Radiobutton
+    dialog --backtitle "$dialogtitle" --title "Virenscanner" --radiolist "$dialogshorthelp\n\n
+Wählen Sie den von Ihnen bevorzugten Virenscanner aus. Er wird zum regelmäßen Scannen der Filerserver-Freigaben sowie
+aller ein- und ausgehenden emails verwendet.\n\n
+Wenn Sie Antivir von Avira auswählen, wird im weiteren Verlauf der Installation eine kostenfreie Lizenz zur privaten
+Nutzung von Antivir installiert. Bei gewerblicher Nutzung des Servers muss eine entsprechende Lizenz käuflich erworben
+werden.\nClamav hingegen ist zu 100% Open-Source-Software, d.h. dessen Nutzung ist auch im gewerblichen Umfeld kostenfrei." 22 80 8 \
+	clamav "Open-Source Virenscanner" on\
+	antivir "Kommerzieller Virenscanner von Avira" off\
+	2>$0_temp
+	av=`cat $0_temp`
+
+#---# HTTPS    
+    yesno "Soll Ihr invis Server via Internet (HTTPS) erreichbar sein?\n\nVoraussetzung dafür ist ein etwa bei DynDNS.org registrierter Hostname, Zugriff auf einen eigenen DNS Server im Internet oder eine feste IP-Adresse." "HTTPs Zugang"
+    exthttps=${?}
+    
+    if [[ $exthttps == "0" ]]; then
+	ok=0
+	while [[ $ok != "1" ]]; do
+	dialog --backtitle "$dialogtitle" --title "HTTPs Zugang" --inputbox "Geben Sie bitten den vollständigen Namen (FQDN) oder die IP-Adresse ein unter dem/der ihr invis Server erreichbar sein soll." 0 0 \
+	2>$0_temp
+	exitcode=${?}
+	ddnshn=`cat $0_temp`
+	
+	# Doch noch abbrechen
+	if [[ $exitcode == "1" || $exitcode == "255" ]]; then
+	    ddnshn="none"
+	    break
+	fi
+	
+	if [[ $ddnshn =~ ^[a-zA-Z0-9_\-]{1,254}\.[a-zA-Z0-9_\-]{1,254}+\.?[a-zA-Z0-9_\-]{1,254}+\.[a-zA-Z]{1,5}$ || $ddnshn =~ ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]] ;then
+	    ok=1
+	fi
+	done
+    else
+	ddnshn="none"
+    fi
+
+#---#SMTP Daten
+    yesno "Um Emails zuverlässig versenden zu können werden die Zugangsdaten zum SMTP-Server (Server für ausgehende Mails) Ihres Providers benötigt.\n\nSind Ihnen diese Daten bekannt?\n(Wenn nicht, müssen Sie dies zu einem späteren Zeitpunkt von Hand in den Dateien /etc/postfix/main.cf & sasl_passwd eintragen.)" "SMTP Zugangsdaten"
+    bekannt=${?}
+    ok=0
+    if [[ $bekannt == "0" ]]; then
+    while (( $ok != "4" ));do
+	dialog --backtitle "$dialogtitle" --title "SMTP Zugangsdaten" --form "$dialogshorthelp\n\n
+Geben Sie bitte den Hostnamen bzw. die IP-Adresse Ihres SMTP-Relays, sowie den zuhehörigen Benutzernamen und das Passwort ein." 18 74 9 \
+	"Hostname/IP:" 2 2 "$mailserver" 2 20 45 0\
+	"Port [25/587]:" 4 2 "$smtpport" 4 20 45 0\
+	"Benutzername:" 6 2 "$smtpun" 6 20 45 0\
+	"Passwort:" 8 2 "$smtppw" 8 20 45 0\
+	2>$0_temp
+	exitcode=${?}
+	# Doch noch abbrechen
+	if [[ $exitcode == "1" || $exitcode == "255" ]]; then
+	    mailrelay="none"
+	    break
+	fi
+	
+	smtpvalues=(`cat $0_temp`)
+	
+	if [[ ${smtpvalues[0]} =~ ^[a-zA-Z0-9_\-]{1,254}\.[a-zA-Z0-9_\-]{1,254}+\.?[a-zA-Z0-9_\-]{1,254}+\.[a-zA-Z]{1,5}$ || ${smtpvalues[0]} =~ ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]] ;then
+	    mailserver="${smtpvalues[0]}"
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+	
+	if (( ${smtpvalues[1]} == 25 || ${smtpvalues[1]} == 587 ));then
+	    smtpport=${smtpvalues[1]}
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+	
+	if (( ${#smtpvalues[2]} > 2 ));then
+	    smtpun="${smtpvalues[2]}"
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+	
+	if (( ${#smtpvalues[3]} > 2 ));then
+	    smtppw="${smtpvalues[3]}"
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+	done
+
+	if (( $smtpport == 587 )); then
+	    mailrelay="[$mailserver]:$smtpport"
+	else
+	    mailrelay="[$mailserver]"
+	fi
+	
+    else
+	mailrelay="none"
+    fi
+
+#---# CleanTransfer
+    yesno "Auf Ihrem Fileserver wird eine Verzeichnisfreigabe (Transfer) für den allgemeinen Dateiaustausch angelegt.\n\n
+Bekanntermaßen häufen sich dort die Datenmengen schnell an und sind größtenteils unstrukturiert. In der Regel fühlt sich niemand 
+dafür verantwortlich in besagtem Verzeichnis aufzuräumen.\n\n
+Sollen alte Dateien und Verzeichnisse automatisch aus der Transfer-Freigabe gelöscht werden?" "Transferverzeichnis aufräumen"
+    cleantr=${?}
+    
+    if [[ $cleantr == "0" ]]; then
+	dialog --backtitle "$dialogtitle" --title "Transferverzeichnis aufräumen" --radiolist "Wie alt dürfen Dateien und Verzeichnisse in der Transferfreigabe maximal werden?" 12 50 4\
+	"21 Tage" "3 Wochen" on\
+	"62 Tage" "6 Wochen" off\
+	"90 Tage" "3 Monate" off\
+	2>$0_temp
+	trdays=`cat $0_temp|cut -d " " -f1`
+    fi
+
+    yesno "Sollen Cronjobs für regelmäßige Virenscanns der Fileserver-Verzeichnisse eingerichtet werden?" "Regelmäßige Virenscans der Serverfreigaben"
+    avcron=${?}
+
+#---# Ende der Fragestunde
+
+    sshport=`/usr/bin/freeports`
+    httpsport=`/usr/bin/freeports`
+    while [[ $sshport == $httpsport ]]; do
+	httpsport=`/usr/bin/freeports`
+    done
+ 
+    msgbox "Für den externen Zugriff auf Server per SSH oder HTTPS wurden per Zufallsgenerator vom Standard abweichende Ports ermittelt. Dies erhöht die Sicherheit des Servers.\n\n
+Notieren Sie sich bitte die folgenden Ports in Ihrem Protokoll:\n\n
+SSH Port: $sshport\n\n
+HTTPS Port: $httpsport\n\n
+Aus Ihrem lokalen Netz heraus kann für SSH weiter Port 22 verwendet werden." "SSH und HTTPS Port"
+
+    # Alle Daten in Kontrolldatei Schreiben
+    echo "Country:$country" > $setupdir/invis_confdata
+    echo "Region:$region" >> $setupdir/invis_confdata
+    echo "City:$city" >> $setupdir/invis_confdata
+    echo "Organisation:$organisation" >> $setupdir/invis_confdata
+    echo "Admail:$admail" >> $setupdir/invis_confdata
+    echo "Admin:$admin" >> $setupdir/invis_confdata
+
+    echo "Hostname:$hn" >> $setupdir/invis_confdata
+    echo "Domain:$domain" >> $setupdir/invis_confdata
+    echo "FQDN:$hn.$domain" >> $setupdir/invis_confdata
+    echo "baseDN:$ldapbase" >> $setupdir/invis_confdata
+    echo "Workgroup:$smbdomain" >> $setupdir/invis_confdata
+    echo "IP:$ipaddr" >> $setupdir/invis_confdata
+    echo "Networkbase:$netaddr" >> $setupdir/invis_confdata
+    echo "NMask-short:$shortnmask" >> $setupdir/invis_confdata
+    echo "NMask-long:$longnmask" >> $setupdir/invis_confdata
+    echo "Broadcast:$bcastaddr" >> $setupdir/invis_confdata
+    echo "ReverseDom:$revnet" >> $setupdir/invis_confdata
+    echo "Forwarders:$forwarders"  >> $setupdir/invis_confdata
+
+    manpasshash=`/usr/sbin/slappasswd -s $manpass`
+    echo "ManagerPW:$manpass:$manpasshash" >> $setupdir/invis_confdata
+    masterpasshash=`/usr/sbin/slappasswd -s $masterpass`
+    echo "MasterPW:$masterpass:$masterpasshash" >> $setupdir/invis_confdata
+    adminpasshash=`/usr/sbin/slappasswd -s $adminpass`
+    echo "AdminPW:$adminpass:$adminpasshash" >> $setupdir/invis_confdata
+    echo "MySQLpw:$mysqlpw" >> $setupdir/invis_confdata
+    echo "NtopPw:$ntoppw" >> $setupdir/invis_confdata
+    echo "IMAPserver:$whichimap"  >> $setupdir/invis_confdata
+    if [[ $whichimap == "cyrus" ]];then
+	echo "CyrusPw:$cyruspw" >> $setupdir/invis_confdata
+    fi
+    echo "SambaPakete:$whichsamba" >> $setupdir/invis_confdata
+    echo "ERPSoftware:$whicherp" >> $setupdir/invis_confdata
+    echo "SSHPORT:$sshport" >> $setupdir/invis_confdata
+    echo "HTTPSPORT:$httpsport" >> $setupdir/invis_confdata
+    echo "AV:$av" >> $setupdir/invis_confdata
+    if [[ $avcron == "0" ]]; then
+        echo "AVCRON:j" >> $setupdir/invis_confdata
+    else
+	echo "AVCRON:n" >> $setupdir/invis_confdata
+    fi
+    echo "DDNS:$ddnshn" >> $setupdir/invis_confdata
+    if [[ $mailrelay == "none" ]]; then
+	echo "SMTPRELAY:$mailrelay" >> $setupdir/invis_confdata 
+    else
+	echo "SMTPRELAY:$mailrelay" >> $setupdir/invis_confdata 
+	echo "SMTPRUN:$smtpun" >> $setupdir/invis_confdata 
+	echo "SMTPRPW:$smtppw" >> $setupdir/invis_confdata 
+    fi    
+    if [[ $cleantr == "0" ]]; then
+	echo "cleanTR:j" >> $setupdir/invis_confdata
+	echo "TRmaxDays:$trdays" >> $setupdir/invis_confdata
+    else
+	echo "cleanTR:n" >> $setupdir/invis_confdata
+    fi
+
+    writeprepstat "sysprep" 
+    waitbox "quest" "sysprep" 
+
+    # Trennzeichenvariable zurück auf alten Wert setzen
+    IFS=$oldifs
+    
+    #Temporaermuell loeschen
+    rm -f ./sine_temp
+}
+
+# System vorbereiten - Dateien nach /etc/sysconfig kopieren
+sysprep() {
+    cd $setupdir
+
+    timestamp=`date +%s`
+    windowtitle="Systemvorbereitung"
+    pgsubtitle="Es wird eine Sicherung des /etc Verzeichnisses ertellt."
+    tar -czf ./etc-backup-$timestamp.tar.gz /etc 2>&1| tee -a $setupdir/sine.log | pgbox
+
+    # Verzeichnisse in /etc/skel anlegen
+    mkdir /etc/skel/Dokumente
+    mkdir /etc/skel/Downloads
+    mkdir /etc/skel/Bilder
+    mkdir /etc/skel/Musik
+    mkdir /etc/skel/Videos
+    
+    # Den dämlichen nscd rauswerfern
+    chkservice nscd d
+
+    # Virenscanner einrichten
+
+    # Quarantäneverzeichnis anlegen
+    mkdir /var/spool/infected
+    av=`getconfdata "AV" "2"`
+    avcron=`getconfdata "AVCRON" "2"`
+    
+    # Samba Pakete werden installiert
+    pgsubtitle="Die gewählten Samba-Pakete werden installiert"
+    sambapackages=`getconfdata "SambaPakete" "2"`
+    if [[ $sambapackages == "sernet" ]]; then
+	rpm -e --nodeps libwbclient0 samba-client
+	zypper -n install -n --from sernet-samba `cat $cfilesdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
+    else
+	zypper -n install -n `cat $cfilesdir/zypper-package-lists/opensuse_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
+    fi
+    
+    # NFS-Server
+    pgsubtitle="Zusätzliche Fileserver Software wird installiert" 
+    zypper -n install -n `cat $cfilesdir/zypper-package-lists/fileserver_additional` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+    zyppercheck ${PIPESTATUS[0]}
+
+    # Der ausgewählte Virenscanner wird in invis.conf eingetragen
+    strings="AV:clamav%AV:$av"
+    changevalues $confdir "invis.conf" "$strings"
+    
+    # Eintragen, ob regelmäßig auf Viren geprüft wird.
+    strings="avCheck:j%avCheck:$avcron"
+    changevalues $confdir "invis.conf" "$strings"
+
+    pgsubtitle="Der ausgewählte Virenscanner wird installiert.\nAls globales Quarantäneverzeichnis wurde /var/spool/infected angelegt."
+    if [[ $av == "clamav" ]]; then 
+	zypper -n install -n clamav 2>&1| tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	cp $cfilesdir/Virenscanner/clamd.conf /etc 	2>&1| tee -a $setupdir/sine.log
+        cp $cfilesdir/Virenscanner/freshclam.conf /etc 	2>&1| tee -a $setupdir/sine.log
+        touch /var/log/clamd.log 				2>&1| tee -a $setupdir/sine.log
+        chown vscan:vscan /var/log/clamd.log 			2>&1| tee -a $setupdir/sine.log
+        touch /var/log/freshclam.log 				2>&1| tee -a $setupdir/sine.log
+        chown vscan:vscan /var/log/freshclam.log 		2>&1| tee -a $setupdir/sine.log
+        freshclam 2>&1| tee -a $setupdir/sine.log | pgbox
+        chkservice "freshclam"
+	chkservice "clamd"
+    else  
+	# Info einblenden
+	clear
+	windowtitle="Avira Antivir Installation"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/avira.txt" 0 0
+	zypper -n install -n antivir 2>&1| tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	pgsubtitle="Die Antivir Lizenzdatei wird heruntergeladen und Avira Antivir wird aktualisiert"
+	/usr/local/sbin/fetchavkey 2>&1| tee -a $setupdir/sine.log | pgbox
+		cp /usr/bin/avupdate /etc/cron.hourly/ 2>&1| tee -a $setupdir/sine.log
+	# Quick'n'Dirty -- SUID-Bit für avscan setzen
+	chmod u+s /usr/lib/AntiVir/guard/avscan 2>&1| tee -a $setupdir/sine.log
+	# Antivir-Konfiguration anpassen
+	cp $cfilesdir/Virenscanner/avguard.conf /etc/avira/ 2>&1| tee -a $setupdir/sine.log
+	cp $cfilesdir/Virenscanner/avscan.conf /etc/avira/ 2>&1| tee -a $setupdir/sine.log
+	# avguard in RL-Konzept aufnehmen und starten
+	chkservice "avguard"
+    fi
+
+    # Vorbereitete sysconfig Dateien kopieren
+    # Ist QnD, sollte mit changevalues erledigt werden....
+    cp $cfilesdir/System/sysconfig/* /etc/sysconfig/ 2>&1| tee -a $setupdir/sine.log
+
+    #/etc/hosts anpassen
+    file="hosts"
+    path="/etc"
+    ipaddr=`getconfdata "IP" "2"`
+    strings="127.0.0.2%$ipaddr"
+    changevalues $path $file "$strings"
+    
+    #/etc/sysconfig/ntop anpassen
+    file="ntop"
+    path="/etc/sysconfig"
+    strings="192.168.220.10%$ipaddr"
+    changevalues $path $file "$strings"
+
+    #Admin PW fuer ntop-user wwwrun setzen
+    # Achtung Bug im ntop Paket: ntop versucht die user-db in /var/ntop anzulegen, falsch!. Workaround:
+    ln -s /var/lib/ntop /var/ntop
+    ntoppw=`getconfdata "NtopPw" "2"`
+    ntop --set-admin-password=$ntoppw -u wwwrun 2>&1| tee -a $setupdir/sine.log | pgbox
+
+    # Systemgruppe für den Zugriff auf private-Keys einrichten
+    groupadd -g 998 -r pkeys 2>&1| tee -a $setupdir/sine.log
+
+    #openSSL einrichten und CA bauen
+    cp $cfilesdir/ssl/openssl.cnf /etc/ssl 2>&1| tee -a $setupdir/sine.log
+    cp $cfilesdir/ssl/CA.pl /usr/share/ssl/misc/ 2>&1| tee -a $setupdir/sine.log
+
+    file="openssl.cnf"
+    path="/etc/ssl"
+    
+    country=`getconfdata "Country" "2"`
+    strings="DE%$country"
+    changevalues $path $file "$strings"
+
+    region=`getconfdata "Region" "2"`
+    strings="Hessen%$region"
+    changevalues $path $file "$strings"
+
+    city=`getconfdata "City" "2"`
+    strings="Schotten%$city"
+    changevalues $path $file "$strings"
+
+    organisation=`getconfdata "Organisation" "2"`
+    strings="invis-server.org%$organisation"
+    changevalues $path $file "$strings"
+
+    admail=`getconfdata "Admail" "2"`
+    strings="domadmin@invis-net.loc%$admail"
+    changevalues $path $file "$strings"
+    
+    msgbox "Um auf Ihrem invis Server SSL-Schlüssel und Zertifikate für Web- und Mailserver zu erstellen wird eine Zertifizierungsstelle (CA) benötigt.\n\nDies wird im Folgenden vorgenommen. 
+Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie übernehmen. Lediglich den Common Name müssen Sie selbst erdenken. Er taucht als Name der CA in allen damit signierten Zertifikaten auf.
+\n\nNotieren Sie sich auf jeden Fall dass hierbei zu vergebende Passwort, Sie werden es immer wieder benötigen!\n\nDrücken Sie nach dem OK bitte noch einmal die Enter-Taste." "CA erstellen"
+    # invis CA erstellen
+    cd /etc/ssl
+    /usr/share/ssl/misc/CA.pl -newca | tee -a $setupdir/sine.log
+    cd $OLDPWD
+    # Verzeichnis fuer dnssec Schluessel erzeugen
+    mkdir -p /etc/ssl/ddns 2>&1| tee -a $setupdir/sine.log
+
+    # Systemüberwachungstools werden installiert
+    cp /usr/bin/inetcheck /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/diskchecker /usr/local/bin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/freeports /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/alldump /usr/local/sbin/	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/dwdatasnapshot /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/scanleases /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/afterup /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/amacheck /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/avrun /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/clean_transfer /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/clean_recycle /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/serverkeys /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/fixpearchannel /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/fixbindchroot /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/mkdbsilent /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/umtsup /usr/local/sbin 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/fetchavkey /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/safebootpart /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+
+    # Konfiguration fuer Notfall-Internetzugang via Handy und T-Mobile (Teathering)
+    cp $cfilesdir/invis/wvd_tmobile.conf /etc/invis 2>&1| tee -a $setupdir/sine.log
+
+    chown -R root:root /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    chmod -R ug+x /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+
+    chown -R root:root /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    chmod -R a+x /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+
+    # PHP ini-Dateien anpassen
+    cp $cfilesdir/webserver/apache2/php.ini /etc/php5/apache2/ 2>&1| tee -a $setupdir/sine.log
+    path="/etc/php5/apache2"
+    file="php.ini"
+    strings="i6lib%$libdir"
+    changevalues $path $file "$strings"
+
+    cp $cfilesdir/webserver/fcgid/php.ini /etc/php5/fastcgi/
+    path="/etc/php5/fastcgi"
+    strings="i6lib%$libdir"
+    changevalues $path $file "$strings"
+
+    # Workaround fuer fastcgi php.ini Bug
+    ln -s /etc/php5/fastcgi /etc/php5/fpm
+
+#    pgsubtitle="PHP PEAR Channel Konfiguration wird aktualisiert"
+#    /usr/local/sbin/fixpearchannel 2>&1 | tee -a $setupdir/sine.log | pgbox
+
+    # invis cron-file wird installiert
+    cp $cfilesdir/invis/invis.cron /etc/cron.d/ 2>&1| tee -a $setupdir/sine.log
+
+    # invis permissions-file wird installiert.
+    cp $cfilesdir/System/permissions.d/invis-server /etc/permissions.d/ 2>&1| tee -a $setupdir/sine.log
+
+    # invis Konfigurationsdatei anpassen
+    file="invis.conf"
+
+    strings="domadmin@invis-net.loc%$admail"
+    changevalues $confdir $file "$strings"
+
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $confdir $file "$strings"
+
+    cleantr=`getconfdata "cleanTR" "2"`
+    if [[ $cleantr == "j" ]]; then
+	strings="cleanTrOn:n%cleanTrOn:$cleantr"
+	changevalues $confdir $file "$strings"
+	maxdays=`getconfdata "TRmaxDays" "2"`
+	strings="trMaxDays:21%trMaxDays:$maxdays"
+	changevalues $confdir $file "$strings"
+    fi
+
+    ddnshn=`getconfdata "DDNS" "2"`
+    if [[ $ddnshn != "none" ]]; then
+	strings="hostname.ihredomain.de%$ddnshn"
+	changevalues $confdir $file "$strings"
+    fi
+
+    imapserver=`getconfdata "IMAPserver" "2"`
+    if [[ $imapserver == "zarafa" ]]; then
+	strings="usedgroupware%$imapserver"
+	changevalues $confdir $file "$strings"
+    elif [[ $imapserver == "cyrus" ]]; then
+	strings="usedgroupware%groupe"
+	changevalues $confdir $file "$strings"
+    else
+    	strings="usedgroupware%sogo"
+	changevalues $confdir $file "$strings"
+    fi
+
+    # invis Passwort-Datei anpassen
+    file="invis-pws.conf"
+    managerpw=`getconfdata "ManagerPW" "2"`
+    strings="manager-secret%$managerpw"
+    changevalues $confdir $file "$strings"
+    
+    masterpw=`getconfdata "MasterPW" "2"`
+    strings="master-secret%$masterpw"
+    changevalues $confdir $file "$strings"
+    
+    adminpw=`getconfdata "AdminPW" "2"`
+    strings="admin-secret%$adminpw"
+    changevalues $confdir $file "$strings"
+
+    mysqlpw=`getconfdata "MySQLpw" "2"`
+    strings="mysql-rootpw%$mysqlpw"
+    changevalues $confdir $file "$strings"
+    
+    writeprepstat "ldap"
+    waitbox "sysprep" "ldap"
+}
+
+# LDAP einrichten
+ldap() {
+    cd $setupdir
+    clear
+    windowtitle="LDAP Server"
+    ## Konfigurationsdateien kopieren
+    cp $cfilesdir/fileserver/smbldap-tools/* /etc/smbldap-tools/ 2>&1| tee -a $setupdir/sine.log
+    # Anpassen der Datei /etc/smbldap-tools/smbldap.conf
+    smbdom=`getconfdata "Workgroup" "2"`
+    path="/etc/smbldap-tools"
+    file="smbldap.conf"
+    strings="I5-NET%$smbdom"
+    changevalues $path $file "$strings"
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=i5-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    smbhostname=`getconfdata "Hostname" "2"`
+    smbhostname=`echo $smbhostname | tr [a-z] [A-Z]`
+    strings="INVIS5%$smbhostname"
+    changevalues $path $file "$strings"
+    domain=`getconfdata "Domain" "2"`
+    strings="i5-net.loc%$domain"
+    changevalues $path $file "$strings"
+    
+    # Anpassen der Datei /etc/smbldap-tools/smbldap_bind.conf
+    path="/etc/smbldap-tools"
+    file="smbldap_bind.conf"
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=i5-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    masterpw=`getconfdata "MasterPW" "2"`
+    strings="master-secret%$masterpw"
+    changevalues $path $file "$strings"
+    
+    # Kopieren der notwendigen LDAP Schemadateien
+    cp $cfilesdir/LDAP/Schemas/*.schema /etc/openldap/schema/ 2>&1| tee -a $setupdir/sine.log
+    chown -R root:root /etc/openldap/schema 2>&1| tee -a $setupdir/sine.log
+    chmod -R a+r /etc/openldap/schema 2>&1| tee -a $setupdir/sine.log
+    # Erzeugen und Anpassen der Dateien /etc/openldap/slapd.conf & slapd.acl
+    cp $cfilesdir/LDAP/Conf/slapd.* /etc/openldap/ 2>&1| tee -a $setupdir/sine.log
+    # slapd.acl
+    path="/etc/openldap"
+    file="slapd.acl"
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    # slapd.conf
+    file="slapd.conf"
+    changevalues $path $file "$strings"
+
+    managerhash=`getconfdata "ManagerPW" "3"`
+    zeichen="\/"
+    managerhash=`echo $managerhash| sed "s/$zeichen/\\\\\\\\$zeichen/g"`
+    strings="manager-secret-hash%$managerhash"
+    changevalues $path $file "$strings"
+
+    # Bauen des Server-Schlüsselsatzes
+    cd /etc/ssl
+    msgbox "Es wird jetzt ein SSL-Schlüsselsatz für Ihren LDAP-Server erzeugt.\n\n
+Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." "Erzeugen des LDAP-Server Schlüsselsatzes"
+
+    /usr/local/sbin/serverkeys ldap 2>&1| tee -a $setupdir/sine.log
+    chown -R :pkeys /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
+    chmod g+rx /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
+    usermod -a -G pkeys ldap 2>&1| tee -a $setupdir/sine.log
+    usermod -a -G mail ldap 2>&1| tee -a $setupdir/sine.log
+
+    cd $OLDPWD
+
+    # Vorbereiten der LDIF Dateien
+    pgsubtitle="LDAP System wird konfiguriert"
+    mkdir ./ldif 2>&1| tee -a $setupdir/sine.log | pgbox
+    
+    { for x in `find $cfilesdir/LDAP -name *.ldif`; do
+	cp $x ./ldif| tee -a $setupdir/sine.log
+    done } 2>&1| tee -a $setupdir/sine.log | pgbox
+    
+    path=./ldif
+    { for x in $path/*; do
+	file=`basename $x`
+	echo "Bereite Datei $file vor."
+	basedn=`getconfdata "baseDN" "2"`
+	strings="dc=invis-net,dc=loc%$basedn"
+	changevalues $path $file "$strings"
+        
+	zeichen="\/"
+	managerhash=`getconfdata "ManagerPW" "3"`
+	managerhash=`echo $managerhash| sed "s/$zeichen/\\\\\\\\$zeichen/g"`
+        strings="manager-secret-hash%$managerhash"
+        changevalues $path $file "$strings"
+	
+	masterhash=`getconfdata "MasterPW" "3"`
+	masterhash=`echo $masterhash| sed "s/$zeichen/\\\\\\\\$zeichen/g"`
+        strings="master-secret-hash%$masterhash"
+        changevalues $path $file "$strings"
+
+	adminhash=`getconfdata "AdminPW" "3"`
+	adminhash=`echo $adminhash| sed "s/$zeichen/\\\\\\\\$zeichen/g"`
+        strings="admin-secret-hash%$adminhash"
+        changevalues $path $file "$strings"
+
+	organization=`getconfdata "Organisation" "2"`
+	strings="targetOrganization%$organization"
+	changevalues $path $file "$strings"
+
+	strings="descriptionText%Basisknoten des LDAP-Verzeichnisses von $organization"
+        changevalues $path $file "$strings"
+	
+	hname=`getconfdata "Hostname" "2"`
+	strings="invis5%$hname"
+	changevalues $path $file "$strings"
+	
+	fqdn=`getconfdata "FQDN" "2"`
+	strings="invisfqdn%$fqdn"
+	changevalues $path $file "$strings"
+	
+	domain=`getconfdata "Domain" "2"`
+        strings="invis-net.loc%$domain"
+	changevalues $path $file "$strings"
+	
+	dompart1=`echo $domain|cut -d "." -f 1`
+	strings="invis-net%$dompart1"
+	changevalues $path $file "$strings"
+	
+	ipaddr=`getconfdata "IP" "2"`
+	strings="192.168.220.10%$ipaddr"
+	changevalues $path $file "$strings"
+	
+	netpart1=`echo "$ipaddr" | cut -d "." -f 1`
+	netpart2=`echo "$ipaddr" | cut -d "." -f 2`
+	netpart3=`echo "$ipaddr" | cut -d "." -f 3`
+	netpart="$netpart1.$netpart2.$netpart3."
+	strings="192.168.220.%$netpart"
+	changevalues $path $file "$strings"
+	
+	rd=`getconfdata "ReverseDom" "2"`
+	strings="220.168.192%$rd"
+	changevalues $path $file "$strings"
+	
+	hostpart=`echo "$ipaddr" | cut -d "." -f 4`
+	strings="relativeDomainName:10%relativeDomainName:$hostpart"
+	changevalues $path $file "$strings"
+	
+	strings="relativeDomainName=10,%relativeDomainName=$hostpart,"
+	changevalues $path $file "$strings"
+	
+	strings="dhcpNetMask:24%dhcpNetMask:$shortnmask"
+	changevalues $path $file "$strings"
+	
+    done } 2>&1| tee -a $setupdir/sine.log | pgbox
+
+    ## Aktive LDAP-Eintrage fuer Groupware und ERP aktivieren/deaktivieren
+    whichgroupware=`getconfdata "IMAPserver" "2"`
+    whicherp=`getconfdata "ERPSoftware" "2"`
+    
+    file="iportal-initial.ldif"
+    if [[ $whichgroupware == "zarafa" ]]; then
+	strings="GROUPETRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="SOGOTRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="ZARAFATRUE%TRUE"
+	changevalues $path $file "$strings"
+    elif [[ $whichgroupware == "cyrus" ]]; then
+	strings="GROUPETRUE%TRUE"
+	changevalues $path $file "$strings"
+	strings="SOGOTRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="ZARAFATRUE%FALSE"
+	changevalues $path $file "$strings"
+    else
+	strings="SOGOTRUE%TRUE"
+	changevalues $path $file "$strings"
+	strings="GROUPETRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="ZARAFATRUE%FALSE"
+	changevalues $path $file "$strings"
+    fi
+
+    if [[ $whicherp == "openerp" ]]; then
+	strings="LXTRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="OPENERPTRUE%TRUE"
+	changevalues $path $file "$strings"
+	strings="WAWISIONTRUE%FALSE"
+	changevalues $path $file "$strings"
+    elif [[ $whicherp == "wawision" ]]; then
+	strings="LXTRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="OPENERPTRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="WAWISIONTRUE%TRUE"
+	changevalues $path $file "$strings"
+    else
+	strings="LXTRUE%TRUE"
+	changevalues $path $file "$strings"
+	strings="OPENERPTRUE%FALSE"
+	changevalues $path $file "$strings"
+	strings="WAWISIONTRUE%FALSE"
+	changevalues $path $file "$strings"
+    fi
+
+    # LDAP fuellen
+    pgsubtitle="Das LDAP Verzeichnis wird aufgebaut"
+    { for x in $path/*; do
+	#echo $x
+	/usr/sbin/slapadd -l $x
+    done } 2>&1| tee -a $setupdir/sine.log | pgbox
+    
+    #Der openLDAP-Server wird ins Runlevel-Konzept übernommen und gestartet
+    pgsubtitle="Der LDAP Dienst wird initialisiert"
+    /usr/sbin/slapindex -f /etc/openldap/slapd.conf 2>&1| tee -a $setupdir/sine.log | pgbox
+    chkservice "ldap"
+    
+    # phpldapadmin konfigurieren
+    # Installation entfaellt, da es per rpm installiert wird.
+    cp $cfilesdir/LDAP/phpldapadmin/config.php /srv/www/htdocs/phpldapadmin/config/
+
+    cp /usr/bin/addaddress /usr/local/sbin/
+    cp /usr/bin/addcn.pl /usr/local/sbin/
+    cp /usr/bin/buildpostaladdress.pl /usr/local/sbin/
+    
+    chown -R root:root /usr/local/sbin
+    chmod -R ug+x /usr/local/sbin
+    
+    writeprepstat "dns"
+    waitbox "ldap" "dns"
+}
+
+# DNS-Server einrichten
+dns() {
+    cd $setupdir
+    clear
+    windowtitle="DNS Server"
+    #echo -e "\033[1;33mIhr Nameserver wird eingerichtet\033[0m"
+    cp $cfilesdir/dhcp-dns/bind-ldap/named.conf /etc 2>&1| tee -a $setupdir/sine.log
+
+    # Konfiguration von bind wird angepasst
+    path="/etc"
+    file="named.conf"
+    forwarders=`getconfdata "Forwarders" "2"`
+    strings="FORWARD-DNS-SERVERS%$forwarders"
+    changevalues $path $file "$strings"
+    
+    shortnmask=`getconfdata "NMask-short" "2"`
+    ipaddr=`getconfdata "IP" "2"`
+    netpart1=`echo "$ipaddr" | cut -d "." -f 1`
+    netpart2=`echo "$ipaddr" | cut -d "." -f 2`
+    netpart3=`echo "$ipaddr" | cut -d "." -f 3`
+    netpart="$netpart1.$netpart2.$netpart3"
+    strings="192.168.220/24%$netpart/$shortnmask"
+    changevalues $path $file "$strings"
+    basedn=`getconfdata "baseDN" "2"`
+    bdnpart1=`echo "$basedn" | cut -d "," -f 1`
+    bdnpart2=`echo "$basedn" | cut -d "," -f 2`
+    strings="dc=invis-net%$bdnpart1"
+    changevalues $path $file "$strings"
+    strings="dc=loc%$bdnpart2"
+    changevalues $path $file "$strings"
+    
+    rd=`getconfdata "ReverseDom" "2"`
+    strings="220.168.192%$rd"
+    changevalues $path $file "$strings"
+    
+    domain=`getconfdata "Domain" "2"`
+    strings="invis-net.loc%$domain"
+    changevalues $path $file "$strings"
+
+    adminpw=`getconfdata "AdminPW" "2"`
+    strings="admin-secret%$adminpw"
+    changevalues $path $file "$strings"
+    
+    # Anpassen der Datei /etc/resolv.conf
+    cp $cfilesdir/dhcp-dns/resolv.conf /etc 2>&1| tee -a $setupdir/sine.log
+    file="resolv.conf"
+    strings="192.168.220.10%$ipaddr"
+    changevalues $path $file "$strings"
+    
+    strings="invis-net.loc%$domain"
+    changevalues $path $file "$strings"    
+
+    # Chroot Umgebung fuer bind 9.8.x fixen -- hoffentlich nur temporaer notwendig
+    /usr/bin/fixbindchroot 2>&1| tee -a $setupdir/sine.log
+
+    # DNS Dienst starten und ins Runlevel-Konzept einbinden.
+    chkservice "named"
+    
+    # Schlüssel für DHCP initiertes DNS-Update erzeugen
+    #echo -e "\033[1;33mEs wird ein Schlüssel für DNS-Update via DHCP erzeugt. Das dauert....\033[0m"
+    #/usr/bin/genDDNSkey --force
+    #cp /etc/named.keys /var/lib/dhcp/etc
+
+    #echo -e "\033[1;33mPassen Sie evtl. noch den Eintrag der Forward-Nameserver in /etc/named.conf an Ihre Umgebung an.\033[0m"
+    writeprepstat "dhcp"
+    waitbox "dns" "dhcp"
+}
+
+# DHCP-Server einrichten
+dhcp() {
+    cd $setupdir
+    clear
+    windowtitle="DHCP Server"
+
+    cp $cfilesdir/dhcp-dns/dhcpd.conf /etc
+
+    # Konfiguration des DHCP Servers wird angepasst
+    path="/etc"
+    file="dhcpd.conf"
+    adminpw=`getconfdata "AdminPW" "2"`
+    strings="admin-secret%$adminpw"
+    changevalues $path $file "$strings"
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+
+    # DHCP Dienst starten und ins Runlevel-Konzept einbinden.
+    chkservice "dhcpd"
+        
+    writeprepstat "mailserver"
+    waitbox "dhcp" "mailserver"
+}
+
+# Mail-Server einrichten
+mailserver() {
+    cd $setupdir
+    pgsubtitle="Mailserver wird eingerichtet"
+    clear
+    windowtitle="Mail Server"
+    zypper -n install -n `cat $cfilesdir/zypper-package-lists/mailserver_additional` 2>&1| tee -a $setupdir/sine.log | pgbox
+    zyppercheck ${PIPESTATUS[0]}
+
+    # amavisd-new und clamav einrichten
+    av=`getconfdata "AV" "2"`
+    if [[ $av == "clamav" ]]; then
+        cp $cfilesdir/mailserver/amavisd/amavisd_clamav.conf /etc/amavisd.conf 2>&1| tee -a $setupdir/sine.log
+    else
+	cp $cfilesdir/mailserver/amavisd/amavisd.conf /etc/amavisd.conf 2>&1| tee -a $setupdir/sine.log
+    fi
+
+    # Der Dienst freshclam wird auf jeden Fall gestartet, da Clamav zur Standart Installation gehoert
+    # und er von amavis immer als secondary Virenscanner genutzt wird.
+    chkservice "freshclam"
+
+    # Rechte am Virusmails-Quarantaene-Verzeichnis anpassen
+    chown -R vscan:vscan /var/spool/amavis 2>&1| tee -a $setupdir/sine.log
+    chmod g+rwx /var/spool/amavis/virusmails 2>&1| tee -a $setupdir/sine.log
+
+    path="/etc"
+    file="amavisd.conf"
+    fqdn=`getconfdata "FQDN" "2"`
+    strings="invis.invis-net.loc%$fqdn"
+    changevalues $path $file "$strings"
+    domain=`getconfdata "Domain" "2"`
+    strings="invis-net.loc%$domain"
+    changevalues $path $file "$strings"
+    chkservice "amavisd"
+
+    # Mailkonto fuer SPAM-Mails kann erst nach Einrichtung der Samba-Domäne angelegt werden
+    
+    # Bauen des Server-Schlüsselsatzes
+    cd /etc/ssl
+    msgbox "Es wird jetzt ein SSL-Schlüsselsatz für Ihren Mailserver erzeugt.\n\n
+Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." "Erzeugen des Mailserver Schlüsselsatzes"
+
+    /usr/local/sbin/serverkeys ms 2>&1| tee -a $setupdir/sine.log
+    chown :pkeys /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
+    chmod g+rx /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
+    usermod -a -G pkeys postfix 2>&1| tee -a $setupdir/sine.log
+    usermod -a -G mail postfix 2>&1| tee -a $setupdir/sine.log
+
+    cd $OLDPWD
+
+    # Kopieren der Postfix-Konfigurationsdateien
+    cp $cfilesdir/mailserver/postfix/* /etc/postfix 2>&1| tee -a $setupdir/sine.log
+    
+    ## Dovecot, Zarafa oder Cyrus
+    whichimap=`getconfdata "IMAPserver" "2"`
+    case "$whichimap" in
+    
+	"dovecot" )
+	    # Dovecot einrichten 
+    	    pgsubtitle="Dovecot IMAP wird installiert und eingerichtet"
+	    zypper -n install -n dovecot21 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+	    cp -r $cfilesdir/mailserver/dovecot/* /etc/dovecot/ 2>&1| tee -a $setupdir/sine.log
+	    path="/etc/dovecot/conf.d"
+	    file="15-lda.conf"
+	    domain=`getconfdata "Domain" "2"`
+	    strings="invis-net.loc%$domain"
+	    changevalues $path $file "$strings"
+	    # Benutzerkonto fuer das Mailhandling anlegen
+	    groupadd -r -g 399 vmail| tee -a $setupdir/sine.log
+	    useradd -r -u 399 -d /var/spool/mail -c "Benutzerkonto fuer Dovecot Mailhandling" -s /bin/false -g vmail vmail| tee -a $setupdir/sine.log
+	
+	    # Rechte an Verzeichnissen so anpassen, dass dovecot darin schreiben darf
+	    chown vmail:mail /var/lib/dovecot 2>&1| tee -a $setupdir/sine.log
+	    chmod 0775 /var/lib/dovecot 2>&1| tee -a $setupdir/sine.log
+	    chown -R :vmail /var/spool/mail 2>&1| tee -a $setupdir/sine.log
+
+	    # Dovecots Modulpfad an Systemarchitektur anpassen
+	    if [[ $libdir == "/usr/lib64" ]]; then 
+		strings="/usr/lib/dovecot/modules%$libdir/dovecot/modules"
+		changevalues $path $file "$strings"
+	    fi
+	    usermod -a -G pkeys dovecot 2>&1| tee -a $setupdir/sine.log
+	    chkservice "dovecot"
+
+	    # Postfix konfiguration kopieren
+	    rm -f `ls /etc/postfix/ |grep "main.[zarafa|cyrus]"`
+	    mv /etc/postfix/main.dovecot /etc/postfix/main.cf 2>&1| tee -a $setupdir/sine.log
+	    
+	    # Transportweg fuer lokale emails festlegen
+	    echo "$domain	dovecot:" >> /etc/postfix/relay
+	    postmap /etc/postfix/relay
+	    ;;
+	"cyrus" )
+	    # Cyrus einrichten
+	    pgsubtitle="Cyrus IMAP wird installiert und eingerichtet"
+	    zypper -n install -n cyrus-imapd 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/sasl_mechs` 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+	    cp $cfilesdir/mailserver/cyrus/*.conf /etc 2>&1| tee -a $setupdir/sine.log
+	    #cp $cfilesdir/syslog-ng/syslog-ng.conf /etc/syslog-ng 2>&1| tee -a $setupdir/sine.log
+	    # Passwort für den User cyrus setzen
+	    cyruspw=`getconfdata "CyrusPw" "2"`
+	    #msgbox "Für den Benutzer \"cyrus\" muss ein Passwort gesetzt werden" "Cyrus IMAP wird vorbereitet"
+	    echo "cyrus:$cyruspw" | chpasswd | tee -a $setupdir/sine.log | pgbox
+	    usermod -a -G pkeys cyrus 2>&1| tee -a $setupdir/sine.log
+	    chkservice "saslauthd"
+	    chkservice "cyrus"
+	    # Postfix Konfiguration kopieren
+	    rm -f `ls /etc/postfix/ |grep "main.[dovecot|zarafa]"` 2>&1| tee -a $setupdir/sine.log
+	    mv /etc/postfix/main.cyrus /etc/postfix/main.cf 2>&1| tee -a $setupdir/sine.log
+	    ;;
+	"zarafa" )
+	    pgsubtitle="Zarafa Groupware und Mailserver wird installiert und eingerichtet"
+	    # temporaer mariadb wieder enfernen und durch mysql ersetzen
+	    zypper -n rm mariadb mariadb-client  2>&1| tee -a $setupdir/sine.log | pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+	    zypper -n in mysql-community-server mysql-community-server-client mysql-community-server-tools  2>&1| tee -a $setupdir/sine.log | pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/zarafa` 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+	    # Zarafa konfigurieren hier, Starten der Dienste erfolgt im Groupware Abschnitt
+	    # Apache Confs fuer Webaccess kopieren
+	    cp $cfilesdir/webserver/zarafa-wa/*.conf /etc/apache2/conf.d/ 2>&1| tee -a $setupdir/sine.log
+	    
+	    # Symbolischen Link auf das z-push2 Verzeichnis anlegen
+	    ln -s /srv/www/htdocs/z-push2 /srv/www/htdocs/z-push
+	    
+	    # Datensicherungstools installieren
+	    cp /usr/bin/zbackup /usr/local/sbin
+	    cp /usr/bin/zdbdump /usr/local/sbin
+	    chown root:root /usr/local/sbin/z*
+	
+	    rm -f `ls /etc/postfix/ |grep "main.[dovecot|cyrus]"` 2>&1| tee -a $setupdir/sine.log
+	    mv /etc/postfix/main.zarafa /etc/postfix/main.cf 2>&1| tee -a $setupdir/sine.log
+	    ;;
+esac
+
+    # Postfix Konfiguration anpassen
+    path="/etc/postfix"
+    file="main.cf"
+    fqdn=`getconfdata "FQDN" "2"`
+    strings="invis5.i5-net.loc%$fqdn"
+    changevalues $path $file "$strings"
+    
+    domain=`getconfdata "Domain" "2"`
+    strings="i5-net.loc%$domain"
+    changevalues $path $file "$strings"
+    
+    nw=`getconfdata "Networkbase" "2"`
+    shortnmask=`getconfdata "NMask-short" "2"`
+    strings="192.168.220.0/24%$nw/$shortnmask"
+    changevalues $path $file $strings
+    
+    # Wenn Zugangsdaten für mailrelay bekannt sasl_passwd erzeugen
+    mailrelay=`getconfdata "SMTPRELAY" "2"`
+    smtpport=`getconfdata "SMTPRELAY" "3"`
+    if [[ $mailrelay != "none" ]]; then
+	strings="\[mail.example.org\]%$mailrelay:$smtpport"
+	changevalues $path $file "$strings"
+        smtpun=`getconfdata "SMTPRUN" "2"`
+        smtppw=`getconfdata "SMTPRPW" "2"`
+	echo "$mailrelay:$smtpport		$smtpun:$smtppw" >> /etc/postfix/sasl_passwd
+	/usr/sbin/postmap /etc/postfix/sasl_passwd
+    fi
+    
+    # canonical-files anpassen
+    file="canonical"
+    fqdn=`getconfdata "FQDN" "2"`
+    strings="invis5.i5-net.loc%$fqdn"
+    changevalues $path $file "$strings"
+    
+    domain=`getconfdata "Domain" "2"`
+    strings="i5-net.loc%$domain"
+    changevalues $path $file "$strings"
+    /usr/sbin/postmap $path/$file
+    
+    file="s-canonical.cf"
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=i5-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    
+    adminpw=`getconfdata "AdminPW" "2"`
+    strings="admin-secret%$adminpw"
+    changevalues $path $file "$strings"
+
+    file="r-canonical.cf"
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=i5-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+
+    adminpw=`getconfdata "AdminPW" "2"`
+    strings="admin-secret%$adminpw"
+    changevalues $path $file "$strings"
+    
+    # Postfix neustarten und in Runlevel aufnehmen
+    # Mailman einrichten ????
+    /usr/lib/mailman/bin/mailman-generate-sysconfig 2>&1| tee -a $setupdir/sine.log|pgbox
+    chkservice "postfix"
+
+    # Mailman einrichten
+    msgbox "Das Programm Mailman wird vorbereitet.\n\nEs wird für Verwaltungszwecke eine erste Mailingliste eingerichtet. Dafür
+müssen Sie unter anderem ein Passwort vergeben." "Mailman Installation"
+    /usr/lib/mailman/bin/mmsitepass
+    /usr/lib/mailman/bin/newlist mailman
+
+    writeprepstat "cups"
+    waitbox "mailserver" "cups"
+}
+
+# CUPS Server einrichten
+cups() {
+    cd $setupdir
+    clear
+    windowtitle="CUPS Server"
+
+    cp $cfilesdir/cups/cupsd.conf /etc/cups/cupsd.conf 
+
+    ipaddr=`getconfdata "IP" "2"`
+    path="/etc/cups"
+    file="cupsd.conf"
+    strings="192.168.220.10%$ipaddr"
+    changevalues $path $file $strings
+
+    net=`getconfdata "Networkbase" "2"`
+    path="/etc/cups"
+    file="cupsd.conf"
+    strings="192.168.220.0%$net"
+    changevalues $path $file $strings
+
+    # Workaround für CUPS-Bug
+    mkdir $libdir/cups/driver
+    
+    chkservice "cups"
+
+    writeprepstat "samba"
+    waitbox "cups" "samba"
+}
+
+# Samba-Server einrichten
+samba() {
+    cd $setupdir
+    clear
+    windowtitle="Samba Server"
+
+    cp $cfilesdir/fileserver/samba/smb.conf /etc/samba 2>&1| tee -a $setupdir/sine.log
+    # Scriptvorlage fuer das Verschieben der Windows-Bibliotheken kopieren
+    cp $cfilesdir/fileserver/service/Win_Scripts/movelibdirs.cmd /etc/invis/templates/ 2>&1| tee -a $setupdir/sine.log
+
+    # Anpassen der Datei smb.conf
+
+    ipaddr=`getconfdata "IP" "2"`
+    path="/etc/samba"
+    file="smb.conf"
+    strings="192.168.220.10%$ipaddr"
+    changevalues $path $file "$strings"
+    
+    smbdom=`getconfdata "Workgroup" "2"`
+    strings="I5-NET%$smbdom"
+    changevalues $path $file "$strings"
+    
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=i5-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    
+    smbhostname=`getconfdata "Hostname" "2"`
+    smbhostname=`echo $smbhostname | tr [a-z] [A-Z]`
+    strings="INVIS5%$smbhostname"
+    changevalues $path $file "$strings"
+
+    av=`getconfdata "AV" "2"`
+    if [[ $av == "beide" ]]; then
+	av="antivir"
+    fi
+
+    #Erstellen der Virenscanner-Konfiguration
+    cp $cfilesdir/fileserver/samba/vscan-$av.conf /etc/samba/vscan-$av.conf 2>&1| tee -a $setupdir/sine.log
+
+    # Freigaben werden angelegt
+    cp $cfilesdir/fileserver/samba/smb.shares.conf /etc/samba/smb.shares.conf 2>&1| tee -a $setupdir/sine.log
+    path="/etc/samba"
+    file="smb.shares.conf"
+    strings="vscan-av%vscan-$av"
+    changevalues $path $file "$strings"
+    # Samba Pakete von Sernet ermöglichen, Abfrage in Modul Quest
+
+    # vscan wird nicht mehr verwendet!
+    # Hier vscan vfs-Module kopieren, wenn Sernet-Samba eingesetzt wird
+    #yesno "Nutzen Sie die openSUSE Samba Pakete?" "Samba Installation"
+    #sernet=${?}
+
+    # Ist das noch nötig?
+    #if [[ $sernet == "1" ]]; then
+#	if [[ $libdir == "/usr/lib" ]]; then
+#	    cp ~/prepdir/cfiles/fileserver/samba/samba-vscan/32bit/* $libdir/samba/vfs
+#	else
+#	    cp ~/prepdir/cfiles/fileserver/samba/samba-vscan/64bit/* $libdir/samba/vfs
+#	fi
+#    fi
+    
+    mkdir -p -m 2770 /srv/shares/verwaltung 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 2775 /srv/shares/archiv 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 2775 /srv/shares/archiv/projektarchiv 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 0770 /srv/shares/projekte 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 2775 /srv/shares/aktuell 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 2775 /srv/shares/service 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 2777 /srv/shares/transfer 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 2775 /srv/shares/media 2>&1| tee -a $setupdir/sine.log
+    mkdir -p -m 0775 /srv/shares/gruppen 2>&1| tee -a $setupdir/sine.log
+    
+    # Verzeichnis fuer Windows-Batch-Scripts anlegen
+    mkdir -p -m 2775 /srv/shares/service/winscripts 2>&1| tee -a $setupdir/sine.log
+    
+    # Service Dateien kopieren
+    cp -r $cfilesdir/fileserver/service/* /srv/shares/service 2>&1| tee -a $setupdir/sine.log
+    chmod -R g+w /srv/shares/service 2>&1| tee -a $setupdir/sine.log
+    
+    # Setzen des LDAP Zugangspasswort
+    masterpw=`getconfdata "MasterPW" "2"`
+    pgsubtitle="Samba erhält das LDAP-Administrationspasswort"
+    /usr/bin/smbpasswd -w $masterpw 2>&1| tee -a $setupdir/sine.log | pgbox
+
+    # Logon-Scripts werden kopiert
+    cp $cfilesdir/fileserver/samba/logon-scripts/*.cmd /var/lib/samba/netlogon
+    hn=`getconfdata "Hostname" "2"`
+    path="/var/lib/samba/netlogon"
+    file="user.cmd"
+    strings="invis5%$hn"
+    changevalues $path $file "$strings"
+
+    file="admin.cmd"
+    strings="invis5%$hn"
+    changevalues $path $file "$strings"
+
+    file="gast.cmd"
+    strings="invis5%$hn"
+    changevalues $path $file "$strings"
+
+    file="verwaltung.cmd"
+    strings="invis5%$hn"
+    changevalues $path $file "$strings"
+
+    # Ermitteln der Domänen-SID und eintragen derselben in die smbldap-tools Konfiguration
+    sid=`/usr/bin/net getlocalsid|cut -d ":" -f 2`
+    sid=`echo $sid|tr -d " "`
+    path="/etc/smbldap-tools"
+    file="smbldap.conf"
+    strings="domSID%$sid"
+    changevalues $path $file "$strings"
+        
+    # Anbinden des Servers an die LDAP-Benutzerdatenbank (LDAP-Client via sssd und PAM, Client verwendet STARTTLS)
+    basedn=`getconfdata "baseDN" "2"`
+    cp $cfilesdir/LDAP/conf-client/openldap/ldap.conf /etc/openldap/ldap.conf 2>&1| tee -a $setupdir/sine.log
+    path="/etc/openldap"
+    file="ldap.conf"
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+
+    cp $cfilesdir/LDAP/conf-client/ldap.conf /etc/ldap.conf 2>&1| tee -a $setupdir/sine.log
+    path="/etc"
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+
+    cp $cfilesdir/LDAP/conf-client/ldap /etc/sysconfig/ldap 2>&1| tee -a $setupdir/sine.log
+    path="/etc/sysconfig"
+    file="ldap"
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    
+    cp $cfilesdir/LDAP/conf-client/sssd/sssd.conf /etc/sssd/ 2>&1| tee -a $setupdir/sine.log
+    path="/etc/sssd"
+    file="sssd.conf"
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    chmod 600 /etc/sssd/sssd.conf
+    
+    cp $cfilesdir/LDAP/conf-client/nsswitch.conf /etc/nsswitch.conf 2>&1| tee -a $setupdir/sine.log
+    cp $cfilesdir/LDAP/conf-client/pam.d/*-pc /etc/pam.d/ 2>&1| tee -a $setupdir/sine.log
+
+    # sssd neu starten
+    chkservice "sssd"
+
+    # Bevölkern der Domäne mit den smbldap-tools. Minimale UID,GID & RID auf 3000 gesetzt, damit group-e die User gleich sieht.
+    pgsubtitle="Die Samba Domäne wird aufgebaut."
+    /usr/sbin/smbldap-populate -u 3000 -g 3000 -r 3000 2>&1| tee -a $setupdir/sine.log |pgbox
+
+    # Um über Samba neue Benutzer beispielsweise Maschinen-Konten beim Domaenenbeitritt on the fly erzeugen zu können
+    # benötigt Samba root-Rechte. Dafür wird im LDAP ein zweites root-Benutzerkonto angelegt.
+    msgbox "Geben Sie ein Passwort für \"root\" ein."
+
+    ### root PW im LDAP setzen
+    smbldappw root #| tee -a $setupdir/sine.log
+
+    # Grouppe fuer Maildummies anlegen
+    smbldap-groupadd -a -g 600 maildummies
+
+    # Mailkonto für SPAM-Mails einrichten
+    smbldap-useradd -g 600 -m -s /bin/false -c "Spam-Mail Konto" junk 2>&1| tee -a $setupdir/sine.log
+    msgbox "Geben Sie ein Passwort für das Spam-Benutzer-Konto \"junk\" ein."
+
+    ### junk PW im LDAP setzen
+    smbldappw junk #| tee -a $setupdir/sine.log
+
+    pgsubtitle="Es werden die Gruppen All und Verwaltung angelegt"
+    # Gruppe All fuer Group-e anlegen
+    /usr/sbin/smbldap-groupadd -a All -g 3000 2>&1| tee -a $setupdir/sine.log |pgbox
+    # Anlegen der Gruppe Verwaltung
+    /usr/sbin/smbldap-groupadd -a Verwaltung 2>&1| tee -a $setupdir/sine.log |pgbox
+
+    # Anlegen der Gruppe Verwaltung
+    /usr/sbin/smbldap-groupadd -a mobilusers 2>&1| tee -a $setupdir/sine.log |pgbox
+
+    pgsubtitle="Es wird ein Benutzkonto für den Domänen Administrator \"domadmin\" angelegt."
+    # Anlegen des Domaenenadministrators
+    /usr/sbin/smbldap-useradd -m -a -G "Domain Admins" -E admin.cmd -c "Windows Domaenen Administrator" domadmin 2>&1| tee -a $setupdir/sine.log |pgbox
+    msgbox "Geben Sie ein Passwort für \"domadmin\" ein."
+
+    # Passwort fuer domadmin setzen
+    smbldappw domadmin #| tee -a $setupdir/sine.log
+    
+    # SSSD Cache fuer ungueltig erklaeren
+    sss_cache -UG
+
+    #Anpassen der Besitzrechte der Freigaben
+    /bin/chown -R root:"Domain Users" /srv/shares/archiv 2>&1| tee -a $setupdir/sine.log
+    /bin/chown -R root:"Domain Users" /srv/shares/gruppen 2>&1| tee -a $setupdir/sine.log
+    /bin/chown -R root:"Domain Users" /srv/shares/projekte 2>&1| tee -a $setupdir/sine.log
+    /bin/chown -R root:"Domain Users" /srv/shares/media 2>&1| tee -a $setupdir/sine.log
+    /bin/chown -R root:"Domain Admins" /srv/shares/service 2>&1| tee -a $setupdir/sine.log
+    /bin/chown -R root:"Domain Guests" /srv/shares/transfer 2>&1| tee -a $setupdir/sine.log
+    /bin/chown -R root:"Verwaltung" /srv/shares/verwaltung 2>&1| tee -a $setupdir/sine.log
+
+    # Zielverzeichnis fuer aschenputtel anlegen
+    mkdir -p -m 2770 /srv/shares/portal/uploads 2>&1| tee -a $setupdir/sine.log
+    chown root:"Domain Users" /srv/shares/portal/uploads 2>&1| tee -a $setupdir/sine.log
+    # Download-Verzeichnis anlegen
+    mkdir -p -m 2775 /srv/shares/portal/downloads 2>&1| tee -a $setupdir/sine.log
+    chown domadmin:"Domain Users" /srv/shares/portal/downloads 2>&1| tee -a $setupdir/sine.log
+
+    #Printer-Scripts kopieren
+    find /usr/share/doc/packages/ -type f -name smb*.pl -exec cp '{}' /usr/local/sbin/ \; 2>&1| tee -a $setupdir/sine.log
+    chown root:"Domain Admins" /usr/local/sbin/*printer.pl 2>&1| tee -a $setupdir/sine.log
+    chmod ug+x /usr/local/sbin/*printer.pl 2>&1| tee -a $setupdir/sine.log
+
+    #Verzeichnisrechte anpassen - Profilverzeichnisse
+    chown root:"Domain Users" /var/lib/samba/profiles 2>&1| tee -a $setupdir/sine.log
+    chmod 1777 /var/lib/samba/profiles 2>&1| tee -a $setupdir/sine.log
+
+    #Verzeichnisrechte anpassen - Druckertreiber Freigabe print$
+    chown -R root:"Domain Admins" /var/lib/samba/drivers 2>&1| tee -a $setupdir/sine.log
+    chmod -R g+ws /var/lib/samba/drivers 2>&1| tee -a $setupdir/sine.log
+
+    ## Vermutlich muss sich das Folgende an die Moeglichkeit Benutzer anzulegen anschließen,
+    ## oder hier ganz verschwinden....
+    # Alle Gruppen mit den Attributen und Objektklassen der gewaehlten Groupware ausstatten
+    # Testen, welche Groupware zum Einsatz kommt
+    whichimap=`getconfdata "IMAPserver" "2"`
+    
+    path="/usr/local/sbin"
+    file="manipgroups"
+    cp /usr/bin/$file $path/ 2>&1| tee -a $setupdir/sine.log
+    chown root:root $path/$file 2>&1| tee -a $setupdir/sine.log
+    chmod 0700 $path/$file 	2>&1| tee -a $setupdir/sine.log
+
+    if [[ $whichimap != "zarafa" ]]; then
+        path="/usr/local/sbin"
+	file="addgeg"
+	cp /usr/bin/$file $path/
+	chown root:root $path/$file
+	chmod 0700 $path/$file
+	$path/$file 2>&1|tee -a $setupdir/sine.log
+    else
+        path="/usr/local/sbin"
+	file="addzag"
+	cp /usr/bin/$file $path/
+	chown root:root $path/$file
+	chmod 0700 $path/$file
+	$path/$file 2>&1|tee -a $setupdir/sine.log
+	file="extzu"
+	cp /usr/bin/$file $path/ 	2>&1| tee -a $setupdir/sine.log
+	chown root:root $path/$file 	2>&1| tee -a $setupdir/sine.log
+	chmod 0700 $path/$file 		2>&1| tee -a $setupdir/sine.log
+    fi
+
+    yesno "Auf Ihrem Server wurde ein Samba-PDC eingerichtet.\n\n
+Es wurden grundlegende Gruppen und Systemaccounts angelegt.\nDer Server verfügt über die Freigaben:\n\n
+    - Verwaltung: Freigabe für Mitglieder der gleichnamigen Gruppe.\n
+    - Archiv: Ablageort für nicht mehr aktuelle Dateien.\n
+    - Projekte: Ablageort für aktuelle Dateien und das Group-e Projektmanagement.\n
+    - Service: Dateien für den Domänen-Administrator, wie Software, Treiber und Patches.\n
+    - Transfer: Freigabe für Dateiaustausch.\n
+    - & Media: Freigabe für Multimedia-Dateien.\n\n
+Es wurde die Gruppe Verwaltung angelegt, sowie ein Benutzer domadmin, Mitglied der Gruppe Domain Admins.\n
+Ihr Server wurde darüber hinaus an die LDAP-Benutzerdatenbank angebunden.\n\n
+Sie können jetzt Benutzer anlegen. Alternativ lässt sich dies auch bequem über das invis Portal erledigen.\n\n
+Möchten Sie jetzt Benutzer anlegen?" "Benutzerkonten anlegen"
+    nextuser=${?}
+    
+    while [[ $nextuser == "0" ]]; do
+	username=""
+	while (( ${#username} <= 3 )); do
+	    dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --form "$dialogshorthelp\n\n
+Geben Sie die folgenden Daten für den neuen Benutzer ein:" 18 74 7 \
+	    "Benutzername:" 2 2 "$mailrelay" 2 20 45 0\
+	    "Vorname:" 4 2 "$smtpun" 4 20 45 0\
+	    "Nachname:" 6 2 "$smtppw" 6 20 45 0\
+	    2>$0_temp
+	    uservalues=(`cat $0_temp`)
+	    username=${uservalues[0]}
+	done
+	yesno "Soll der neue Benutzer ein vollwertiger Benutzer sein? (Ansonsten wird nur ein Mail-Dummy-Konto eingerichtet)" "Benutzerkonten anlegen"
+	windows=${?}
+	if [[ $windows == "0" ]]; then  
+	    yesno "Soll der neue Benutzer Mitglied der privilegierten Gruppe \"Verwaltung\" sein?" "Benutzerkonten anlegen"
+	    verwaltung=${?}
+	fi
+	
+	# Alle neuen Benutzer bekommen eine Willkommens-Mail zugesandt, dies dient der automatischen Erzeugung eines Maildirs.
+	if [[ $windows == "1" ]]; then
+	    /usr/sbin/smbldap-useradd -m -s /bin/false -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
+	elif [[ $verwaltung == "0" ]]; then
+	    /usr/sbin/smbldap-useradd -m -a -G "Verwaltung" -E verwaltung.cmd -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
+	else
+	    /usr/sbin/smbldap-useradd -m -a -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
+	fi
+
+        echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
+        # Passwort setzen
+        smbldappw $username
+        echo "Willkommen in der Domäne $smbdom"|mailx -s Willkommen $username@localhost
+	if [[ $windows == "j" ]]; then
+	    mkdir /srv/shares/portal/downloads/$username
+	    chmod g+rwsx,o-rwx /srv/shares/portal/downloads/$username
+	fi
+	yesno "Möchten Sie einen weiteren Benutzer anlegen?" "Benutzerkonten anlegen" nextuser
+	nextuser=${?}
+    done
+    # Gastkonto anlegen
+    yesno "Möchten Sie jetzt einen minderprivilegierten Gast-Benutzer anlegen?" "Benutzerkonten anlegen"
+    guest=${?}
+    
+    if [[ $guest == "0" ]]; then
+	#read -p "Geben Sie den gewünschten Benutzernamen ein: " username
+	dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --inputbox "Geben Sie bitten den gewünschten Benutzernamen ein." 0 0 \
+	2>$0_temp
+	username=`cat $0_temp`
+	/usr/sbin/smbldap-useradd -m -a -s /bin/false -g 514 -E gast.cmd -c "Gastkonto" $username
+	echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
+	smbldappw $username
+    fi
+
+    # Samba-Server starten und in Runlevel eintragen
+    chkservice "nmb"
+    chkservice "smb"
+
+
+    # NFSv4 Server vorbereiten -- aber nicht starten
+    mkdir -p /srv/nfs4_base/home
+    mkdir /srv/nfs4_base/shares    
+    cp $cfilesdir/fileserver/nfs/exports_nfs4 /etc/exports
+    cat $cfilesdir/fileserver/nfs/fstab_extention >> /etc/fstab
+    mount -a
+    domain=`getconfdata "Domain" "2"`
+    path="/etc"
+    file="idmapd.conf"
+    strings="localdomain%$domain"
+    changevalues $path $file "$strings"
+
+    writeprepstat "webserver"
+    waitbox "samba" "webserver"
+
+}
+
+# Web-Server einrichten
+webserver() {
+    cd $setupdir
+    clear
+    windowtitle="Web Server"
+    waitinfobox "Ihr Webserver sowie das invis-Portal werden eingerichtet.
+Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/config.php vorgenommen werden." "Webserver-Konfiguration"
+    pgsubtitle="Zeichensatz des openSUSE-Manuals wird in UTF8 umgewandelt"
+    /usr/bin/changecharset "/usr/share/doc/manual/opensuse-manuals_de" 2>&1 | tee -a $setupdir/sine.log | pgbox
+
+    # Installation Portal
+    # MIME_Type wird jetzt aus spins:invis installiert
+    #pgsubtitle="PHP-PEAR MIME_Type wird installiert"
+    #pear install MIME_Type 2>&1 |pgbox
+    cp -R $cfilesdir/webserver/portal /srv/www/htdocs/
+    chown -R wwwrun:www /srv/www/htdocs 
+    fqdn=`getconfdata "FQDN" "2"`
+    masterpw=`getconfdata "MasterPW" "2"`
+    path="/srv/www/htdocs/portal"
+    cp $path/config.php.dist $path/config.php
+    file="config.php"
+    strings="master-secret%$masterpw"
+    changevalues $path $file "$strings"
+
+    strings="invis.invis-net.loc%$fqdn"
+    changevalues $path $file "$strings"
+    
+    ipaddr=`getconfdata "IP" "2"`
+    netpart1=`echo "$ipaddr" | cut -d "." -f 1`
+    netpart2=`echo "$ipaddr" | cut -d "." -f 2`
+    netpart3=`echo "$ipaddr" | cut -d "." -f 3`
+    netpart="$netpart1.$netpart2.$netpart3"
+    strings="192.168.220%$netpart"
+    changevalues $path $file "$strings"
+    
+    netpart="$netpart3.$netpart2.$netpart1"
+    strings="220.168.192%$netpart"
+    changevalues $path $file "$strings"
+    
+    groupware=`getconfdata "IMAPserver" "2"`
+    if [[ $groupware == "cyrus" ]]; then
+	groupware="groupe"
+    fi
+    if [[ $groupware == "dovecot" ]]; then
+	groupware="sogo"
+    fi
+    strings="usedgroupware%$groupware"
+    changevalues $path $file "$strings"
+
+    # auch in invis.conf anpassen
+    path="/etc/invis/"
+    file="invis.conf"
+    changevalues $path $file "$strings"
+
+    # Putty bereitstellen
+    cp $cfilesdir/putty/putty.exe /srv/www/htdocs/portal/
+    
+    # Shell-in-a-Box einrichten
+    #sshport=`getconfdata "SSHPORT" "2"`
+    #path="/etc/init.d/"
+    #file="shellinabox"
+    #strings="SSH%SSH:localhost:$sshport --localhost-only --disable-ssl"
+    #changevalues $path $file "$strings"
+    #chmod +x $path$file
+    
+    # Proxy-Module einrichten
+    a2enmod headers
+    #a2enmod xml2enc
+    a2enmod proxy
+    a2enmod proxy_http
+    a2enmod proxy_html
+    cp -a /etc/apache2/conf.d/mod_proxy_html.conf.in /etc/apache2/conf.d/mod_proxy_html.conf
+    
+    # Stammzertifikat der Server-CA bereitstellen
+    cp /etc/ssl/CA/cacert.pem /srv/www/htdocs/portal/inc/
+    
+    # Shellscripts installieren
+    cp /usr/bin/creategroupshare /usr/local/sbin/
+    cp /usr/bin/createhome /usr/local/sbin/
+    cp /usr/bin/deletehome /usr/local/sbin/
+    
+    # sudoers Datei anpassen
+    cat $cfilesdir/webserver/sudoers-expansion >> /etc/sudoers
+    
+    # Upload-Verzeichnis anlegen und Rechte anpassen
+    mkdir -m 2770 /srv/uploads
+    chown wwwrun:www /srv/uploads
+    
+    #aschenputtel installieren
+    cp /usr/bin/aschenputtel /usr/local/sbin/
+    chmod 755 /usr/local/sbin/aschenputtel
+    chown root:root /usr/local/sbin/aschenputtel
+    
+    # Kopieren und anpassend der Konfigurationsdateien
+    cp $cfilesdir/webserver/invis.conf /etc/apache2/conf.d/
+    cp $cfilesdir/webserver/invis-vh.conf /etc/apache2/vhosts.d/
+    path="/etc/apache2/vhosts.d"
+    file="invis-vh.conf"
+    fqdn=`getconfdata "FQDN" "2"`
+    strings="invisX.invis-net.loc%$fqdn"
+    changevalues $path $file "$strings"
+    
+    domain=`getconfdata "Domain" "2"`
+    strings="invis-net.loc%$domain"
+    changevalues $path $file "$strings"
+
+    # php5-apc Modul konfigurieren - ermoeglicht Fortschrittsbalken beim Datei-Upload
+    echo "apc.rfc1867 = On" >> /etc/php5/conf.d/apc.ini
+
+    # HTTPS-Port ändern
+    cp $cfilesdir/webserver/listen.conf /etc/apache2/
+    file="listen.conf"
+    path="/etc/apache2"
+    
+    httpsport=`getconfdata "HTTPSPORT" "2"`
+    strings="httpsport%$httpsport"
+    changevalues $path $file "$strings"
+
+    # Vergangenheit
+    # htpasswd Files anlegen
+    #cp -R $cfilesdir/webserver/passwds /srv/www/passwds
+    #chown -R wwwrun.www /srv/www/passwds
+
+    ## Externer Zugriff via HTTPS?
+    ddnshn=`getconfdata "DDNS" "2"`
+    if [[ $ddnshn != "none" ]]; then
+
+	msgbox "Es werden Schlüssel für den https-Zugriff erzeugt. Geben Sie bei der Frage nach dem Common-Name einen z.B. bei dyndns.org registrierten im Internet gültigen Namen, oder falls vorhanden Ihre feste IP-Adresse ein." "Webserver-Konfiguration"
+	/usr/local/sbin/serverkeys ws
+	
+        # Kopieren und anpassend der Konfigurationsdateien
+        cd $setupdir
+        cp $cfilesdir/webserver/invis-sslvh.conf /etc/apache2/vhosts.d/
+        path="/etc/apache2/vhosts.d"
+        file="invis-sslvh.conf"
+        strings="your.ddns-domain.net%$ddnshn"
+        changevalues $path $file "$strings"
+
+	# Lokalen Hostnamen ersetzten
+	fqdn=`getconfdata "FQDN" "2"`
+        strings="invis.invis-net.loc%$fqdn"
+        changevalues $path $file "$strings"
+
+	# Https Port setzen
+	httpsport=`getconfdata "HTTPSPORT" "2"`
+        strings="httpsport%$httpsport"
+        changevalues $path $file "$strings"
+
+    fi
+    # CorNAz installieren
+    # Verzeichnisse werden angelegt.
+    mkdir -p /var/cornaz/bin
+    mkdir /var/cornaz/build
+    mkdir /var/cornaz/bu
+    mkdir /var/cornaz/inuse		2>&1|tee -a $setupdir/sine.log |pgbox
+    mkdir /var/cornaz/sysconfig
+    mkdir /var/cornaz/vacation
+    mkdir -p /srv/www/htdocs/cornaz/inc
+    mkdir /srv/www/htdocs/cornaz/pics
+
+    # Mailproviderdatei an lokales LDAP-Verzeichnis anpassen
+    # Dateien werden kopiert
+    # Quellverzeichnis
+    sourcedir="$cfilesdir/webserver/cornaz"
+    cp $sourcedir/fetchmail/fetchmail /etc/init.d/
+    cp $sourcedir/sysconfig/fetchmail /var/cornaz/sysconfig/
+    cp $sourcedir/var/* /var/cornaz/bin/
+    # /etc/sudoers wird angepasst.
+    cp /etc/sudoers /etc/sudoers.bak
+echo "Cmnd_Alias FETCHPHP = /var/cornaz/bin/fetchcopy
+wwwrun ALL=NOPASSWD:FETCHPHP" >> /etc/sudoers
+echo "Cmnd_Alias HOLIDAY = /var/cornaz/bin/holiday
+wwwrun ALL=NOPASSWD:HOLIDAY" >> /etc/sudoers
+echo "Cmnd_Alias BACKHOME = /var/cornaz/bin/backhome
+wwwrun ALL=NOPASSWD:BACKHOME" >> /etc/sudoers
+
+    cp $sourcedir/htdocs/*.php /srv/www/htdocs/cornaz/
+    cp $sourcedir/htdocs/pics/* /srv/www/htdocs/cornaz/pics/
+    cp $sourcedir/htdocs/inc/* /srv/www/htdocs/cornaz/inc/
+
+    # Konfigurationsdaten ermitteln.
+    domain=`getconfdata "Domain" "2"`
+    ldaphost="localhost"
+    basedn=`getconfdata "baseDN" "2"`
+    path="/srv/www/htdocs/cornaz/inc"
+    file="config.inc.php"
+    strings="i6-maildomain%$domain"
+    changevalues $path $file "$strings"
+    strings="i6-ldaphost%$ldaphost"
+    changevalues $path $file "$strings"
+    strings="i6-basedn%$basedn"
+    changevalues $path $file "$strings"
+
+    # Sysconfig Datei bearbeiten
+    path="/var/cornaz/sysconfig"
+    file="fetchmail"
+    strings="localdomain%$domain"
+    changevalues $path $file "$strings"
+
+    # Dummy fetchmailrc anlegen.
+    echo 'poll pop.example.com protocol pop3 user dummy pass . is junk here' > /var/cornaz/build/.fetchmailrc
+    
+    #Dateirechte anpassen
+    chown -R wwwrun:root /var/cornaz
+    chown -R wwwrun:www /srv/www/htdocs/cornaz
+    chmod 0700 /var/cornaz/bin/fetchcopy
+    chmod 0700 /var/cornaz/bin/holiday
+    chmod 0700 /var/cornaz/bin/backhome
+# needless   chmod 0700 /var/cornaz/inuse/.fetchmailrc		2>&1|tee -a $setupdir/sine.log |pgbox
+# needless   chown fetchmail /var/cornaz/inuse/.fetchmailrc	2>&1|tee -a $setupdir/sine.log |pgbox
+
+    # fetchcopy ausfuehren
+    /var/cornaz/bin/fetchcopy				2>&1|tee -a $setupdir/sine.log |pgbox
+    chmod 0700 /var/cornaz/inuse/.fetchmailrc		2>&1|tee -a $setupdir/sine.log |pgbox
+    chown fetchmail /var/cornaz/inuse/.fetchmailrc	2>&1|tee -a $setupdir/sine.log |pgbox
+
+    # Webserver fuer worker-MPM konfigurieren
+    a2enmod -d php5
+    a2enmod fcgid
+    a2enmod rewrite
+    path="/etc/sysconfig/"
+    file="apache2"
+    strings="APACHE_MPM=\"\"%APACHE_MPM=\"worker\""
+    changevalues $path $file "$strings"
+    a2enflag FCGID
+    
+    # Webserver, shellinabox, fetchmail und Mailman neustarten und in Runlevel integrieren
+    chkservice "fetchmail"
+    chkservice "shellinabox"
+    chkservice "apache2"
+    chkservice "mailman"
+
+    writeprepstat "mysqlserver"
+    waitbox "webserver" "mysqlserver"
+}
+
+# MySQL-Server einrichten
+mysqlserver() {
+    cd $setupdir
+    clear
+    windowtitle="MySQL Server"
+
+    cp $cfilesdir/sql/mysql/config.inc.php /srv/www/htdocs/phpMyAdmin/config.inc.php
+    chown wwwrun:www /srv/www/htdocs/phpMyAdmin/config.inc.php
+    #MySQL Config schreiben und in Runlevel integrieren und starten.
+    cp $cfilesdir/sql/mysql/my.cnf /etc/
+    chkservice "mysql"
+
+    #MySQL Root-Passwort setzen
+    mysqlpw=`getconfdata "MySQLpw" "2"`
+    /usr/bin/mysqladmin password $mysqlpw
+
+    # Neuaufbau der Postfix chroot Umgebung zur Unsterstützung von mysql.sock 
+    chkservice "postfix"
+
+    writeprepstat "postgresqlserver"
+    waitbox "mysqlserver" "postgresqlserver"
+}
+
+# PostgreSQL-Server einrichten
+postgresqlserver() {
+    cd $setupdir
+    clear
+    windowtitle="PostgreSQL Server"
+
+    #cp /srv/www/htdocs/phpPgAdmin/conf/config.inc.php-dist /srv/www/htdocs/phpPgAdmin/conf/config.inc.php
+    pgsubtitle="PostgreSQL \"vorübergehend\" starten."
+    /etc/init.d/postgresql start 2>&1|tee -a $setupdir/sine.log |pgbox
+
+    # Konfigurationsdateien kopieren -> sind für lx-office vorbereitet.
+    cp $cfilesdir/sql/postgresql/*.conf /var/lib/pgsql/data 2>&1 |tee -a $setupdir/sine.log
+    chown -R postgres:postgres /var/lib/pgsql/ 2>&1 |tee -a $setupdir/sine.log
+    # Postgresql neu starten
+
+    yesno "Soll PostgreSQL automatisch gestartet werden? (Ist nur notwendig, wenn OpenERP oder LX-Office installiert wird.)" "Runlevel Eintrag für PostgreSQL wird konfiguriert."
+    pgsqlrl=${?}
+    if [[ $pgsqlrl == "1" ]]; then
+#	/etc/init.d/postgresql stop 2>&1 |tee -a $setupdir/sine.log |pgbox 
+	chkservice "postgresql" disable
+    else
+	chkservice "postgresql"
+    fi
+
+    writeprepstat "firewall"
+    waitbox "postgresqlserver" "firewall"
+}
+
+# Firewall einrichten und SSH-Port ändern
+firewall() {
+    cd $setupdir
+    clear
+    windowtitle="Firewall"
+
+    # Kopieren und anpassen der Firewall Konfiguration
+    cp $cfilesdir/firewall/SuSEfirewall2 /etc/sysconfig/
+    file="SuSEfirewall2"
+    path="/etc/sysconfig"
+    nw=`getconfdata "Networkbase" "2"`
+    netpart1=`echo "$nw" | cut -d "." -f 1`
+    netpart2=`echo "$nw" | cut -d "." -f 2`
+    netpart3=`echo "$nw" | cut -d "." -f 3`
+    netpart4=`echo "$nw" | cut -d "." -f 4`
+    netpart="$netpart1.$netpart2.$netpart3.$netpart4"
+    shortnmask=`getconfdata "NMask-short" "2"`
+    strings="192.168.220.0/24%$netpart/$shortnmask"
+    changevalues $path $file $strings
+    
+    # geaenderten SSH-Port einfuegen
+    sshport=`getconfdata "SSHPORT" "2"`
+    strings="sshport%$sshport"
+    changevalues $path $file "$strings"
+
+    # geaenderten HTTPS-Port einfuegen
+    httpsport=`getconfdata "HTTPSPORT" "2"`
+    strings="httpsport%$httpsport"
+    changevalues $path $file "$strings"
+    
+    # SSH Port ändern
+    cp $cfilesdir/ssh/sshd_config /etc/ssh
+    path="/etc/ssh"
+    file="sshd_config"
+
+    sshport=`getconfdata "SSHPORT" "2"`
+    strings="sshport%$sshport"
+    changevalues $path $file "$strings"
+
+
+    # Kleinen Bug im SSH init-Script fixen
+    path="/etc/init.d"
+    file="sshd"
+    strings="ssh-keygen -t dsa -b 2048%ssh-keygen -t dsa -b 1024"
+    changevalues $path $file "$strings"
+    chmod a+x $path/$file
+    
+    # SSHd neu starten
+    chkservice "sshd"
+    
+    # Firewall starten und in Runlevel eintragen
+    chkservice "SuSEfirewall2_init"
+    chkservice "SuSEfirewall2"
+
+    writeprepstat "nagios"
+    waitbox "firewall" "nagios"
+}
+
+nagios() {
+    cd $setupdir
+    clear
+    windowtitle="Vorbereitung für Server Monitoring"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/nagios.txt" 18 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Planen Sie den Server via Icinga oder Nagios zu überwachen?" 0 0
+    cont=${?}
+    if [[ $cont == "0" ]]; then
+        # Vorbereitung zur Ueberwachung des Servers via Icinga oder Nagios
+	zypper -n install -n `cat $cfilesdir/zypper-package-lists/nagios_plugins` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	groupadd -g 9000 nagios 2>&1 | tee -a $setupdir/sine.log | pgbox
+	useradd -u 9000 -g nagios -d /home/nagios -m -c "Nagios Admin" nagios 2>&1 | tee -a $setupdir/sine.log | pgbox
+	mkdir /home/nagios/.ssh 2>&1 | tee -a $setupdir/sine.log
+	chown -R nagios:nagios /home/nagios/ 2>&1 | tee -a $setupdir/sine.log
+    fi
+    writeprepstat "groupware"
+    waitbox "nagios" "groupware"
+}
+
+groupware() {
+
+whichimap=`getconfdata "IMAPserver" "2"`
+
+if [[ $whichimap == "cyrus" ]]; then
+    cd $setupdir
+    clear
+    windowtitle="Group-e Installation"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/group-e.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Group-e installieren?" 0 0
+    cont=${?}
+
+    if [[ $cont == "0" ]]; then
+	pgsubtitle="Zusätzliche Software wird installiert"
+	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n `cat $cfilesdir/zypper-package-lists/group-e` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+        dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen Group-e automatisch herunterzuladen?" 0 0
+	download=${?}
+	if [[ $download == "0" ]]; then
+	    # Link für Download mit wget:
+	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_v1.741.tar.bz2/download 2>&1 | tee -a $setupdir/sine.log | pgbox
+	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_z-push_v2.7.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
+	fi
+
+        # Entpacken des groupe Archivs
+        getpath=`find $setupdir -name "group-e_v*.tar.bz2"`
+        #echo $getpath
+	if [[ ! -f $getpath ]]; then
+            dialog --backtitle "$dialogtitle" --title "Group-e Installaton" --inputbox "Das Group-e Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum Group-e Archiv an:" 0 0 \ 2> $0_temp
+            getpath=`cat $0_temp`
+        fi
+	if [[ -f $getpath ]]; then
+	    pgsubtitle="Group-e wird entpackt und installiert."
+	    tar -xvf $getpath -C . 2>&1 |pgbox
+	    mv ./group-e /srv/www/htdocs/
+	    chown -R wwwrun:www /srv/www/htdocs/group-e
+	    chmod -R 775 /srv/www/htdocs/group-e/dyn
+	    #chgrp -R www /srv/www/htdocs/group-e/dyn
+	    cp /srv/www/htdocs/group-e/etc/apache.conf /etc/apache2/conf.d/groupe.conf
+	    path="/etc/apache2/conf.d"
+	    file="groupe.conf"
+	    strings="/opt/group-e%/srv/www/htdocs/group-e"
+	    changevalues $path $file "$strings"
+	    path="/srv/www/htdocs/group-e/www/cfg"
+	    file="global.inc.php"
+	    changevalues $path $file "$strings"
+	    path="/srv/www/htdocs/group-e/etc/phplib"
+	    file="prepend.php"
+	    changevalues $path $file "$strings"
+	    msgbox "Die Datenbank für Group-e wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	    mysqladmin -u root -p create groupe
+	    msgbox "Für die Group-e-Datenbank wird UTF8 als Zeichensatz gewählt - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	    mysql -u root -p --default-character-set=utf8 groupe < /srv/www/htdocs/group-e/dump/group-e_1.6_utf8.sql
+	    msgbox "Die Tabellenstruktur für die Group-e-Datenbank wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	    mysql -u root -p < $cfilesdir/groupe/user.sql
+	    path="/srv/www/htdocs/group-e/etc/phplib/lib"
+	    file="local.inc"
+	    strings="YOUR_GROUPE_PASSWORD%myxlgruss"
+	    changevalues $path $file "$strings"
+	    
+	    # Apache Default-Server-Konfiguration anpassen (FollowSymlinks wird hinzu gefügt)
+	    cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
+	
+	    # mount.cifs bzw. umount.cifs für Group-e verfügbar machen
+	    # Ist mit den PHP5 Paketen aus dem invis Repository eigentlich nit mehr notwendig.
+	    #chmod u+s /sbin/mount.cifs
+	    #chmod u+s /sbin/umount.cifs
+	    # Symbolische Links bleiben, praktisch fuer alle die smbmount nutzen.
+	    ln -s /sbin/mount.cifs /bin/smbmount
+	    ln -s /sbin/umount.cifs /bin/smbumount
+
+	    # Mail-Dummy für Projektmanagement anlegen
+	    /usr/sbin/smbldap-useradd -m -s /bin/false projekte
+	    msgbox "Es wurde ein Postfach-User für den Group-e Projektmanager angeleget, bitte geben Sie ein Passwort ein." "$windowtitle"
+	    smbldappw projekte
+	    echo "Initmail" |mailx -s Initmail projekte@localhost
+
+	    # z-push Installation -- Experimentell
+            getpath=`find ~ -name "group-e_z-push*.tar.gz"`
+	    echo $getpath
+	    if [[ ! -f $getpath ]]; then
+		dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $0_temp
+		getpath=`cat $0_temp`
+	    fi
+	    if [[ -f $getpath ]]; then
+		# Apache Konfigurationserweiterung kopieren.
+		#cp $cfilesdir/webserver/z-push.conf /etc/apache2/conf.d/
+		cp $cfilesdir/webserver/z-push_vh.conf /etc/apache2/vhosts.d/
+		# z-push entpacken und Verzeichnis verschieben
+		pgsubtitle="z-push wird entpackt und installiert."
+		tar -xvf $getpath -C . 2>&1 |pgbox
+		mv ./z-push /srv/www/htdocs/
+		chown -R wwwrun:www /srv/www/htdocs/z-push
+		
+		path="/srv/www/htdocs/z-push"
+		file="config.php"
+		strings="/soap.php%/group-e/soap.php"
+		changevalues $path $file "$strings"
+
+		strings="Amsterdam%Berlin"
+		changevalues $path $file "$strings"
+
+		strings="/var/www/z-push%/srv/www/htdocs/z-push"
+		changevalues $path $file "$strings"
+		
+		# Muss noch getestet werden, kann sein, dass das unnötig ist.
+	        ddnsname=`getconfdata "DDNS" "2"`
+		httpsport=`getconfdata "HTTPSPORT" "2"`
+		strings="'GROUP_URL_DOMAIN',''%GROUP_URL_DOMAIN','$ddnsname'"
+		changevalues $path $file "https://$strings:$httpsport"
+		
+		path="/etc/apache2/vhosts.d"
+		file="z-push_vh.conf"
+		strings="your.ddns-domain.net%$ddnsname"
+		changevalues $path $file "$strings"
+	    fi
+	
+	    chkservice "apache2"
+	else
+	    msgbox "Das Group-e Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
+	    exit 
+	fi
+	
+	writeprepstat "erp"
+	waitbox "groupware" "erp"
+    else
+	msgbox "Group-e Installation übersprungenen." "$windowtitle"
+	writeprepstat "erp" 
+    fi 
+elif [[ $whichimap == "dovecot" ]]; then
+    cd $setupdir
+    clear
+    windowtitle="SOGo Installation"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/sogo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"
+
+    zypper -n install -n `cat $cfilesdir/zypper-package-lists/sogo` 2>&1 | tee -a $setupdir/sine.log | pgbox
+    zyppercheck ${PIPESTATUS[0]}
+    cp $cfilesdir/sogo/SOGo /etc/sysconfig/SOGo
+    mkdir /etc/sogo
+    cp $cfilesdir/sogo/sogo.conf /etc/sogo/
+    confdir="/etc/sogo"
+    file="sogo.conf"
+    basedn=`getconfdata "baseDN" "2"`
+    strings="dc=i5-net,dc=loc%$basedn"
+    changevalues $confdir $file "$strings"
+    adminpw=`getconfdata "AdminPW" "2"`
+    strings="admin-secret%$adminpw"
+    changevalues $confdir $file "$strings"
+    sogodbuserpw=`mkdbsilent sogo sogo a`
+    strings="dbuserpw%$sogodbuserpw"
+    changevalues $confdir $file "$strings"
+    chown :sogo /etc/sogo/sogo.conf
+    chkservice "sogod"
+
+    writeprepstat "erp"
+    waitbox "groupware" "erp"
+else
+    ## Zarafa
+    cd $setupdir
+    clear
+    windowtitle="Zarafa Konfiguration"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/zarafa.txt" 38 90
+
+    ## Fix Zarafa Package-Bugs
+    # Spaeter wieder entfernen
+    mkdir -p /var/lib/zarafa-webaccess/tmp
+    mkdir -p /var/lib/zarafa-webaccess/plugins
+    chmod a+rwx /var/lib/zarafa-webaccess/tmp
+    libzarafaclient=`ls $libdir | grep "libzarafaclient-"`
+    ln -s $libdir/$libzarafaclient $libdir/libzarafaclient.so
+
+    # htaccess-Dateien entfernen, wenn Apache Worker MPM aktiv ist
+    isworker=`ps ax |grep httpd2-worker |grep -v grep|wc -l`
+    if (( $isworker > 0 )); then
+	rm -f /usr/share/zarafa-webaccess/.htaccess
+	rm -f /usr/share/zarafa-webapp/.htaccess
+	chkservice "apache2"
+    fi
+
+    ## Helfer-Scripts kopieren
+    cp /usr/bin/*zarafa* /usr/local/sbin/
+    #cp /usr/bin/runzarafa /usr/local/sbin/
+
+    chown root:root /usr/local/sbin/*zarafa*
+    chmod ug+x /usr/local/sbin/*zarafa*
+    
+    ## Leere Zarafa-Datenbank anlegen
+    zarafadbuserpw=`mkdbsilent zarafa zarafa a`
+    #echo "MysqlPW: $zarafadbuserpw"
+
+    # Locales-Vorlage kopieren
+    cp $cfilesdir/zarafa/zarafa /etc/sysconfig/
+
+    # Konfigurationsvorlagen kopieren
+    cp $cfilesdir/zarafa/*.cfg /etc/zarafa/
+    
+    # Konfigurationsdaten einlesen
+    domain=`getconfdata "Domain" "2"`
+    basedn=`getconfdata "baseDN" "2"`
+    ldapmasterpw=`getconfdata "MasterPW" "2"`
+
+    # Datenbank Zugang in Zarafa Konfiguration einfuegen usw.
+    path="/etc/zarafa"
+    file="server.cfg"
+    strings="dbuserpass%$zarafadbuserpw"
+    changevalues $path $file "$strings"
+
+    strings="postmaster@localhost%domadmin@$domain"
+    changevalues $path $file "$strings"
+
+    ## Plugin-Path bei Bedarf anpassen
+    if [[ $libdir == "/usr/lib64" ]]; then
+	strings="/usr/lib/zarafa%$libdir/zarafa"
+	changevalues $path $file "$strings"
+    fi
+
+    # LDAP Konfiguration anpassen
+    file="ldap.cfg"
+    strings="master-secret%$ldapmasterpw"
+    changevalues $path $file "$strings"
+
+    strings="dc=zarafa,dc=com%$basedn"
+    changevalues $path $file "$strings"
+    
+    strings="dc=invis-net,dc=loc%$basedn"
+    changevalues $path $file "$strings"
+    
+    path="/etc/postfix"
+    file="zarafa-users.cf"
+    strings="dbuserpass%$zarafadbuserpw"
+    changevalues $path $file "$strings"
+
+    ## Locales anpassen
+    path="/etc/zarafa/userscripts"
+    strings="en_US%de_DE.UTF-8"
+    file="companies_common.sh"
+    changevalues $path $file "$strings"
+
+    file="groups_common.sh"
+    changevalues $path $file "$strings"
+
+    file="users_common.sh"
+    changevalues $path $file "$strings"
+
+    path="/etc/zarafa/webaccess-ajax"
+    file="config.php"
+    
+    strings="London%Berlin"
+    changevalues $path $file "$strings"
+
+    strings="en_EN%de_DE.UTF-8"
+    changevalues $path $file "$strings"
+    
+    # Zarafa-Schluessel erzeugen
+    mkzarafakey
+    
+    # Dienste ins Runlevel-Konzept eintragen
+    for zinit in /etc/init.d/zarafa-* ; do
+	zinit=`basename $zinit`
+	chkservice $zinit
+    done
+    
+    #z-push als vHost anlegen & apache reload
+    cp $cfilesdir/webserver/z-push_vh.conf /etc/apache2/vhosts.d/
+    rm -f /etc/apache2/conf.d/z-push.conf
+    /etc/init.d/apache2 reload
+    
+    # Oeffentlichen Speicher anlegen
+    zarafa-admin -s    
+    extzu junk 1
+    
+    writeprepstat "erp"
+    waitbox "groupware" "erp"
+
+fi
+
+}
+
+erp() {
+whicherp=`getconfdata "ERPSoftware" "2"`
+case $whicherp in
+
+    "lx-erp" )
+	# PostgreSQL in RL eintragen, wenn noch nicht geschehen
+	srvon=`chkconfig postgresql|grep " on"`
+	if [[ -z $srvon ]]; then chkservice "postgresql"; fi
+	    lxerpversion="2.7.0"
+	    cd $setupdir
+	    clear
+	    windowtitle="LX-ERP Installation"
+	    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/lx-erp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie LX-ERP installieren?" 0 0
+	    cont=${?}
+
+	    if [[ $cont == "0" ]]; then
+		pgsubtitle="Zusätzliche Software wird installiert"
+		zypper refresh 2>&1 |pgbox
+		zypper -n install -n `cat $cfilesdir/zypper-package-lists/lx-office` 2>&1 |pgbox
+		zyppercheck ${PIPESTATUS[0]}
+	
+		# Apache FCGID-Modul aktivieren
+		a2enmod fcgid
+		/etc/init.d/apache2 reload 2>&1 |pgbox
+	
+		# Automatischer Download
+    		dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen LX-Office automatisch herunterzuladen?" 0 0
+		download=${?}
+		if [[ $download == "0" ]]; then
+		    # Link für Download mit wget:
+		    #http://downloads.sourceforge.net/project/lx-office/Lx-Office%20ERP/2.7.0/lx-office-erp-2.7.0.tar.gz
+		    wget http://downloads.sourceforge.net/project/lx-office/Lx-Office%20ERP/$lxerpversion/lx-office-erp-$lxerpversion.tar.gz 2>&1 |pgbox
+		fi
+
+		# Entpacken des lx-office-erp Archivs
+    		getpath=`find $setupdir -name "lx-office-erp*.tar*"`
+		if [[ ! -f $getpath ]]; then
+        	    dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Das LX-ERP Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum LX-ERP Archiv an:" 0 0 \ 2> $0_temp
+        	    getpath=`cat $0_temp`
+    		fi
+		if [[ -f $getpath ]]; then
+		    pgsubtitle="LX-ERP wird entpackt und installiert."
+		    tar -xvf $getpath -C . 2>&1 | tee -a $setupdir/sine.log | pgbox
+		    mv $setupdir/lxoffice-erp-$lxerpversion /srv/www/htdocs/lxerp
+		    chown -R wwwrun:www /srv/www/htdocs/lxerp
+		    cp $cfilesdir/lxerp/lx_office.conf /srv/www/htdocs/lxerp/config/lx_office.conf
+		    cp $cfilesdir/lxerp/lx-office-task-server /etc/init.d/
+
+		    msgbox "Der LX-Office Taskserver wird ins Runklevelkonzept integriert.
+Sein Start wird solange fehlschlagen, bis Sie einen gültigen LX-Office Benutzernamen in
+/srv/www/htdocs/lxerp/config/lx_office.conf eingetragen haben." "$windowtitle"
+
+		    chkservice "lx-office-task-server"
+
+		    msgbox "Es wird ein Postgresql-Benutzer - lxoffice - für LX-Office angelegt. 
+Vergessen Sie bitte nicht das hierbei von Ihnen zu vergebende Passwort. ;-)" "$windowtitle"
+		    sudo -u postgres createuser -d -r -S -P lxoffice
+		    ok=0
+		    while (( $ok != "1" ));do
+			dialog --backtitle "$dialogtitle" --title "LX-Office-DB Passwort" --insecure --passwordform "$dialogshorthelp\n\n
+Bitte geben Sie dass soeben vergebene Passwort für den LX-Office Datenbankbenutzer zur weiteren Verwendung erneut ein.\n\n" 17 64 2 \
+			"LX-Office-DB-Passwort:" 2 2 "" 2 23 10 0\
+			"Kontrolle:" 2 36 "" 2 47 10 0\
+			2>$0_temp
+			lxpassword=(`cat $0_temp`)
+			if [[ ${lxpassword[0]} == ${lxpassword[1]} ]];then
+			    ok=1
+			fi
+		    done
+		    lxpw="${lxpassword[0]}"
+
+		    pgsubtitle="Datenbanken werden angelegt"
+		    cp /$cfilesdir/lxerp/function.sql /tmp
+		    chmod o+r /tmp/function.sql
+		    cd /tmp
+		    sudo -u postgres psql template1 -f /tmp/function.sql 2>&1 | tee -a $setupdir/sine.log | pgbox
+		    rm -f /tmp/function.sql
+		    cd $setupdir
+		    dialog --backtitle "$dialogtitle" --title "$windowtitle" --radiolist "$dialogshorthelp\n\n
+Legen Sie jetzt bitte fest auf welche Art LX-Office Benutzer authentifiziert werden.\n
+Da LX-Office nur eine 1 zu 1 Zuordnung von Benutzer zu Datenbank zulässt, ist die LDAP-Authentifizierung nur
+dann sinnvoll, wenn lediglich mit einer LX-Office Datenbank gearbeitet wird."  16 80 8 \
+		    SQL "Benutzerverwaltung über eigene Authentifizierungsdatenbank" on\
+		    LDAP "Anbindung an die vorhandene LDAP Benutzerverwaltung" off\
+		    2>$0_temp
+		    lxauth=`cat $0_temp`
+		    path="/srv/www/htdocs/lxerp/config"
+		    file="lx_office.conf"
+		    if [[ $lxauth == "LDAP" ]]; then
+			basedn=`getconfdata "baseDN" "2"`
+			strings="dc=invis-net,dc=loc%$basedn"
+			changevalues $path $file "$strings"
+			strings="module = DB%module = LDAP"
+			changevalues $path $file "$strings"
+			ldapadminpw=`getconfdata "AdminPW" "2"`
+			strings="admin_secret%$ldapadminpw"
+			changevalues $path $file "$strings"
+		    fi
+		strings="lxpass%$lxpw"
+		changevalues $path $file "$strings"
+	    else 
+		msgbox "LX-ERP Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
+		exit
+	    fi
+
+	    writeprepstat "faxgate"
+	    waitbox "erp" "faxgate"
+	
+	else
+	    msgbox "LX-ERP Installation übersprungenen" "$windowtitle"
+	    writeprepstat "faxgate"
+	fi 
+	;;
+    
+    "wawision")
+	cd $setupdir
+	clear
+	windowtitle="waWision Installation"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/wawision.txt" 20 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie waWision installieren?" 0 0
+	cont=${?}
+	
+	if [[ $cont == "0" ]]; then
+	    pgsubtitle="Zusätzliche Software wird installiert"
+	    zypper refresh 2>&1 |pgbox
+	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/wawision` 2>&1 |pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+	    # Hier Datenbank installation einfügen
+	    wawipass=`mkdbsilent wawision1 wawision a`
+	    msgbox "Datenbank für waWision wurde angelegt.\n\nDatenbank: wawision1\nBenutzer: wawision\nPasswort: $wawipass\n\nNotieren Sie sich bitte diese Daten. Sie werden beim ersten Zugriff auf waWision benötigt." "$windowtitle"
+	    writeprepstat "faxgate"
+	    waitbox "erp" "faxgate"
+	else
+	    msgbox "waWision Installation übersprungenen" "$windowtitle"
+	    writeprepstat "faxgate"
+	fi
+	;;
+
+    "openerp")
+	# PostgreSQL in RL eintragen, wenn noch nicht geschehen
+	srvon=`chkconfig postgresql|grep " on"`
+	if [[ -z $srvon ]]; then chkservice "postgresql"; fi
+	## OpenERP
+	cd $setupdir
+	clear
+	windowtitle="OpenERP Installation"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/openerp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie OpenERP installieren?" 0 0
+	cont=${?}
+
+	if [[ $cont == "0" ]]; then
+
+	    ## Hier OpenERP Installation und Konfiguration
+	    windowtitle="OpenERP Installation"
+	
+	    pgsubtitle="Benötigte Software wird installiert"
+	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/openerp` 2>&1 | tee -a $setupdir/sine.log | pgbox
+
+	    msgbox "Es wird ein Postgresql-Benutzer - openerp - für OpenERP angelegt. 
+Vergessen Sie bitte nicht das hierbei von Ihnen zu vergebende Passwort. ;-)" "$windowtitle"
+	    sudo -u postgres createuser -d -P openerp
+	    sudo -u postgres createdb --encoding=utf-8 --owner openerp openerp
+
+	    # Dienste ins RL-Konzept aufnehmen
+	    chkservice openerp-server
+	    chkservice openerp-web
+
+	    writeprepstat "faxgate"
+	    waitbox "erp" "faxgate"
+	else
+	    msgbox "OpenERP Installation übersprungenen" "$windowtitle"
+	    writeprepstat "faxgate"
+	    waitbox "erp" "faxgate"
+	fi 
+	;;
+    *)
+        msgbox "Keine ERP Software gewünscht" "$windowtitle"
+	writeprepstat "faxgate"
+	waitbox "erp" "faxgate"
+	;;
+esac
+}
+
+faxgate() {
+    cd $setupdir
+    clear
+    windowtitle="Faxgate/Capisuite Installation"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/faxgate.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Faxgate installieren?" 0 0
+    cont=${?}
+
+    if [[ $cont == "0" ]]; then
+	ok=0
+	while [[ $ok != "1" ]]; do
+	dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Geben Sie bitte Ihre Telefonvorwahl ein." 0 0 \
+	2>$0_temp
+	exitcode=${?}
+	vorwahl=`cat $0_temp`
+	
+	if [[ $vorwahl =~ ^[0-9]{3,7}$ ]] ;then
+	    ok=1
+	fi
+	done
+	# Treiber installieren
+	pgsubtitle="Fritzcard-Treiber werden installiert"
+	cp /usr/bin/fcinst /usr/local/sbin
+	/usr/bin/fcinst 2>&1 | tee -a $setupdir/sine.log | pgbox
+	pgsubtitle="Zusätzliche Software wird installiert"
+	zypper -n install -n `cat $cfilesdir/zypper-package-lists/faxgate`  2>&1 | tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	
+	# System fuer AVM-Treiber vorbereiten
+	echo -e "mknod /dev/capi20 c 68 0\nchmod 0660 /dev/capi20\nchgrp dialout /dev/capi20\ncapiinit start\n" >> /etc/init.d/boot.local
+	file="50-blacklist.conf"
+	path="/etc/modprobe.d"
+	strings="blacklist fcpci%#blacklist fcpci"
+        changevalues $path $file "$strings"
+	echo -e "## invis-server.org -- Modul avmfritz blockieren\nblacklist avmfritz\n" >> /etc/modprobe.d/50-blacklist.conf
+	
+	# FritCard einrichten
+	fcname=`lspci |grep AVM|cut -d ":" -f3|cut -d " " -f2-`
+	cp $cfilesdir/CapiSuite/cfg-contr0 /etc/sysconfig/isdn/
+	file="cfg-contr0"
+	path="/etc/sysconfig/isdn"
+	strings="fcname%$fcname"
+        changevalues $path $file "$strings"
+	strings="vorwahl%$vorwahl"
+        changevalues $path $file "$strings"
+
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --radiolist "$dialogshorthelp\n\n
+Je nach dem, ob Sie über lediglich eine oder mehrere Faxnummern verfügen,
+können Sie Faxgate für den Single- oder Multi-User-Betrieb einrichten.\n\n
+Für den Multi-User-Betrieb sollten Sie über einen ISDN Anlagenanschluss verfügen."  16 90 8 \
+	Single-User "Es steht nur eine Fax-Nummer zur Verfügung (ISDN Mehrgeräteanschluss)." on\
+	Multi-User "Es stehen mehrere Faxnummern zur Verfügung (ISDN Anlagenanschluss). " off\
+	2>$0_temp
+	singleuser=`cat $0_temp`
+
+    if [[ $singleuser == "Single-User" ]]; then
+	cat $cfilesdir/fileserver/samba/smb.faxgate.su >> /etc/samba/smb.shares.conf
+	msgbox "Es wird ein neuer Benutzer unter dem Namen \"fax\" angelegt, mit dem Sie sich später
+am Faxgate Client anmelden und der alle eingehenden Faxe per email erhält.
+Geben Sie ein zugehöriges Passwort ein." "$windowtitle"
+
+	smbldap-useradd -m fax
+	smbldappw fax
+	echo "Fax-Benutzer erfolgreich eingerichtet"|mailx -s "Init-Mail" fax@localhost
+
+	chkservice "nmb"
+	chkservice "smb"
+    else
+	cat $cfilesdir/fileserver/samba/smb.faxgate.mu >> /etc/samba/smb.shares.conf
+	chkservice "nmb"
+	chkservice "smb"
+    fi
+	# sudoers Erweiterung wird eingefügt
+	cp $cfilesdir/CapiSuite/faxgate/sudoers-expansion $setupdir
+
+	fqdn=`getconfdata "FQDN" "2"`
+        path="$setupdir"
+        file="sudoers-expansion"
+        strings="invis5.invis-net.loc%$fqdn"
+        changevalues $path $file "$strings"
+
+        ip=`getconfdata "IP" "2"`
+        strings="192.168.220.10%$ip"
+        changevalues $path $file "$strings"
+
+        cp /etc/sudoers /etc/sudoers.ori
+	cat $setupdir/sudoers-expansion >> /etc/sudoers
+	
+	# Fax-Drucker wird eingerichtet
+	pgsubtitle="Faxdrucker wird eingerichtet"
+	/usr/sbin/lpadmin -p Faxgate -v faxgate://capisuite -m Faxgate.ppd.gz -E 2>&1 |pgbox
+	
+	# SSH-Portweiterleitung einrichten - provisorische Lösung für faxgate-Client
+	ip=`getconfdata "IP" "2"`
+	sshport=`getconfdata "SSHPORT" "2"`
+	echo "$ip 22 $ip $sshport" > /etc/rinetd.conf
+	sleep 1
+	#msgbox "Achtung: Das folgende Fenster müssen Sie vermutlich mit \"STRG+C\" abbrechen. Warum das Programm an
+#dieser Stelle hängen bleibt ist uns bisher ein Rätsel. Wir suchen nach der Lösung." "$windowtitle"
+	chkservice "rinetd"
+
+	writeprepstat "webcdwriter"
+	waitbox "lxerp" "webcdwriter"
+    else
+	msgbox "Fax-Server-Installation übersprungenen." "$windowtitle"
+	writeprepstat "webcdwriter"
+    fi 
+}
+
+webcdwriter() {
+    cd $setupdir
+    clear
+    windowtitle="WebCDWriter Installation"
+
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/webcdcreator.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie WebCDCreator installieren?" 0 0
+    cont=${?}
+
+    # Weitermachen?
+    if [[ $cont == "0" ]]; then
+	pgsubtitle="Software wird installiert"
+	zypper -n install -n webcdwriter sox 2>&1 |pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	# wodim verfügbar machen
+	rm -f /var/CDWserver/bin/cdrecord
+	cp -af /usr/bin/wodim /var/CDWserver/bin/wodim
+	chown root:root /var/CDWserver/bin/wodim
+	chmod 4750 /var/CDWserver/bin/wodim
+	ln -s /var/CDWserver/bin/wodim /var/CDWserver/bin/cdrecord
+	# genisoimage verfügbar machen
+	rm -f /var/CDWserver/bin/mkisofs
+	cp -af /usr/bin/genisoimage /var/CDWserver/bin/genisoimage
+	chown root:root /var/CDWserver/bin/genisoimage
+	chmod 4750 /var/CDWserver/bin/genisoimage
+	ln -s /var/CDWserver/bin/genisoimage /var/CDWserver/bin/mkisofs
+	# readom verfügbar machen
+	rm -f /var/CDWserver/bin/readcd
+	cp -af /usr/bin/readom /var/CDWserver/bin/readom
+	chown root:root /var/CDWserver/bin/readom
+	chmod 4750 /var/CDWserver/bin/readom
+	ln -s /var/CDWserver/bin/readom /var/CDWserver/bin/readcd
+	# permanenten fstab Eintrag für Brenner hinzufügen
+	cp /etc/fstab /etc/fstab.ori
+	echo "/dev/sr0 /media/cdrom0	udf,iso9660 noauto,utf8 0 0" >> /etc/fstab
+
+	# cdwserver ins Runlevel-Konzept integrieren und starten
+	cp $setupdir/CDWserver/CDWserver /etc/init.d
+	chkservice "CDWserver"
+    else
+	msgbox "WebCDWriter Installation übersprungen" "$windowtitle"
+    fi
+    writeprepstat "openvpn"
+    waitbox "webcdwriter" "openvpn"
+}
+
+openvpn() {
+    cd $setupdir
+    clear
+    windowtitle="OpenVPN Installation"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/openvpn.txt" 38 92 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie OpenVPN installieren?" 0 0
+    cont=${?}
+
+    if [[ $cont == "0" ]]; then
+	pgsubtitle="openvpn wird installiert" 
+	zypper -n install -n openvpn 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+
+	# openVPN Key-Center einrichten
+	domain=`getconfdata "Domain" "2"`
+	echo $domain
+	path="/usr/share/openvpn/easy-rsa/2.0"
+	file="Makefile"
+	cp $path/$file $path/$file.ori
+	strings="DESTDIR=%DESTDIR=/etc/openvpn"
+        changevalues $path $file "$strings"
+	strings="PREFIX=%PREFIX=$domain"
+        changevalues $path $file "$strings"
+	cd $path
+	pgsubtitle="easy-rsa wird installiert"
+	make install 2>&1 | tee -a $setupdir/sine.log | pgbox
+	cp $path/$file.ori $path/$file
+	
+        path="/etc/openvpn/$domain"
+        file="vars"
+	cd $path
+        strings="\`pwd\`%$path"
+        changevalues $path $file "$strings"
+
+        country=`getconfdata "Country" "2"`
+        strings="KEY_COUNTRY=\"US\"%KEY_COUNTRY=\"$country\""
+        changevalues $path $file "$strings"
+
+        region=`getconfdata "Region" "2"`
+        strings="KEY_PROVINCE=\"CA\"%KEY_PROVINCE=\"$region\""
+        changevalues $path $file "$strings"
+
+        city=`getconfdata "City" "2"`
+        strings="SanFrancisco%$city"
+        changevalues $path $file "$strings"
+
+        organisation=`getconfdata "Organisation" "2"`
+        strings="Fort-Funston%$organisation"
+	changevalues $path $file "$strings"
+
+        admail=`getconfdata "Admail" "2"`
+        strings="mail@host.domain%$admail"
+        changevalues $path $file "$strings"
+
+        strings="KEY_SIZE=1024%KEY_SIZE=2048"
+        changevalues $path $file "$strings"
+
+	name=`getconfdata "Admin" "2"`
+	echo "export KEY_NAME=\"$name\"" >> $path/$file
+
+	# Server-Konfiguration erzeugen.
+	cp $cfilesdir/openvpn/invis-server.conf /etc/openvpn
+	path="/etc/openvpn"
+	file="invis-server.conf"
+
+	strings="invis-net.loc%$domain"
+        changevalues $path $file "$strings"
+
+	ip=`getconfdata "IP" "2"`
+        strings="192.168.220.10%$ip"
+        changevalues $path $file "$strings"
+
+	net=`getconfdata "Networkbase" "2"`
+        strings="192.168.220.0%$net"
+        changevalues $path $file "$strings"
+
+	ddns=`getconfdata "DDNS" "2"`
+        strings="openvpn_server%$ddns"
+        changevalues $path $file "$strings"
+
+	# CA, Schlüssel usw. erzeugen
+	msgbox "CA, Server-Key und Diffie-Hellmann Parameter werden erzeugt. Speziell letzteres kann dauern...\nBeim Erzeugen von Zertifizierungsstelle und Server Zertifikaten können Sie in der Regel die vorgegebenen Parameter übernehmen.\nLediglich beim Feld \"Organizational Unit\" existiert keine Vorgabe. Der Parameter kann frei vergeben werden, sollte aber sinnvoll sein. Beispiel: \n\nOrganizational Unit: VPN CA bei der CA oder VPN Server beim Server-Zertifikat." "$windowtitle"
+	cd /etc/openvpn/$domain
+	# Umgebungsvariablen setzen
+	source ./vars 
+	./clean-all 
+	./build-ca
+	pgsubtitle="Diffie-Hellmann Parameter werden erzeugt"
+	./build-dh 2>&1 |pgbox
+	./build-key-server $ddns
+
+	msgbox "Beispiel Client-Konfigurationsdateien finden Sie im cfiles Unterverzeichnis.
+Um Schlüssel für einen Client zu erzeugen wechseln Sie nach /etc/openvpn/$domain und führen Sie 
+build-key \"clienthostname\" aus. Weitere Infos unter wiki.invis-server.de." "openVPN Clients einrichten"
+    # openvpn ins Runlevel-Konzept integrieren und starten
+	chkservice "openvpn"
+    else
+	msgbox "Wenn Sie es sich zu einem späteren Zeitpunkt anders überlegen, können Sie diesen Schritt durch erneutes Aufrufen des Setup-Scripts mit dem Parameter \"openvpn\" wiederholen." "OpenVPN Installation übersprungen"
+
+    fi
+    writeprepstat "dokuwiki"
+    waitbox "openvpn" "dokuwiki"
+}
+
+dokuwiki() {
+    cd $setupdir
+    clear
+    windowtitle="Dokuwiki Installation"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/dokuwiki.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Dokuwiki installieren?" 0 0
+    cont=${?}
+
+    if [[ $cont == "0" ]]; then
+
+    # Downloadlink ermitteln
+    pgsubtitle="Dokuwiki wird heruntergeladen und installiert"
+    cd $setupdir
+    #wget `lynx --dump http://www.splitbrain.org/projects/dokuwiki|grep "http"|grep ".tgz"|head -n1|tr -s " "|cut -d " " -f3` 2>&1 |pgbox
+    wget http://download.dokuwiki.org/src/dokuwiki/dokuwiki-stable.tgz
+    
+    getpath=`find ~ -name "dokuwiki*.tgz"`
+    tar -xzf $getpath -C /srv/www/htdocs 2>&1 |pgbox
+    mv /srv/www/htdocs/dokuwiki* /srv/www/htdocs/dokuwiki
+
+    # Display Wiki Page Plugin herunterladen
+    # Vorübergehender Link fuer Displaywikipage
+    pgsubtitle="Dokuwiki-Erweiterungen werden heruntergeladen und installiert"
+    wget http://cloud.github.com/downloads/tatewake/dokuwiki-plugin-displaywikipage/displaywikipage-stable.tar.gz 2>&1 |pgbox
+    getpath=`find ~ -name "display*.tar.gz"`
+    tar -xzf $getpath -C /srv/www/htdocs/dokuwiki/lib/plugins/ 2>&1 |pgbox
+
+    # Display Wiki Page Plugin herunterladen
+    # Voruebergehender Link fuer Monobook Template
+    wget http://cloud.github.com/downloads/tatewake/dokuwiki-template-monobook/monobook-stable.tar.gz 2>&1 |pgbox
+    getpath=`find ~ -name "monobook*.tar.gz"`
+    tar -xzf $getpath -C /srv/www/htdocs/dokuwiki/lib/tpl/ 2>&1 |pgbox
+
+    # Encrypt Password Plugin
+    wget http://www.werbeagentur-willers.de/download/dokuwiki-plugins/encryptedpasswords.zip
+    getpath=`find ~ -name "encrypted*.zip"`
+    unzip $getpath -d /srv/www/htdocs/dokuwiki/lib/plugins/ 2>&1 |pgbox
+
+    chown -R wwwrun:www /srv/www/htdocs/dokuwiki
+    
+    # Konfigurieren
+    path="/srv/www/htdocs/dokuwiki/conf"
+    file="local.php"
+    cp $cfilesdir/dokuwiki/$file $path/$file
+    
+    organisation=`getconfdata "Organisation" "2"`
+    strings="organization%$organisation"
+    changevalues $path $file "$strings"
+    
+    adminpw=`getconfdata "AdminPW" "2"`
+    strings="admin-secret%$adminpw"
+    changevalues $path $file "$strings"
+    
+    basedn=`getconfdata "baseDN" "2"`
+    strings="basedn%$basedn"
+    changevalues $path $file "$strings"
+    
+    # Gruppen fuer Dokuwiki anlegen
+    smbldap-groupadd -a wiki-nutzer 2>&1 |pgbox
+    smbldap-groupadd -a wiki-redakteure 2>&1 |pgbox
+    smbldap-groupadd -a wiki-chefredakteure 2>&1 |pgbox
+    
+    # ACL-Datei kopieren
+    cp $cfilesdir/dokuwiki/acl.auth.php /srv/www/htdocs/dokuwiki/conf/
+    chown wwwrun:www /srv/www/htdocs/dokuwiki/conf/acl.auth.php
+
+    else
+	msgbox "Wenn Sie es sich zu einem späteren Zeitpunkt anders überlegen, können Sie diesen Schritt durch erneutes Aufrufen des Setup-Scripts mit dem Parameter \"dokuwiki\" wiederholen." "Dokuwiki Installation übersprungen"
+    fi
+    writeprepstat "etherpad"
+    waitbox "dokuwiki" "etherpad"
+}
+
+etherpad() {
+    cd $setupdir
+    clear
+    windowtitle="Etherpad Lite Installation"
+
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/etherpad.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Etherpadd-Lite installieren?" 0 0
+    cont=${?}
+
+    # Weitermachen?
+    if [[ $cont == "0" ]]; then
+	pgsubtitle="Software wird installiert"
+	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install nodejs etherpad-lite 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	npm install -g node-inspector 2>&1 | tee -a $setupdir/sine.log | pgbox
+	confdir="/var/lib/etherpad-lite"
+	file="settings.json"
+	mv $confdir/$file $confdir/$file.orig
+	cp $cfilesdir/etherpad/$file $confdir/$file 2>&1 | tee -a $setupdir/sine.log | pgbox
+	etherpaddbuserpw=`mkdbsilent etherpad etherpad a`
+	strings="dbuserpw%$etherpaddbuserpw"
+	changevalues $confdir $file "$strings"
+	chkservice "etherpad-lite"
+	service etherpad-lite stop
+	mysql -u root -p < $cfilesdir/etherpad/charset.sql
+	service etherpad-lite start
+    else
+	msgbox "Etherpad-Lite Installation übersprungen" "$windowtitle"
+    fi
+    writeprepstat "ready"
+}
+
+### Ende der Funktionen - Beginn Hauptprogramm
+
+# Einlesen des aktuellen Setup-Status
+read -a prepstat < $setupdir/prepstat
+
+# Testen, ob dialog installiert ist.
+
+if [[ -z `which dialog 2>/dev/null` ]]; then
+    echo  -e "\n\033[1;33mDas Programm \"dialog\" wird installiert.\033[0m"
+    zypper -n install -n dialog
+    zyppercheck ${PIPESTATUS[0]}
+fi
+
+if [[ $prepstat == "ready" ]] && [[ $1 == "nagios" || $1 == "groupware" || $1 == "erp" || $1 == "faxgate" || $1 == "webcdwriter" || $1 == "openvpn" || $1 == "dokuwiki" || $1 == "etherpad" ]]; then
+	echo $1
+	sleep 1
+	$1
+	echo "ready" > $setupdir/prepstat
+else
+    read -a nextstep < $setupdir/prepstat
+    while [[ $nextstep != "ready" ]]; do
+	# Aufruf des nächsten Setup-Schrittes
+	#echo $nextstep
+	sleep 1
+	$nextstep
+	read -a nextstep < $setupdir/prepstat
+    done
+fi
+
+# Und Tschuess
+textbox "./infofiles/aftersetup.txt" "Installation abgeschlossen" "Beenden"
+
+# Auräumen -- Evtl. verwaiste dialog Prozesse killen
+killall dialog > /dev/null 2>&1
+rm -f ./$0_temp
+

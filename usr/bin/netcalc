@@ -1,0 +1,52 @@
+#!/bin/bash
+# Tool zur Umrechnung von langen in kurze Netzwerkmasken
+# (c) 2009 Stefan Schaefer invis-server.org
+# License GPLv3
+# Questions at: stefan@invis-server.org
+# Donations welcome ;-)
+
+# Einlesen der langen Netzwerkmaske
+longmask=$1
+#echo $longmask > subnetmask.log
+# Array zum Testen der eingegebenen Netzwerkmaske
+possible=(0 128 192 224 240 248 252 255)
+
+shortmask=0
+i=1
+while (( $i <= 4 )); do
+    #Stueck fuer Stueck zerlegen
+    lmpart=`echo $longmask|cut -d "." -f $i`
+    geprueft=8
+    for number in ${possible[*]}; do
+	if [[ $lmpart != $number ]]; then
+	    (( geprueft=$geprueft-1 ))
+	fi
+    done
+    if [[ $lmpart == "" ]] || (( $geprueft == 0 )); then echo "Keine gueltige Netzwerkmaske"; exit; fi
+    
+    #echo $lmpart
+    if (( $lmpart == 255 )); then
+	bitsum=8
+    else
+	n=8
+	bitsum=0
+	while (( n > 0 )); do
+	    (( potenz=2**$n ))
+	    #echo $potenz
+	    #echo $lmpart
+	    if (( $lmpart >= $potenz )); then
+		bit=1
+		(( lmpart=$lmpart-$potenz ))
+	    else
+		bit=0
+	    fi
+	(( bitsum=$bitsum+$bit ))
+	(( n=$n-1 ))
+	done
+    fi
+    #echo $bitsum
+    (( shortmask=$shortmask+$bitsum ))
+    (( i=$i+1 ))
+done
+
+echo $shortmask

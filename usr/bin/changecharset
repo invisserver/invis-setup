@@ -1,0 +1,24 @@
+#!/bin/sh
+# Change charset in every file in directory from iso-8859-1x to utf-8
+# Default origin charset = iso-8859-15
+# (C) 2008 invis-server.org
+# mail: stefan@invis-server.org
+# License: GPLv3
+
+
+#directory="/usr/share/doc/manual/opensuse-manual_de/manual"
+from="iso-8859-1"
+
+if [[ $# -eq 1 ]]; then
+    directory="$1"
+    if [[ ! -f $directory/utf8 ]]; then
+        for x in $directory/*; do 
+	    if [[ -f $x ]]; then
+    	        iconv -f $from -t utf-8 $x > $x.2
+	        mv $x.2 $x
+		rm -f $x.2
+	    fi
+	done
+    touch $directory/utf8
+    fi
+fi

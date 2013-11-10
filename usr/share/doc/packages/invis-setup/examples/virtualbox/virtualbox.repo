@@ -1,0 +1,10 @@
+[virtualbox]
+name=VirtualBox for openSUSE 11.4
+baseurl=http://download.virtualbox.org/virtualbox/rpm/opensuse/11.4
+type=yum
+enabled=1
+priority=120
+autorefresh=1
+gpgcheck=1
+gpgkey=http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc
+keeppackages=0

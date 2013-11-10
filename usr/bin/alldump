@@ -1,0 +1,80 @@
+#!/bin/bash
+# Shellscript zum Sichern aller Datenbanken eines invis Servers.
+# (C) 2009 invis-server.org
+# Author: Stefan Schaefer / stefan@invis-server.org
+# Questions: http://forum.invis-server.org
+# License: GPLv3
+
+# Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+## Name der Zarafadb
+zarafadb=`getconfdata $conffile "zDatabase" "2"`
+
+## Sicherungsverzeichnis
+
+dasibase=`getconfdata $conffile "DasiDir" "2"`
+dasitarget=`getconfdata $conffile "DBTarget" "2"`
+dasidir="$dasibase/$dasitarget"
+
+dumpdir="/srv/shares/archiv/dbdumps"
+
+# Erstellen, wenn nicht vorhanden
+if [[ ! -d $dumpdir ]]; then
+    mkdir -p $dumpdir
+    chmod 0777 $dumpdir
+fi
+
+if [[ ! -d $dasidir ]]; then
+    mkdir -p $dasidir
+fi
+
+datum=`date +%Y%m%d`
+
+## Sichern des LDAP-Verzeichnisses
+slapcat > $dumpdir/ldap-sicherung.ldif
+
+## MySQL
+# root PW einlesen
+mysqlrootpw=`getconfdata $passfile "MySQLroot" "2"`
+loginstring="-u root --password=$mysqlrootpw"
+
+# Alle Datenbanken ermitteln und sichern
+alldbs=(`mysqlshow  $loginstring |tr -s " "| cut -d " " -f2| grep -v "+"|grep -v "Databases"`)
+for db in ${alldbs[*]}; do
+    # Zarafa-DB ausschließen
+    if [[ $db != "$zarafadb" ]]; then
+	mysqldump $loginstring --add-drop-table --single-transaction $db > $dumpdir/mysql-$db-sicherung.sql
+    fi
+done
+
+## PostgreSQL
+# ins Home-Verzeichnis von User postgres wechseln
+cd /var/lib/pgsql
+alldbs=(`sudo -u postgres psql -l|tr -d " "|grep -v "Name"|grep -v "-"|grep -v "Listof"|grep -v "("|cut -d "|" -f1`)
+
+for db in ${alldbs[*]}; do
+    sudo -u postgres pg_dump -C -d -b $db > $dumpdir/pgsql-$db-sicherung.sql 2>/dev/null
+done
+cd
+
+## Sicherungen archivieren
+find $dumpdir/*| afio -oZ $dasidir/$datum-alle-datenbanken.cpio
+
+## Dump-Verzeichnis leeren
+rm -rf $dumpdir/*

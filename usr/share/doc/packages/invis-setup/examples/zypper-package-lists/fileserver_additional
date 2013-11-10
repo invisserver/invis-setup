@@ -1,0 +1,8 @@
+nfs-kernel-server
+nfsidmap
+vsftpd
+tftp
+yast2-ftp-server
+yast2-nfs-server
+yast2-samba-server
+yast2-tftp-server

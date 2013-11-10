@@ -1,0 +1,9 @@
+Es war eine dumme Idee die Eicar-Testsignaturen direkt in dieses
+Paket aufzunehmen. Blöd, wenn der Virenscanner beim Download des 
+invis-Setup-Pakets Alarm schlägt.
+
+Statt die Datei selbst beizulegen haben wir mit geteicar ein
+kleines Script zum direkten Download der Testsignatur Datei beigelegt.
+
+Die heruntergeladene Datei kann zum Test des Virenscanners verwendet 
+werden.

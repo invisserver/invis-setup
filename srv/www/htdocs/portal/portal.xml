@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE portal SYSTEM "portal.dtd">
+<portal onload="init();">
+	<sources>
+		<!-- main style sheets -->
+		<source type="css" src="css/invis.css" />
+		
+		<!-- custom portal wide stylesheets -->
+		
+		<!-- ############################## -->
+		<!-- ############################## -->
+		
+		<!-- javascript framework -->
+		<source type="javascript" src="js/prototype.js" />
+<!--	<source type="javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js" /> -->
+		
+		<!-- portal wide javascripts -->
+		<source type="javascript" src="js/encrypt.js" />
+		<source type="javascript" src="js/invis-base.js" />
+		<source type="javascript" src="js/invis-site.js" />
+-		<source type="javascript" src="js/invis-pwdmeter.js" />
+		
+		<!-- custom portal wide javascripts -->
+		
+	</sources>
+	
+	<sections>
+<!--
+		<section name linkname title inc [restricted="yes"] [visible="both|int|ext"]>
+			[<source type src />]*
+		</section>
+-->
+		<section name="lokal" linkname="loc" title="Willkommen" inc="inc/loc.section.inc.php" />
+		
+		<section name="internet" linkname="int" title="Internet" inc="inc/int.section.inc.php">
+			<source type="css" src="css/int.section.css" />
+		</section>
+		
+		<section name="status" linkname="stat" title="Serverstatus" inc="inc/status.section.inc.php" />
+		
+		<section name="transfer" linkname="transfer" title="Dateitransfer" inc="inc/transfer.section.inc.php" visible="ext" />
+		
+		<section name="?" linkname="help" title="Helpdesk" inc="inc/help.section.inc.php" />
+		
+		<section name="administration" linkname="admin" title="Administration" restricted="yes" inc="inc/admin.section.inc.php">
+			<source type="css" src="css/admin.section.css" />
+			<source type="javascript" src="js/admintools.js" />
+		</section>
+		
+	</sections>
+</portal>
+

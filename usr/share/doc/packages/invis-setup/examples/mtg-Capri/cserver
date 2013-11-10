@@ -1,0 +1,70 @@
+#! /bin/sh
+#
+# Copyright (c) 2002 SuSE Linux AG, Nuernberg, Germany. All rights reserved.
+#
+# File: /etc/init.d/boot.loadmodules
+# Author: Jiri Srain <jsrain@suse.cz>
+#
+# media transfer AG, Darmstadt/Germany
+#
+# Shell-Script
+#
+# Classification: admin eyes only
+# Status: Release
+# Version: 1.7
+#
+# (C) 1996-2003
+#
+# last modified: 09/08/2003, AB
+######################################################
+# Modified by Stefan Schaefer FSP Computer & Netzwerke
+# 09.08.2007
+### BEGIN INIT INFO
+# Provides:          capriserver
+# Required-Start:    $syslog $network isdn
+# Required-Stop:
+# Default-Start:     3 5
+# Default-Stop:
+# Description:       load modules required to be loaded in specific order
+### END INIT INFO
+#
+# Set the following variables according to your needs
+# before using this script
+#
+######################################################
+CAPRIROOT=/usr/local/mtG-CAPRI-Server
+AWK=awk
+##################################
+#
+# No user serviceable parts below
+#
+##################################
+case "$1" in
+'start')
+	cd ${CAPRIROOT}/bin
+	if [ -f capriserver ]
+        then
+		echo "mtG-CAPRI-Server starting."
+		LD_LIBRARY_PATH=${CAPRIROOT}/lib:$LD_LIBRARY_PATH
+		export LD_LIBRARY_PATH
+		./capriserver 1>${CAPRIROOT}/trace/capri.out 2>&1 &
+	fi
+	;;
+'stop')
+	PID=`ps ax | grep './capriserver' | grep -v grep | $AWK '{print $1}'`
+	if [ ! -z "$PID" ] ;  then
+		kill ${PID} 1> /dev/null 2>&1
+	fi
+	;;
+'restart')
+	$0 stop && $0 start
+	;;
+'reload')
+	$0 stop && $0 start
+	;;
+*)
+	echo "Usage: $0  { start | stop | restart | reload }"
+	exit 1
+	;;
+esac
+exit 0

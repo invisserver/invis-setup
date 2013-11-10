@@ -1,0 +1,31 @@
+#!/bin/bash
+# Kleines Script, um sich einen Avira Evaluations-Key herunter zu laden.
+#
+# Hinweis: die dauerhafte Verwendung des Evaluations-Key im produktiven 
+# und gewerblichen Einsatz ist ein Verstoss gegen die Avira Lizenz-
+# bedingungen.
+# In der Praxis hat sich allerdings gezeigt, dass auf aelteren openSUSE
+# Versionen ein Professional-Lizenz-Schluessel zu einer eingeschraenkten
+# Funktion unserer Version des Virenscanners fuehrte. In diesen Faellen
+# sollte nichts dagegen sprechen, dauerhaft den Evaluationsschluessel
+# zu verwenden, wenn ein Professional-Key erworben wurde.
+
+# (C) 2013 Stefan Schaefer -- invis-server.org
+# Author: Stefan Schaefer / stefan@invis-server.org
+# Questions: http://forum.invis-server.org
+# License: GPLv3
+
+# Zielverzeichnis
+avdir="/usr/lib/AntiVir/guard"
+
+# Alten Schluessel umbenennen
+mv $avdir/hbedv.key $avdir/hbedv.old
+
+# Schluessel herunterladen und installieren
+wget -P $avdir --trust-server-names http://personal.avira-update.com/package/peclkey/win32/int/hbedv.key
+
+# Antivir aktualisieren
+avupdate-guard
+
+# Dienst neu starten
+/etc/init.d/avguard restart

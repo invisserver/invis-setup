@@ -1,0 +1,98 @@
+# Define global ACLs to disable default read access.
+
+# Sample security restrictions
+#	Require integrity protection (prevent hijacking)
+#	Require 112-bit (3DES or better) encryption for updates
+#	Require 63-bit encryption for simple bind
+# security ssf=1 update_ssf=112 simple_bind=64
+
+# Sample access control policy:
+#       Root DSE: allow anyone to read it
+#       Subschema (sub)entry DSE: allow anyone to read it
+#       Other DSEs:
+#               Allow self write access to user password
+#               Allow anonymous users to authenticate
+#               Allow read access to everything else
+#       Directives needed to implement policy
+
+#When  writing  submatch  rules,  it may be convenient to avoid unnecessary regex <dnstyle> use; for instance, to
+#       allow access to the subtree of the user that matches the what clause, one could use
+#
+#            access to dn.regex="^(.+,)?uid=([^,]+),dc=example,dc=com$"
+#                 by dn.regex="^uid=$1,dc=example,dc=com$$" write
+#                 by ...
+#
+#       However, since all that is required in the to clause is substring expansion, a more efficient solution is
+#
+#            access to dn.regex="^(.+,)?uid=([^,]+),dc=example,dc=com$"
+#                 by dn.exact,expand="uid=$1,dc=example,dc=com" write
+#                 by ...
+
+access to attrs=userPassword,userPKCS12
+        by dn="uid=admin,dc=invis-net,dc=loc" write
+	by self write
+        by * auth
+	
+access to attrs=sambaNTPassword,sambaLMPassword
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+	by * none
+
+access to attrs=shadowLastChange
+        by dn="uid=admin,dc=invis-net,dc=loc" write
+        by self write
+        by * read
+
+access to dn.regex="^fsp([^,]+),uid=([^,]+),ou=Users,ou=Benutzerverwaltung,dc=invis-net,dc=loc"
+	by dn="uid=admin,dc=invis-net,dc=loc" write
+	by dn="uid=admin,ou=Benutzerverwaltung,dc=invis-net,dc=loc" write
+	by dn.exact,expand="uid=$2,ou=Users,ou=Benutzerverwaltung,dc=invis-net,dc=loc" write
+	by dn="uid=admin,ou=Benutzerverwaltung,dc=invis-net,dc=loc" read 
+	by * none
+
+access to dn.one="ou=Users,ou=Benutzerverwaltung,dc=invis-net,dc=loc"
+        by dn="uid=admin,ou=Benutzerverwaltung,dc=invis-net,dc=loc" write
+	by dn="uid=admin,dc=invis-net,dc=loc" write	
+	by self write
+	by * read
+
+access to dn.sub="ou=Benutzerverwaltung,dc=invis-net,dc=loc"
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by dn="uid=admin,ou=Benutzerverwaltung,dc=invis-net,dc=loc" write
+	by * read
+
+access to dn.sub="ou=Automount,dc=invis-net,dc=loc"
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by dn="uid=admin,ou=Automount,dc=invis-net,dc=loc" write
+	by * read
+
+access to dn.sub="ou=DNS-Server,dc=invis-net,dc=loc"
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by dn="uid=admin,ou=DNS-Server,dc=invis-net,dc=loc" write
+	by * read
+
+access to dn.sub="ou=DHCP-Server,dc=invis-net,dc=loc"
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by dn="uid=admin,ou=DHCP-Server,dc=invis-net,dc=loc" write
+	by * read
+	
+access to dn.sub="ou=Kontakt,dc=invis-net,dc=loc"
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by dn="uid=Admin,ou=Kontakt,dc=invis-net,dc=loc" write
+	by * read
+
+access to dn.sub="ou=Informationen,dc=invis-net,dc=loc"
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by dn="uid=Admin,ou=Kontakt,dc=invis-net,dc=loc" write
+	by * read
+
+
+access to dn.base=""
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by * read
+
+access to dn.base="cn=Subschema"
+        by dn="uid=admin,dc=invis-net,dc=loc" write	
+        by * read
+
+access to *
+        by * read

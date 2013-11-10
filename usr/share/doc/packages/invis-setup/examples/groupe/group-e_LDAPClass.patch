@@ -1,0 +1,13 @@
+--- ClassGroupieUser_FullLdap.php	2009-07-06 12:40:09.000000000 +0200
++++ ClassGroupieUser_FullLdap.php	2009-08-26 10:20:11.000000000 +0200
+@@ -1483,7 +1483,9 @@
+ 				$smb_profile=$this->_getSmbProfileData($userData);
+ 				if (isset($userData['samba']) && isset($oldData['sambaacctflags']) && $userData['samba'] && strpos($oldData['sambaacctflags'][0],'D')) $ldap_add['sambaAcctFlags']=str_replace('D','',$oldData['sambaacctflags'][0]);
+ 				if (isset($userData['samba']) && isset($oldData['sambaacctflags']) && !$userData['samba'] && !strpos($oldData['sambaacctflags'][0],'D')) $ldap_add['sambaAcctFlags']=str_replace(']','D]',$oldData['sambaacctflags'][0]);
+-				if (strlen($userData['username']) && isset($oldData['sambalogonscript']) && $oldData['sambalogonscript'][0]!=$userData['username'].'.bat') $ldap_add['sambaLogonScript']=$userData['username'].'.bat';
++				// Stefan Schaefer - stefan@invis-server.org - Lasst bitte die Finger von bereits vorhandenen Attributen ;-)
++				//if (strlen($userData['username']) && isset($oldData['sambalogonscript']) && $oldData['sambalogonscript'][0]!=$userData['username'].'.bat') $ldap_add['sambaLogonScript']=$userData['username'].'.bat';
++				if (strlen($userData['username']) && !isset($oldData['sambalogonscript'])) $ldap_add['sambaLogonScript']=$userData['username'].'.bat';
+ 				if (strlen($userData['username']) && isset($oldData['sambaprofilepath']) && $oldData['sambaprofilepath'][0]!=$smb_profile['smbProfilePath']) $ldap_add['sambaProfilePath']=$smb_profile['smbProfilePath'];
+ 				if (strlen($userData['username']) && isset($oldData['sambahomedrive']) && $oldData['sambahomedrive'][0]!=$smb_profile['smbHomeDrive']) $ldap_add['sambaHomeDrive']=$smb_profile['smbHomeDrive'];
+ 				if (strlen($userData['username']) && isset($oldData['sambahomepath']) && $oldData['sambahomepath'][0]!=$smb_profile['smbHomePath']) $ldap_add['sambaHomePath']=$smb_profile['smbHomePath'];

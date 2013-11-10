@@ -1,0 +1,4 @@
+    # Virenscanner
+	vfs object = vscan-antivir
+	vscan-antivir: config-file = /etc/samba/vscan-antivir.conf
+	

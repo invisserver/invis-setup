@@ -1,0 +1,7 @@
+# Achtung! Wenn Sie diese Datei von Hand verwenden, ersetzen Sie "i6-libdir" bitte durch den auf Ihrem System gültigen Pfad
+create function plpgsql_call_handler()
+returns opaque
+as 'i6-libdir/postgresql/plpgsql.so'
+language 'c';
+create language 'plpgsql' handler plpgsql_call_handler
+lancompiler 'pl/pgsql';

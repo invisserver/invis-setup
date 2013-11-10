@@ -1,0 +1,25 @@
+#!/bin/bash
+# Mini Script zum automatischen Löschen eines Home-Verzeichnisses
+# (c) 2009 Daniel T. Bender invis-server.org
+# (c) 2009,2013 Stefan Schäfer invis-server.org
+# License: GPLv3
+# Questions: http://forum.invis-server.org
+archivdir="/srv/shares/archiv"
+
+if [ $# -eq 1 ]; then
+	USR=$1;
+	DIR=/home/$USR;
+	#Verzeichnis sichern
+	tar -czf $archivdir/$USR-Home.tar.gz $DIR
+	rm -rf $DIR;
+	profiledir="/var/lib/samba/profiles/$USR*"
+	tar -czf $archivdir/$USR-Profile.tar.gz $profiledir
+	rm -rf $profiledir
+	portaldir=/srv/shares/portal/downloads/$USR
+	tar -czf $archivdir/$USR-Portal.tar.gz $portaldir
+	rm -rf $portaldir
+	rm -f "/srv/shares/service/winscripts/mvlib$USR.cmd"
+	sss_cache -UG
+else
+	echo "Usage: $0 {username}";
+fi

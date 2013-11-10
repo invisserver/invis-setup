@@ -1,0 +1,9 @@
+# Postfix Zugriffskonfiguration auf die Zarafa-Benutzerdatenbank
+user = zarafa
+password = dbuserpass
+hosts = 127.0.0.1
+dbname = zarafa
+# For Postfix 2.2 and later The SQL query template.
+# See mysql_table(5) for details.
+query = select value from objectproperty where objectid=(select objectid from objectproperty where value='%s' limit 1) and propname='loginname';
+

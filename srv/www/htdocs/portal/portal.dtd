@@ -1,0 +1,23 @@
+<!ELEMENT portal (sources, sections)>
+<!ATTLIST portal
+	onload		CDATA	"init();"
+>
+
+<!ELEMENT sources (source*)>
+<!ELEMENT source EMPTY>
+<!ATTLIST source
+	type		(css|javascript)	#REQUIRED
+	src			CDATA	#REQUIRED
+>
+
+<!ELEMENT sections (section*)>
+<!ELEMENT section (source*)>
+<!ATTLIST section
+	name		CDATA	#REQUIRED
+	linkname	CDATA	#REQUIRED
+	title		CDATA	#REQUIRED
+	inc			CDATA	#REQUIRED
+	
+	restricted	(yes)	#IMPLIED
+	visible		(both|int|ext)	#IMPLIED
+>

@@ -1,0 +1,34 @@
+# Initiale LDIF Datei zur Erzeugung einer DNS Struktur nach dem DLZ-Schema
+
+# Master Zonen
+dn: ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: zone.master
+description: Basisknoten der Master Zonen
+
+# 1. Domain: invis-net.loc
+dn: dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzZone
+dlzZoneName: invis-net.loc
+
+# 1. Domain: invis-net.loc -- Hilfswert fuer das invis-Portal
+# Hier wird fuer jede Zone der zuletzt verwendete dlzRecordID-Wert eingetragen.
+dn: infoIdentifier=dlzRecordID,dlzZoneName=invis-net.loc,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: infoEntry
+infoIdentifier: dlzRecordID
+infoText: 65
+description: zuletzt verwendeter dlzRecordID
+
+# 1. Domain: invis-net.loc -- Reverse
+dn: dlzZonename=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzZone
+dlzZoneName: 220.168.192.in-addr.arpa
+
+# 1. Domain: invis-net.loc -- Reverse -- Hilfswert fuer das invis-Portal
+# Hier wird fuer jede Zone der zuletzt verwendete dlzRecordID-Wert eingetragen.
+dn: infoIdentifier=dlzRecordID,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: infoEntry
+infoIdentifier: dlzRecordID
+infoText: 65
+description: zuletzt verwendeter dlzRecordID

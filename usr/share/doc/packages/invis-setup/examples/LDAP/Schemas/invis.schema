@@ -1,0 +1,458 @@
+## invis.schema
+#
+# invis Server LDAP Schema 
+# Objectclass- and attribute-Definitions for:
+# - Mailhandling mit Postfix und fetchmail
+# - invis Portal
+# - MicheleMail
+# - unstructured Informations
+#
+# (c) 2006 Stefan Schaefer / FSP Computer & Netzwerke
+# (c) 2011 Stefan Schaefer / invis-server.org
+# Last Modified: 19.07.2011
+#
+# Infos unter:
+# FSP Computer & Netzwerke
+# Dipl.-Ing. Stefan Schaefer
+# Ludwigstr. 1-3
+# 63679 Schotten
+# Germany
+# email: st-schaefer@fsproductions.de
+# Internet: www.fsproductions.de
+#           www.invis-server.org
+#
+# The IANA has assigned the following Private Enterprise
+# Number to FSP Computer & Netzwerke:
+#
+#                      25601
+#
+# Please see the following for your assignment in the registry:
+#
+# <http://www.iana.org/assignments/enterprise-numbers>
+# 
+
+## OID Definitionen
+
+objectidentifier FSP 1.3.6.1.4.1.25601:1
+objectidentifier FSP.MailAcc FSP:1.1
+objectidentifier FSP.MailFilt FSP:1.2
+objectidentifier FSP.MMailAcc FSP:1.3
+objectidentifier FSP.MailProv FSP:2.1
+objectidentifier FSP.iPortEntry FSP:3.1
+objectidentifier FSP.infoEntry FSP:4.1
+
+## OID Aufbau
+#
+# Mailhandling FSP.1.X
+# MailProvider FSP.2.X
+# To be continued FSP.X
+# attributetypes FSP.X.X.1.x
+# objectclasses FSP.X.X.2.x
+
+
+# Diese Schema setzt die folgenden Schemas voraus:
+# 
+# core.schema
+
+## Attribute zum Mailmapping
+# Hier werden Attribute definiert die für das Weiterleiten,
+# Umadressieren usw. von emails benötigt werden.
+# Ich habe im Folgenden teilweise das Rad neu erfunden,
+# da einige meiner Attribute leicht modifiziert aus dem
+# misc.schema uebernommen sind.
+
+attributetype ( FSP.MailAcc:1.1
+	NAME 'fspLocalMailAddress'
+	DESC 'RFC822 email address of this recipient'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+
+attributetype ( FSP.MailAcc:1.2
+	NAME 'fspLocalMailHost'
+	DESC 'FQDN of the local SMTP/MTA of this recipient'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	SINGLE-VALUE )
+
+attributetype ( FSP.MailAcc:1.3
+	NAME 'fspExtMailAddress'
+	DESC 'RFC822 external address of this recipient'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	SINGLE-VALUE )
+
+# Haupt eMail Adresse eines Users - fuer ausgehende Adressmanipulation
+attributetype ( FSP.MailAcc:1.4
+	NAME 'fspMainMailAddress'
+	DESC 'RFC822 external address of this recipient'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	SINGLE-VALUE )
+
+
+## Attribute fuer fetchmail
+# Attribut Definitionen für fetchmail. fetchmail,
+# soll alle Daten, die es zum Abholen von emails aus
+# externen Postfaechern benoetigt aus dem LDAP DIT
+# beziehen können.
+
+attributetype ( FSP.MailAcc:1.5
+	NAME 'fspExtMailServer'
+	DESC 'FQDN or IP addresse of the remote mailserver'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	SINGLE-VALUE )
+
+attributetype ( FSP.MailAcc:1.6
+	NAME 'fspExtMailProto'
+	DESC 'Protocoll to fetch mail with, like imap or pop3'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	SINGLE-VALUE )
+
+attributetype ( FSP.MailAcc:1.7
+	NAME 'fspExtMailUserName'
+	DESC 'Username for the remote mailbox'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	SINGLE-VALUE )
+
+attributetype ( FSP.MailAcc:1.8
+	NAME 'fspExtMailUserPW'
+	DESC 'Password for the remote mailbox'
+	EQUALITY caseExactIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	SINGLE-VALUE )
+
+# Fetchmail Optionen wie z.b. here, ssl, fetchall usw. werden ohne Kommata eingegeben
+attributetype ( FSP.MailAcc:1.9
+	NAME 'fspMailfetchOpts'
+	DESC 'Options like fetchall or ssl - multiple values possible'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256})
+
+
+## Attribute für MailFilter
+# Die folgenden Attribute sind zum Aufbau
+# Sieve-Mailfilter-Dateien für den Dovecot
+# IMAP Server gedacht.
+
+attributetype ( FSP.MailFilt:1.1
+	NAME 'fspMailFilterName'
+	DESC 'Name for Sieve Filter Rule'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MailFilt:1.2
+	NAME 'fspMailFilterAction'
+	DESC 'Sieve Actions: discard, reject, fileinto, redirect'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256})
+
+attributetype ( FSP.MailFilt:1.3
+	NAME 'fspMailFilterTestCommand'
+	DESC 'Sieve Test: address, header, body, exists, size'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256})
+
+attributetype ( FSP.MailFilt:1.4
+	NAME 'fspMailFilterTestAttribute'
+	DESC 'Sieve Conditions: from, to, cc, bcc, subject, date'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256})
+
+attributetype ( FSP.MailFilt:1.5
+	NAME 'fspMailFilterComparativeOperator'
+	DESC 'Sieve Conditions Comparative Operators: is, contains, match '
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256})
+
+attributetype ( FSP.MailFilt:1.6
+	NAME 'fspMailFilterComparativeValue'
+	DESC 'Sieve Comparative Values'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MailFilt:1.7
+	NAME 'fspMailFilterTransType'
+	DESC 'Sieve Transformation Types: text/plain, text/html, audio/mp3'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256})
+
+attributetype ( FSP.MailFilt:1.8
+	NAME 'fspMailFilterInfo'
+	DESC 'Sieve Action Informations'
+	EQUALITY caseIgnoreIA5Match
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256})
+
+attributetype ( FSP.MailFilt:1.9
+	NAME 'fspMailFilterDescription'
+	DESC 'Short Description'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+# Es folgen Attribute zu Mailservern. 
+# Diese Attribute dienen dazu Daten zu bekannten
+# Mailservern vorzuhalten. Etwa um Vorlagen für
+# Fetchmail-Accounts zu erzeugen.
+
+
+attributetype ( FSP.MailProv:1.1
+	NAME 'fspMailProviderVendor'
+	DESC 'Name of the Mail Service Provider'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MailProv:1.2
+	NAME 'fspMailProviderPOP'
+	DESC 'POP3 Server Address'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MailProv:1.3
+	NAME 'fspMailProviderIMAP'
+	DESC 'IMAP Server Address'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MailProv:1.4
+	NAME 'fspMailProviderSMTP'
+	DESC 'SMTP Server Address'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MailProv:1.5
+	NAME 'fspMailProviderPOPSSL'
+	DESC 'POP3 SSL Support'
+	SINGLE-VALUE
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7)
+
+attributetype ( FSP.MailProv:1.6
+	NAME 'fspMailProviderIMAPSSL'
+	DESC 'IMAP SSL Support'
+	SINGLE-VALUE
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7)
+
+attributetype ( FSP.MailProv:1.7
+	NAME 'fspMailProviderSMTPPort'
+	DESC 'SMTP Server Port'
+	EQUALITY IntegerMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.27{5})
+
+attributetype ( FSP.MailProv:1.8
+	NAME 'fspMailProviderSMTPTLS'
+	DESC 'SMTP TLS Support'
+	SINGLE-VALUE
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7)
+
+attributetype ( FSP.MailProv:1.9
+	NAME 'fspMailProviderUserName'
+	DESC 'POP/IMAP/SMTP Username'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MailProv:1.10
+	NAME 'fspMailProviderDescription'
+	DESC 'Short Description Additional Informations'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+## Attribute für MMailAccount
+# Die folgenden Attribute sind zum Aufbau
+# der MMail-Konfiguration gedacht.
+
+attributetype ( FSP.MMailAcc:1.1
+        NAME 'MMailUser'
+        DESC 'Login Name for IMAP Account'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MMailAcc:1.2
+        NAME 'MMailPassword'
+        DESC 'Password for IMAP Account'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MMailAcc:1.3
+        NAME 'MMailCustomName'
+        DESC 'Custom Name for IMAP Account'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256})
+
+attributetype ( FSP.MMailAcc:1.4
+        NAME 'MMailCustomSignature'
+        DESC 'Custom Name for MAIL Signatur'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{2048})
+
+## Attribute zu invis Portal Eintraegen
+# Im folgenden werden Attribute definiert,
+# die vom invis Portal ausgewertet werden.
+# Im Grunde handelt es sich hierbei um
+# Links, die im Portal angezeigt werden.
+
+attributetype ( FSP.iPortEntry:1.1
+	NAME 'iPortEntryName'
+	DESC 'Name of the Portal Entry'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+	SINGLE-VALUE)
+
+attributetype ( FSP.iPortEntry:1.2
+	NAME 'iPortEntryActive'
+	DESC 'Entry active or not'
+	SINGLE-VALUE
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7)
+
+attributetype ( FSP.iPortEntry:1.3
+	NAME 'iPortEntryURL'
+	DESC 'URL of the Portal Entry Destination'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+	SINGLE-VALUE)
+
+attributetype ( FSP.iPortEntry:1.4
+	NAME 'iPortEntrySSL'
+	DESC 'SSL-Encrypted Link'
+	SINGLE-VALUE
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.7)
+
+attributetype ( FSP.iPortEntry:1.5
+	NAME 'iPortEntryDescription'
+	DESC 'Short Description Additional Informations'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+	SINGLE-VALUE)
+
+attributetype ( FSP.iPortEntry:1.6
+	NAME 'iPortEntryPosition'
+	DESC 'Where to place this Entry'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+	SINGLE-VALUE)
+
+attributetype ( FSP.iPortEntry:1.7
+	NAME 'iPortEntryPriv'
+	DESC 'Who could see this Entry'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+	SINGLE-VALUE)
+
+attributetype ( FSP.iPortEntry:1.8
+	NAME 'iPortEntryButton'
+	DESC 'Button Text of this Entry'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+	SINGLE-VALUE)
+
+attributetype ( FSP.iPortEntry:1.9
+	NAME 'iPortEntryLinkRubrik'
+	DESC 'Classifikation of this Link Entry'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+	SINGLE-VALUE)
+
+attributetype ( FSP.infoEntry:1.1
+	NAME 'infoIdentifier'
+	DESC 'Information Identifier'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+	SINGLE-VALUE)
+
+attributetype ( FSP.infoEntry:1.2
+	NAME 'infoText'
+	DESC 'Information Text'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+	SINGLE-VALUE)
+
+# soviel erstmal - to be continued
+# ... und die zugehoerigen Objektklassen
+
+# Objektklasse fuer ausgehende Adressmanipulation, spaeter evtl. relocation & alias
+objectclass ( FSP.MailAcc:2.1
+	NAME 'fspLocalMailRecipient'
+	DESC 'Internet local mail recipient'
+	SUP top STRUCTURAL
+	MUST	( fspLocalMailAddress $ fspMainMailAddress )
+	MAY	( fspLocalMailHost ) )
+
+objectclass ( FSP.MailAcc:2.2
+	NAME 'fspFetchMailAccount'
+	DESC 'Internet local mail recipient'
+	SUP top STRUCTURAL
+	MUST ( fspExtMailAddress $ fspExtMailServer $ fspExtMailProto $ fspExtMailUserName $ fspExtMailUserPW $ fspLocalMailAddress )
+	MAY	( FSPMailfetchOpts ) )
+
+objectclass ( FSP.MailFilt:2.1
+	NAME 'fspMailFilter'
+	DESC 'Sieve based Mailfilter'
+	SUP top STRUCTURAL
+	MUST	( fspMailFilterName $ fspMailFilterAction $ fspMailFilterTestCommand $ fspMailFilterTestAttribute $ fspMailFilterComparativeOperator $ fspMailFilterComparativeValue )
+	MAY	( fspMailFilterInfo $ fspMailFilterTransType $ fspMailFilterDescription ) )
+
+objectclass ( FSP.MailProv:2.1
+	NAME 'fspMailProvider'
+	DESC 'Informations about Mail-Servers'
+	SUP top STRUCTURAL
+	MUST	( fspMailProviderVendor )
+	MAY	( fspMailProviderPOP $ fspMailProviderIMAP $ fspMailProviderSMTP $ fspMailProviderPOPSSL $ fspMailProviderIMAPSSL $ fspMailProviderSMTPPort $ fspMailProviderSMTPTLS $ fspMailProviderUsername $ fspMailProviderDescription ) )
+
+objectclass ( FSP.iPortEntry:2.1
+	NAME 'iPortEntry'
+	DESC 'Informations about invis Portal Entries'
+	SUP top STRUCTURAL
+	MUST	( iPortEntryName $ iPortEntryUrl $ iPortEntrySSL $ iPortEntryDescription $ iPortEntryActive $ iPortEntryPosition $ iPortEntryPriv $ iPortEntryButton )
+	May	( iPortEntryLinkRubrik ))
+
+objectclass ( FSP.MMailAcc:2.1
+        NAME 'MMailAccount'
+        DESC 'MMail Configuration Data'
+        SUP top STRUCTURAL
+        MUST ( MMailUser $ MMailPassword )
+        MAY     ( MMailCustomName $ MMailCustomSignature) )
+
+objectclass ( FSP.infoEntry:2.1
+	NAME 'infoEntry'
+        DESC 'Unstructured Information Data'
+        SUP top STRUCTURAL
+        MUST ( infoIdentifier $ infoText )
+        MAY     ( description ) )
+

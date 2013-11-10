@@ -1,0 +1,138 @@
+# Initiale LDIF Datei fuer invis Server
+# Stand Oktober 2011
+# (c) 2008 Stefan Schäfer -- FSP Computer & Netzwerke
+# (c) 2011 Stefan Schäfer -- invis-server.org
+# Questions: http://forum.invis-server.org
+# Datei muss an eigene Umgebung angepasst werden.
+# Vor allem sind die hier verwendeten Passwort-Platzhalter
+# "master-secret-hash" und "admin-secret-hash" durch Passwort-Hashes  
+# zu ersetzen. Zur Erzeugung der Hashes ist das Tool
+# "slappaswd" zu verwenden.
+
+# Basis fuer Samba-3 PDC
+dn: dc=invis-net,dc=loc
+objectclass: dcObject
+objectClass: organization
+dc: invis-net
+o: targetOrganization
+description: descriptionText
+
+# Uebergeordneter Management Account
+dn: uid=Admin,dc=invis-net,dc=loc
+objectclass: top
+objectclass: account
+objectclass: simpleSecurityObject
+uid: Admin
+userPassword: master-secret-hash
+description: Verzeichnis Administrator
+
+# Basisknoten Adressbuch
+dn: ou=Kontakt,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: Kontakt
+description: Basis für globales Kontaktmanagement
+
+# Adressbuch Management Account
+dn: uid=Admin,ou=Kontakt,dc=invis-net,dc=loc
+objectclass: top
+objectclass: account
+objectclass: simpleSecurityObject
+uid: Admin
+userPassword: admin-secret-hash
+description: Adressbuch Verzeichnis Administrator
+
+# Basisknoten externes_Adressbuch
+dn: ou=externes_Adressbuch,ou=Kontakt,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: externes_Adressbuch
+description: Basis für externes Adressbuch
+
+# Basisknoten internes_Adressbuch
+dn: ou=internes_Adressbuch,ou=Kontakt,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: internes_Adressbuch
+description: Basis für internes Adressbuch
+
+# Basisknoten Automount
+dn: ou=Automount,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: Automount
+description: Basis für Automount Informationen
+
+# Automount Management Account
+dn: uid=Admin,ou=Automount,dc=invis-net,dc=loc
+objectclass: top
+objectclass: account
+objectclass: simpleSecurityObject
+uid: Admin
+userPassword: admin-secret-hash
+description: Automount Verzeichnis Administrator
+
+# Basisknoten Benutzerverwaltung
+dn: ou=Benutzerverwaltung,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: Benutzerverwaltung
+description: Basis für die Benutzerverwaltung
+
+# Benutzerverwaltung Management Account
+dn: uid=Admin,ou=Benutzerverwaltung,dc=invis-net,dc=loc
+objectclass: top
+objectclass: account
+objectclass: simpleSecurityObject
+uid: Admin
+userPassword: admin-secret-hash
+description: Benutzerverwaltung Verzeichnis Administrator
+
+# Basisknoten DHCP Server
+dn: ou=DHCP-Server,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: DHCP-Server
+description: Basis für den DHCP-Server
+
+# DHCP Management Account
+dn: uid=Admin,ou=DHCP-Server,dc=invis-net,dc=loc
+objectclass: top
+objectclass: account
+objectclass: simpleSecurityObject
+uid: Admin
+userPassword: admin-secret-hash
+description: DHCP Verzeichnis Administrator
+
+# Basisknoten DNS Server
+dn: ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: DNS-Server
+description: Basis für den DNS-Server
+
+# DNS Management Account
+dn: uid=Admin,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: top
+objectclass: account
+objectclass: simpleSecurityObject
+uid: Admin
+userPassword: admin-secret-hash
+description: DNS Verzeichnis Administrator
+
+# Basisknoten Informationen
+dn: ou=Informationen,dc=invis-net,dc=loc
+objectClass: top
+objectClass: organizationalUnit
+ou: Informationen
+description: Basis für zusätzliche Informationen
+
+# Info Management Account
+dn: uid=Admin,ou=Informationen,dc=invis-net,dc=loc
+objectclass: top
+objectclass: account
+objectclass: simpleSecurityObject
+uid: Admin
+userPassword: admin-secret-hash
+description: Info Verzeichnis Administrator
+

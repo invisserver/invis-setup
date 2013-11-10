@@ -1,0 +1,42 @@
+#!/bin/bash
+# Alle Dateien aelter als X Tage aus dem Transferverzeichnis löschen
+# Ordner loeschen, wenn sie leer sind.
+# (c) 2009 Stefan Schaefer invis-server.org
+# (c) 2013 Ingo Goeppert invis-server.org
+# License GPLv3
+# Questions: stefan@invis-server.org
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+# Maximales Dateialter in Tagen
+clean=`getconfdata $conffile "cleanTrOn" "2"`
+alter=`getconfdata $conffile "trMaxDays" "2"`
+transfolder=`getconfdata $conffile "trDir" "2"`
+
+if [[ $clean == "j" ]]; then
+    # Alle Dateien aelter als X-Tage loeschen
+    find $transfolder -type f -mtime +$alter -exec rm {} \;
+
+    # Warnung erzeugen
+    chmod u+w $transfolder/Liesmich.txt
+    echo "Achtung: Leere Verzeichnisse, sowie alle Dateien die älter als 21 Tage sind werden hier automatisch gelöscht!!" > $transfolder/Liesmich.txt
+    chmod a-w $transfolder/Liesmich.txt
+    
+    # Leere Unterverzeichnisse loeschen
+    find $transfolder -mindepth 1 -depth -type d -empty -exec rmdir {} \; 
+fi

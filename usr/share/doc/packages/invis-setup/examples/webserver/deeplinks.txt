@@ -1,0 +1,8 @@
+# Deeplinks verhindern
+    <Directory /srv/www/htdocs/phpMyAdmin>
+        SetEnvIfNoCase Referer "^http://invis.invis-net.loc" dontblock
+        SetEnvIfNoCase Referer "^https://your.dyndns-domain.net" dontblock
+        Order Deny,Allow
+        Deny from all
+        Allow from env=dontblock
+    </Directory>

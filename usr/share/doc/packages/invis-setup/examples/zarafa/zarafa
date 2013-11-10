@@ -1,0 +1,11 @@
+## Path:        Network/Mail/Zarafa
+## Description: Zarafa locale for services
+## Type:        string
+## Default:     "C"
+#
+# Locale setting for zarafa services
+#
+#ZARAFA_LOCALE="C"
+ZARAFA_LOCALE="de_DE.UTF-8"
+ZARAFA_USERSCRIPT_LOCALE="de_DE.UTF8"
+

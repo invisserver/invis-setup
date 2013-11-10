@@ -1,0 +1,52 @@
+# Eine funktionierende Autmount Konfiguration ist nur 
+# fuer Linux-Clients, die Ihre Home-Verzeichnisse via
+# NFS beziehen erforderlich bzw. Wuenschenswert. 
+
+#dn: ou=Automount,dc=invis-net,dc=loc
+#objectClass: top
+#objectClass: organizationalUnit
+#ou: Automount
+#description: Basis der Automount Konfiguration
+
+dn: ou=auto.master,ou=Automount,dc=invis-net,dc=loc
+objectClass: top
+objectClass: automountMap
+ou: auto.master
+
+dn: cn=/home,ou=auto.master,ou=Automount,dc=invis-net,dc=loc
+objectClass: top
+objectClass: automount
+cn: /home
+automountInformation: ldap invis4.invis-net.loc:ou=auto.home,ou=Automount,dc=invis-net,dc=loc
+
+dn: cn=/rshares,ou=auto.master,ou=Automount,dc=invis-net,dc=loc
+objectClass: top
+objectClass: automount
+cn: /rshares
+automountInformation: ldap invis4.invis-net.loc:ou=auto.misc,ou=Automount,dc=invis-net,dc=loc
+
+dn: ou=auto.home,ou=Automount,dc=invis-net,dc=loc
+objectClass: top
+objectClass: automountMap
+ou: auto.home
+
+# Fuer jeden Benutzer muss ein Automount-Knoten fuer dessen
+# Homeverzeichnis angelegt werden. Vervielfaeltigen Sie den folgenden
+# Knoten entsprechend der Anzahl Ihrer User und ersetzen Sie "username" 
+# jeweils durch den entsprechenden Benutzernamen.
+
+dn: cn=username,ou=auto.home,ou=Automount,dc=invis-net,dc=loc
+objectClass: automount
+cn: username
+automountInformation: -fstype=nfs,hard,intr,nodev,nosuid invis4.invis-net.loc:/home/username
+
+dn: ou=auto.misc,ou=Automount,dc=invis-net,dc=loc
+objectClass: top
+objectClass: automountMap
+ou: auto.misc
+
+dn: cn=rshares,ou=auto.misc,ou=Automount,dc=invis-net,dc=loc
+objectClass: automount
+cn: rshares
+automountInformation: invis4.invis-net.loc:/srv/shares
+

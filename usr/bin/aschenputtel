@@ -1,0 +1,71 @@
+#!/bin/bash
+# Kleines Script zum Scannen nach Viren aller Dateien in einem Verzeichnis
+# Erkannte Viren werden in Quarantaene verschoben, nicht infizierte Dateien
+# in ein Ausgangsverzeichnis
+# (C) 2009 Stefan Schaefer invis-server.org
+# License GPLv3 
+# Questions: stefan@invis-server.org
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+## Konfigurationen einlesen
+# Virenscanner festlegen. Moeglich sind "antivir" und "clamscan"
+scanner=`getconfdata $conffile "AV" "2"`
+
+# Quarantaene-Verzeichnis
+quarandir=`getconfdata $conffile "quarDir" "2"`
+
+##  Verzeichnisse
+# Scan-Verzeichnis
+indir="/srv/uploads"
+# Ablageverzeichnis
+outdir="/srv/shares/portal/uploads"
+
+
+#Alle Dateien im Verzeichnis scannen, infizierte Dateien werden zunächst nur markiert.
+if [[ $scanner == "antivir" ]]; then
+    #antivir --allfiles --scan-in-archive --quiet -ren $indir
+    avscan --allfiles --scan-in-archive -q -r1 -lang=DE -s --moveto=$quarandir $indir
+else
+    for file in `clamscan --infected --no-summary $indir|cut -d ":" -f 1`; do
+	mv $file $file.XXX
+    done
+fi
+
+# Alle Dateien im indir verschieben
+
+# zunächst die infizierten in die Quarantäne - Es wird im outdir jeweils eine Meldung erzeugt
+for x in `find $indir -name *.XXX`; do
+    infectedfile=`basename $x`    
+    n1=`echo $infectedfile|wc -c`
+    n2=$((n1-5))
+    infectedfile=`echo $infectedfile|cut -c 1-$n2`
+    echo "Die mit einem Virus infizierte Datei \"$infectedfile\" wurde in Quarantäne verschoben!" > $outdir/$infectedfile.txt 
+    mv $x $quarandir
+done
+
+# jetzt die sauberen ins outdir
+for x in $indir/*; do
+    if [[ -f $x ]]; then
+	mv $x $outdir
+    fi
+done
+
+chown -R root."Domain Users" $outdir
+chmod -R g+w $outdir

@@ -1,0 +1,33 @@
+#!/bin/bash
+# Anpassen der Grouppenknoten im LDAP-DIT an die verwendete Groupware
+# (C) 2011,2013 Stefan Schäfer -- invis-server.org
+# License: GPLv3
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+# Testen, welche Groupware eingesetzt wird
+groupware=`getconfdata "$conffile" "usedGroupware" "2"`
+
+# Script zur Manipulation der Gruppeneintraege aufrufen
+if [[ $groupware == "zarafa" ]]; then
+    addzag
+elif [[ $groupware == "groupe" ]]; then
+    addgeg
+fi
+

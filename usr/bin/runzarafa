@@ -1,0 +1,26 @@
+#!/bin/bash
+
+case $1 in
+
+    start)
+	action=start
+	;;
+    stop)
+	action=stop
+	;;
+    *)
+	action=dumm
+	;;
+esac
+
+if [[ $action != "dumm" ]];then
+    for script in /etc/init.d/zarafa-*; do $script $action; done
+fi
+
+if [[ $action == stop ]];then
+    zpid=`pgrep zarafa-server`
+    if [[ -n $zpid ]]; then
+	echo "Terminating zarafa-server if still running"
+	kill $zpid
+    fi
+fi

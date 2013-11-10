@@ -1,0 +1,104 @@
+## Path:		Network/General
+## Description:
+## Type:		list(yes,no,)
+## ServiceRestart:	boot.ipconfig
+# Do you want the "dynamic IP patch" to be enabled at bootup?
+#
+# DEPRECATED
+# set net.ipv4.ip_dynaddr in /etc/sysctl.conf instead
+#
+IP_DYNIP="yes"
+
+## Type:	list(yes,no,)
+#
+# Enable syn flood protection (see /usr/src/linux/Documentation/Configure.help)
+# Built-in kernel default is "yes".
+#
+# DEPRECATED
+# set net.ipv4.tcp_syncookies in /etc/sysctl.conf instead
+#
+IP_TCP_SYNCOOKIES="yes"
+
+## Type:	list(yes,no,)
+#
+# Runtime-configurable parameter: forward IP packets.
+# Is this host a router?
+#
+# Note that SuSEfirewall2 may override this if active.
+#
+# DEPRECATED
+# set net.ipv4.ip_forward in /etc/sysctl.conf instead
+#
+IP_FORWARD="yes"
+
+## Type:	list(yes,no,)
+## Default:	no
+#
+# Runtime-configurable parameter: forward IPv6 packets.
+#
+# DEPRECATED
+# set net.ipv6.conf.all.forwarding in /etc/sysctl.conf instead
+#
+IPV6_FORWARD="yes"
+
+## Type:	list(yes,no,)
+#
+# Runtime-configurable parameter: use temporary IPv6 addresses
+# instead of using the EUI-64 interface identifer
+#
+# DEPRECATED
+# set net.ipv6.conf.default.use_tempaddr in /etc/sysctl.conf instead
+#
+IPV6_PRIVACY=
+
+## Type:	integer(0:)
+#
+# Runtime-configurable parameter: send MLD announcements of this
+# version.
+#
+# DEPRECATED
+# set net.ipv6.conf.all.force_mld_version in /etc/sysctl.conf instead
+#
+IPV6_MLD_VERSION=
+
+## Type:	list(yes,no,)
+#
+# If you have trouble connecting to some machines on the internet,
+# this may be due to broken firewalls dropping network packets with
+# the ECN (early congestion notification) flag set.
+# Set this to yes to have ECN disabled at boot time.
+#
+DISABLE_ECN="yes"
+
+## Path:	System/Kernel
+## Type:        yesno
+## Default:     no
+#
+# Enable dmapi module probe for the xfs filesystem driver
+# (yes/no)
+#
+DMAPI_PROBE="no"
+
+## Path:	System/Kernel
+## Description:
+## Type:	string
+#
+# Magic SysRq Keys enable some control over the system even if it
+# crashes (e.g. during kernel debugging).
+#
+# Possible values:
+# - no: disable sysrq completely
+# - yes: enable all functions of sysrq
+# - bitmask of allowed sysrq functions:
+#          2 - enable control of console logging level
+#          4 - enable control of keyboard (SAK, unraw)
+#          8 - enable debugging dumps of processes etc.
+#         16 - enable sync command
+#         32 - enable remount read-only
+#         64 - enable signalling of processes (term, kill, oom-kill)
+#        128 - allow reboot/poweroff
+#        256 - allow nicing of all RT tasks
+#
+# For further information see /usr/src/linux/Documentation/sysrq.txt
+#
+ENABLE_SYSRQ="176"

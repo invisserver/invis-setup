@@ -1,0 +1,4 @@
+#!/bin/bash
+# Kleines Script zum Download der Eicar-Testsignaturen.
+
+wget http://www.eicar.org/download/eicarcom2.zip

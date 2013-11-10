@@ -1,0 +1,277 @@
+/*
+ * css/admin.section.css v1.0
+ * admin-drop-in style sheet
+ * (C) 2009 Daniel T. Bender, invis-server.org
+ * License GPLv3
+ * Questions: daniel@invis-server.org
+ */
+
+/*
+ * override global CSS
+ */
+
+.section-title {
+	color: #ff0000;
+	border-color: #ff9999;
+}
+
+/*
+ *
+ */
+ 
+.admin-menu {
+}
+
+.admin-menu ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+.admin-menu li {
+	cursor: pointer;
+	
+	padding: 5px;
+	margin: 0px;
+	
+	border-bottom: 1px solid #b0b0b0;
+	
+	color: #b0b0b0;
+	
+	font-weight: bold;
+	font-family: "Times New Roman", times, serif;
+	
+	list-style-type: none;
+}
+
+.admin-menu li:hover, .admin-menu-active {
+	background-color: #fafafa;
+	color: #b0b0b0;
+	
+	font-style: italic;
+}
+
+#admin-table {
+	width: 100%;
+
+}
+
+#admin-table td {
+	vertical-align: top;
+}
+
+#admin-content {
+	width: 725px;
+	padding: 5px;
+	
+	vertical-align: top;
+	
+	border-left: 1px solid #b0b0b0;
+}
+
+#admin-content-title {
+	font-size: 1.2em;
+	font-weight: bold;
+	display: none;
+}
+
+/*
+ * RESULT TABLE
+ */
+
+#result-table {
+	width: 100%;
+	
+	font-family: "Times New Roman", times, serif;
+}
+
+#result-table th {
+	font-size: 0.8em;
+ 	padding: 5px;
+ 	border-top: 1px solid #b0b0b0;
+	border-bottom: 1px solid #b0b0b0;
+	background-color: #fafafa;
+	
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight: normal;
+	text-align: left;
+}
+
+#result-table thead { color: #b0b0b0; }
+#result-table thead .name { border-right: 1px dashed #b0b0b0; }
+#result-table thead .type { width: 15%; border-right: 1px dashed #b0b0b0; }
+#result-table thead .delete { width: 15%; }
+
+#result-body td {
+	vertical-align: middle;
+	border-bottom: 1px dashed #b0b0b0;
+	padding: 3px;
+}
+
+#result-body .name {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+#result-body .number {
+	padding-left: 1em;
+	color: #b0b0b0;
+	font-size: 0.8em;
+	font-style: italic;
+}
+
+#result-body .delete {
+	font-size: 0.7em;
+	font-family: Helvetica, Arial, sans-serif;
+	color: #808080;
+	cursor: pointer;
+}
+
+#result-paging {
+	font-size: 0.8em;
+}
+
+#result-paging .page-link {
+	padding: 2px;
+	cursor: pointer;
+}
+
+#result-paging .page-active {
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+/*
+ *
+ */
+ 
+ /*
+ * USERBOX
+ */
+
+#userbox, #groupbox {
+	width: 100%;
+	height: 100%;
+	font-size: 1em;
+}
+
+#userbox_head, #groupbox_head {
+	padding: 0px;
+	margin: 0px;
+	font-size: 2em;
+	font-weight: bold;
+	background-color: #fafafa;
+	color: #c0c0c0;
+	border-bottom: 1px solid #c0c0c0;
+	height: 1em;
+	
+}
+
+#userbox_content, #groupbox_content {
+	vertical-align: top;
+	padding: 5px;
+}
+
+#userbox_foot, #groupbox_foot {
+	height: 2em;
+	text-align: right;
+}
+
+#userbox .line, #groupbox .line {
+	vertical-align: bottom;
+	font-family: Arial, sans-serif;
+	font-size: 0.8em;
+	width: 98%;
+	height: 1em;
+	padding: 5px;
+	border-bottom: 1px solid #fafafa;
+}
+
+#userbox .line .key, #groupbox .line .key {
+	width: 25%;
+	font-weight: bold;
+	float: left;
+	height: 1.2em;
+}
+
+#userbox .line .value, #groupbox .line .value {
+	width: 75%;
+	height: 1.2em;
+	float: right;
+	border-bottom: 1px dashed #e0e0e0
+}
+
+#userbox .line .value_disabled, #groupbox .line .value_disabled {
+	font-style: italic;
+	color: #c0c0c0;
+}
+
+/*
+#userbox .button, #groupbox .button {
+	background-color: #fafafa;
+	color: #c0c0c0;
+	margin-right: 2px;
+	padding: 5px;
+	font-size: 0.8em;
+	font-family: Arial, sans-serif;
+	border: 1px solid #c0c0c0;
+}
+*/
+
+#groupbox .listbox {
+	width: 100%;
+	height: 175px;
+	border: 1px solid black;
+	margin: 0px;
+}
+
+#groupbox_table {
+	width: 100%;
+	
+}
+
+#groupbox .listbox option {
+	font-size: 1.2em;
+}
+
+#groupbox_left, #groupbox_right {
+	width: 45%;
+}
+
+#groupbox_center {
+	text-align: center;
+	vertical-align: middle;
+}
+
+#groupbox_center img {
+	cursor: pointer;
+}
+
+/*
+ * INPUT-Box
+ */
+
+input {
+	background-color: #ffffff;
+	border: 1px solid #c0c0c0;
+	//width: 100%;
+	//height: 1.2em;
+}
+
+/*
+ * 
+ */
+#host_discover {
+	width: 100%;
+}
+
+#host_discover th {
+	font-size: 0.8em;
+	font-family: Arial, Helvetica, sans-serif;
+	border-bottom: 1px solid #c0c0c0;
+}
+
+#host_discover td {
+	text-align: center;
+	font-family: "Times New Roman", Times, serif;
+	padding: 5px;
+}

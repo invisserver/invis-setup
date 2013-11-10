@@ -1,0 +1,9 @@
+memcached
+libffi6
+gnustep-make
+gnustep-base
+SOPE-core
+SOPE-gdl1-mysql
+SOPE-gdl1-postgresql
+SOGo
+SOGo-slapd-sockd

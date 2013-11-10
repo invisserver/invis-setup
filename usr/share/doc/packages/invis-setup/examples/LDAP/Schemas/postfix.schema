@@ -1,0 +1,19 @@
+attributetype ( 1.3.6.1.4.1.4203.666.1.200
+        NAME 'mailacceptinggeneralid'
+        EQUALITY caseIgnoreMatch
+        SUBSTR caseIgnoreSubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{1024} )
+attributetype ( 1.3.6.1.4.1.4203.666.1.201
+         NAME 'maildrop'
+         EQUALITY caseIgnoreMatch
+         SUBSTR caseIgnoreSubstringsMatch
+         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{1024} )
+objectClass     ( 1.3.6.1.4.1.4203.666.1.100
+        NAME 'postfixUser'
+        DESC 'Postfix Mail User'
+        SUP top
+        AUXILIARY
+        MAY  (
+            mailacceptinggeneralid $ maildrop
+             )
+        )

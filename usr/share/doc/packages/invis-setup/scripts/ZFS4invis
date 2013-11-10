@@ -1,0 +1,51 @@
+#/bin/bash
+
+IFS=" ,;.:"
+
+
+echo "ZFS Setup for Invis"
+echo "Step #1: Install ZFSonLinux"
+#zypper addrepo http://download.opensuse.org/repositories/home:munix9:zfs/openSUSE_12.3/home:munix9:zfs.repo
+#zypper refresh
+#zypper install spl zfs
+
+echo "Step #2: Create pool"
+read -p "Enter ZFS pool name (e.g. MYPOOL, storage, invistor) > " POOL
+echo "ZFS pool name is $ZPOOL."
+echo "Available devices:"
+LIST=( /dev/disk/by-id/a* )
+for ((I=1;I<${#LIST[*]};I++)); do
+  echo "$I. ${LIST[$I]}"
+done
+read -p "Choice one (or more for mirroring) > " NUM1 NUM2 NUM3
+echo "Your choice: $NUM1 $NUM2 $NUM3"
+if [ "$NUM2" = "" ] 
+  then zpool create -f -m legacy $POOL ${LIST[$NUM1]}
+  else zpool create -m legacy $POOL mirror ${LIST[$NUM1]} ${LIST[$NUM2]}${LIST[$NUM3]}
+fi
+
+zpool status
+zpool list
+
+echo "Step #3: Create datasets and data copying..."
+
+for DIR in srv ; do
+  zfs create $POOL/$DIR
+  mkdir /tmp/$DIR
+  mv /$DIR/* /tmp/$DIR/
+  mount -t zfs $POOL/$DIR /$DIR
+  rsync -avx /tmp/$DIR/ /$DIR/
+done
+zfs list
+zfs mount
+
+echo "Step #4: /etc/fstab"
+
+#cp /cfiles/zfs/fstab_extention >>/etc/fstab
+
+echo "#" >>/etc/fstab
+echo "# ZFS Legacy Mountpoints" >>/etc/fstab
+echo "$POOL/home		/home		zfs	defaults	0 0" >>/etc/fstab
+echo "$POOL/srv			/srv		zfs	defaults	0 0" >>/etc/fstab
+
+echo "Done."

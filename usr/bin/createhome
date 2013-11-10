@@ -1,0 +1,48 @@
+#!/bin/bash
+#Mini Script zum automatischen Anlegen eines Home-Verzeichnisses
+# (c) 2009 Daniel T. Bender invis-server.org
+# (c) 2010 Stefan Schaefer invis-server.org
+# License: GPLv3
+# Questions: http://forum.invis-server.org 
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+confdir="/etc/invis"
+#passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+if [ $# -eq 1 ]; then
+	USR=$1;
+	DIR=/home/$USR;
+	mkdir $DIR;
+	cp -r /etc/skel/* $DIR;
+	cp $confdir/templates/movelibdirs.cmd /srv/shares/service/winscripts/mvlib$USR.cmd
+	chown -R $USR:'Domain Users' $DIR;
+	chmod u+rwx,g-rwx,o-rwx $DIR;
+	cfile="mvlib$USR.cmd"
+	path="/srv/shares/service/winscripts/"
+	string="USER%$USR"
+	changevalues $path $cfile $string
+
+	DIR=/srv/shares/portal/downloads/$USR;
+	mkdir $DIR;
+	chown -R $USR:'Domain Users' $DIR;
+	chmod u+rwx,g+rwsx,o=rx $DIR;
+
+else
+	echo "Usage: $0 {username}";
+fi
+

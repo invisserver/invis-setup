@@ -1,0 +1,4 @@
+/etc/ssl/certs               root:pkeys 0755
+/etc/ssl/private             root:pkeys 0750
+/etc/ssl/CA                  root:pkeys 0750
+/var/lib/samba/profiles	     root:root 0777

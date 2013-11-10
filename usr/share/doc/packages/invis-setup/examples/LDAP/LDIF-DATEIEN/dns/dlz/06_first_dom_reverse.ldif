@@ -1,0 +1,137 @@
+# Vorärts Auflösung der Domain invis-net.loc
+# Drei PCs + Server + Klappkiste
+
+dn: dlzHostName=@,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: @
+
+# SOA-Record
+dn: dlzRecordID=1,dlzHostName=@,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzSOARecord
+dlzRecordID: 1
+dlzHostname: @
+dlzType: soa
+dlzSerial: 2011170742
+dlzRefresh: 3600
+dlzRetry: 1800
+dlzExpire: 604800
+dlzMinimum: 86400
+dlzAdminEmail: root.invis-net.loc.
+dlzPrimaryns: ns.invis-net.loc.
+dlzTTL: 3600
+
+# MX-Record
+dn: dlzRecordID=2,dlzHostName=@,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzMXRecord
+dlzRecordID: 2
+dlzHostname: @
+dlzType: mx
+dlzData: mail.invis-server.loc.
+dlzPreference: 10
+dlzTTL: 3600
+
+# NS-Record
+dn: dlzRecordID=3,dlzHostName=@,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzNSRecord
+dlzRecordID: 3
+dlzHostname: @
+dlzType: ns
+dlzData: ns.invis-server.loc.
+dlzTTL: 3600
+
+# Host Knoten des Servers
+dn: dlzHostName=10,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: 10
+
+# PTR-Record des Servers
+dn:dlzRecordID=10,dlzHostName=10,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 10
+dlzHostName: 10
+dlzType: ptr
+dlzData: invis5.invis-net.loc.
+dlzTTL: 86400
+
+dn:dlzRecordID=11,dlzHostName=10,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 11
+dlzHostName: 10
+dlzType: ptr
+dlzData: ns.invis-net.loc.
+dlzTTL: 86400
+
+# PTR-Record des Servers
+dn:dlzRecordID=12,dlzHostName=10,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 12
+dlzHostName: 10
+dlzType: ptr
+dlzData: mail.invis-net.loc.
+dlzTTL: 86400
+
+# PTR-Record des Servers
+dn:dlzRecordID=13,dlzHostName=10,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 13
+dlzHostName: 10
+dlzType: ptr
+dlzData: www.invis-net.loc.
+dlzTTL: 86400
+
+# Host Knoten PC1
+dn: dlzHostName=120,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: 120
+
+# PTR-Record PC1
+dn: dlzRecordID=50,dlzHostName=120,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 50
+dlzHostName: 120
+dlzType: ptr
+dlzData: pc1.invis-net.loc.
+dlzTTL: 86400
+
+# Host Knoten PC2
+dn: dlzHostName=121,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: 121
+
+# PTR-Record PC2
+dn: dlzRecordID=55,dlzHostName=121,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 55
+dlzHostName: 121
+dlzType: ptr
+dlzData: pc2.invis-net.loc.
+dlzTTL: 86400
+
+# Host Knoten PC3
+dn: dlzHostName=122,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: 122
+
+# PTR-Record PC3
+dn: dlzRecordID=60,dlzHostName=122,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 60
+dlzHostName: 122
+dlzType: ptr
+dlzData: pc3.invis-net.loc.
+dlzTTL: 86400
+
+# Host Knoten Klappkiste
+dn: dlzHostName=150,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectclass: dlzHost
+dlzHostName: 150
+
+# PTR-Record Klappkiste
+dn: dlzRecordID=65,dlzHostName=150,dlzZoneName=220.168.192.in-addr.arpa,ou=zone.master,ou=DNS-Server,dc=invis-net,dc=loc
+objectClass: dlzPTRRecord
+dlzRecordID: 65
+dlzHostName: 150
+dlzType: ptr
+dlzData: klappkiste.invis-net.loc.
+dlzTTL: 86400
+

@@ -1,0 +1,102 @@
+#!/bin/bash
+# Script zur Erzeugung von Schlüsseln für den Web- und Mailserver
+# Dieses Script ersetzt die Scripts "mailserverkeys" und
+# "webserverkeys"
+# Version 0.8
+# (C) 2011,2013 by Stefan Schäfer / invis-server.org
+# License: GPLv3
+# Questions: http://forum.invis-server.org
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+usage() {
+    echo -e "Bitte geben Sie an, ob Sie Schlüssel für LDAP, Mail- oder Webserver\nerzeugen möchten:\n\tlinux:~ # serverkeys ldap,\n\tlinux:~ # serverkeys ms\noder\n\tlinux:~ # serverkeys ws"
+    exit
+}
+
+if [[ -z $1 ]]; then
+    usage
+fi
+
+stype="$1"
+
+# Eingabe pruefen und CN erzeugen
+if [[ $stype == "ms" ]]; then
+    server="Mail"
+    cn="mail.$(hostname -d)"
+elif [[ $stype == "ldap" ]]; then
+    server="ldap"
+    cn="$(hostname -f)"
+elif [[ $stype == "ws" ]]; then
+    server="Web"
+    # DDNS Name
+    cn=`getconfdata $conffile "fqdn" "2"`
+else
+    usage
+fi
+
+# Kurze Bestätigung
+echo -e "\033[1;33mEs werden Schlüssel und Zertifikat für den $server-Server \"$cn\" erzeugt.\033[0m"
+
+# Ins CA Verzeichnis wechseln
+path="/etc/ssl/"
+file="tmp-openssl.cnf"
+cd $path
+echo $PWD
+# Temporäre Konfigurationsdatei erzeugen
+cat ./openssl.cnf| tr "\t" " "|tr -s " " > ./tmp-openssl.cnf
+# Konfiguration anpassen
+string="organizationalUnitName_default = Key-Server%organizationalUnitName_default = $server-Server"
+changevalues $path $file "$string"
+
+string="commonName_default =%commonName_default = $cn"
+changevalues $path $file "$string"
+
+# Schluessel bauen
+cd /etc/ssl/CA
+/usr/bin/openssl req -new -nodes -batch -config /$path/$file -keyout server-key.pem -out server-cert_req.pem
+cd /etc/ssl
+/usr/bin/openssl ca -policy policy_anything -out server-cert.pem -in CA/server-cert_req.pem
+
+# Schluessel anpassen und verschieben
+if [[ $stype == "ws" ]]; then
+    /usr/bin/openssl x509 -in server-cert.pem -out invis-server.crt -outform DER
+    /usr/bin/openssl rsa -in CA/server-key.pem -out invis-server.key
+    mv ./invis-server.crt /etc/apache2/ssl.crt/invis-server.crt
+    mv ./invis-server.key /etc/apache2/ssl.key/invis-server.key
+elif [[ $stype == "ldap" ]]; then
+    # Dadurch steht kein Klartext mehr im Zertifikat
+    /usr/bin/openssl x509 -in server-cert.pem -out invis-server.crt
+    /usr/bin/openssl rsa -in CA/server-key.pem -out invis-server.key
+    mv ./invis-server.crt /etc/ssl/certs/ldap-cert.pem
+    mv ./invis-server.key /etc/ssl/private/ldap-key.pem
+else
+    # Dadurch steht kein Klartext mehr im Zertifikat
+    /usr/bin/openssl x509 -in server-cert.pem -out invis-server.crt
+    /usr/bin/openssl rsa -in CA/server-key.pem -out invis-server.key
+    mv ./invis-server.crt /etc/ssl/certs/i5-cert.pem
+    mv ./invis-server.key /etc/ssl/private/i5-key.pem
+fi
+
+# Aufraeumen
+rm -f ./$file
+rm -f ./server-cert.pem
+#rm -f ./newkey.pem
+#rm -f ./newreq.pem
+rm -f ./CA/server-cert_req.pem
+rm -f ./CA/server-key.pem

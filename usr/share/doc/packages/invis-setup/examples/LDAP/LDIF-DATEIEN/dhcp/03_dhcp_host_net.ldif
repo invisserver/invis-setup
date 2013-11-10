@@ -1,0 +1,59 @@
+# DHCP Host und Netzwerkkonfiguration
+# Netzwerk 192.168.220.0/24 
+# Domaene invis-net.loc
+# 3PCs + Klappkiste bekommen feste Leases 100, 101, 102, 150
+# Zusaetzlich dynamischer Bereich: 200 - 220 inkl. DDNS Update
+
+# PC1
+dn: cn=pc1,cn=DHCP Config,ou=DHCP-Server,dc=invis-net,dc=loc
+cn: pc1
+objectClass: top
+objectClass: dhcpHost
+dhcpHWAddress: ethernet 00:04:75:80:67:cf
+dhcpStatements: fixed-address 192.168.220.120
+
+# PC2
+dn: cn=pc2,cn=DHCP Config,ou=DHCP-Server,dc=invis-net,dc=loc
+cn: pc2
+objectClass: top
+objectClass: dhcpHost
+dhcpHWAddress: ethernet 00:04:75:e1:57:60
+dhcpStatements: fixed-address 192.168.220.121
+
+# PC3
+dn: cn=pc3,cn=DHCP Config,ou=DHCP-Server,dc=invis-net,dc=loc
+cn: pc3
+objectClass: top
+objectClass: dhcpHost
+dhcpHWAddress: ethernet 00:e0:18:55:8d:58
+dhcpStatements: fixed-address 192.168.220.122
+
+# Klappkiste
+dn: cn=klappkiste,cn=DHCP Config,ou=DHCP-Server,dc=invis-net,dc=loc
+cn: klappkiste
+objectClass: top
+objectClass: dhcpHost
+dhcpHWAddress: ethernet 00:e0:98:ae:64:1f
+dhcpStatements: fixed-address 192.168.220.150
+
+# Dynamischer Bereich
+# Da DDNS-Updates gegen einen Bind-Server mit LDAP-Backend nicht funktionieren,
+# wurden die entsprechenden Einträge entfernt
+dn: cn=192.168.220.0,cn=DHCP Config,ou=DHCP-Server,dc=invis-net,dc=loc
+cn: 192.168.220.0
+objectClass: top
+objectClass: dhcpSubnet
+dhcpRange: 192.168.220.200 192.168.220.220
+dhcpNetMask: 24
+dhcpStatements: zone invis-net.loc. { primary 127.0.0.1; }
+dhcpStatements: zone 220.168.192.in-addr.arpa. { primary 127.0.0.1; }
+
+#dn: cn=192.168.220.0,cn=DHCP Config,ou=DHCP-Server,dc=invis-net,dc=loc
+#cn: 192.168.220.0
+#objectClass: top
+#objectClass: dhcpSubnet
+#dhcpRange: 192.168.220.200 192.168.220.220
+#dhcpNetMask: 24
+#dhcpStatements: zone invis-net.loc. { primary 127.0.0.1; key DHCP_UPDATER; }
+#dhcpStatements: zone 220.168.192.in-addr.arpa. { primary 127.0.0.1; key DHCP_UPDATER; }
+

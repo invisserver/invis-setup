@@ -1,0 +1,9 @@
+#!/bin/bash
+# Script zum Zusammenbau des Zarafa-SSL-Keys
+
+keypath="/etc/ssl/private"
+certpath="/etc/ssl/certs"
+
+# Standardschluessel kopieren
+cp $keypath/i5-key.pem $keypath/zarafa.pem
+cat $certpath/i5-cert.pem >> $keypath/zarafa.pem

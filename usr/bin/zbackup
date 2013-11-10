@@ -1,0 +1,51 @@
+#!/bin/bash
+# Script zur regelmaessigen Sicherung der Zarafa-Stores
+# (c) 2011 Stefan Schäfer -- invis-server.org
+# License: GPLv3
+# Questions: http://forum.invis-server.org
+
+# Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+#passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+# Pfade aus Konfiguration einlesen
+dasidir=`getconfdata $conffile "DasiDir" "2"`
+zbutarget=`getconfdata $conffile "zBuTarget" "2"`
+dasipath="$dasidir/$zbutarget"
+
+# Sicherungsverzeichnis anlegen
+if [[ ! -d $dasipath ]]; then
+    mkdir -p $dasipath
+fi
+
+
+# Ggf. vorhandene Sicherung nach oldbackup verschieben
+if [[ -n `ls $dasipath|grep ".zbk.20"` ]]; then 
+
+    if [[ ! -d $dasipath/oldbackup ]]; then
+	mkdir -p $dasipath/oldbackup
+    fi
+    
+    # Verzeichnis leeren
+    rm -rf $dasipath/oldbackup/*
+    
+    # vorhandene Sicherung verschieben
+    find $dasipath/ -maxdepth 1 -type f -exec mv {} $dasipath/oldbackup/ \;
+fi
+
+# Datensicherung der Stores durchführen
+zarafa-backup -a -o $dasipath >> /var/log/zbu.log 2>&1

@@ -1,0 +1,6 @@
+samba
+samba-client
+samba-winbind
+samba-doc
+libsmbclient0
+libwbclient0

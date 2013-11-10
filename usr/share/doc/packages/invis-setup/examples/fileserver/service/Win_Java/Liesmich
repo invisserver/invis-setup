@@ -1,0 +1,9 @@
+Damit der Faxgateclient mit Java7 funktioniert muss duese Java Policy-Datei in das
+Profilverzeichnis der Benutzer kopiert werden.
+
+Alternativ kann der Inhalt zwischen den Klammern auch in:
+
+W7: c:\Program Files(x86)\Java\jre7\lib\security\java.policy
+WXP: c:\Programme(x86)\Java\jre7\lib\security\java.policy
+
+eingefuegt werden.

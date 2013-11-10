@@ -1,0 +1,9 @@
+Typ-Nr. | Benutzertyp | Bedingung
+-------------------------------------------------------------------------
+    3   | Maildummy   | kein Samba, keine Shell, GID 600
+    2   | Samba-Gast  | Samba, keine Shell, GID 514
+    0   | Samba-User  | Samba, Shell
+    4   | Groupware   | Samba, Shell, Groupware-Attribute
+    1   | Samba-Admin | Samba, Shell, Mitglied in Gruppe "Domain Admins"
+
+

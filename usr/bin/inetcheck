@@ -1,0 +1,136 @@
+#! /bin/bash
+# DSL Internetverbindung testen, bei Bedarf wiederherstellen und 
+# auswerten.
+# Als auswertung wird unter dem Namen inetcheck.html im DocumentRoot
+# Verzeichnis des Webservers eine HTML Datei abgelegt, die einfach
+# per Browser ausgelesen werden kann. Diese Datei ist derzeit noch
+# nicht im invis-Portal verlinkt.
+# Zusätzlich wird unter /var/spool/results/inetcheck eine Ergebnisdatei
+# abgelegt, die vom invis Portal ausgewertet wird.
+# Seit Version 2.0 kann das Script auch ein DDNS Update zu einem DNS-Server
+# durchführen.
+#
+# Version 2.1
+# (c) 2009 Stefan Schaefer invis-server.org
+# License GPLv3
+# Questions: stefan@invis-server.org
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+#passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+# Verzeichnis für Ergebnisdateien
+directory="/var/spool/results/inetcheck"
+
+# Datum und Zeit ermitteln
+datum=`date "+%c"`
+
+# Verzeichnis anlegen.
+if [[ ! -d $directory ]]; then
+    mkdir -p $directory
+    chown -R .www $directory
+fi
+
+# Soll ein DDNS Update erfolgen? (Hierzu werden entsprechende Schlüssel
+# des zu aktualisierenden DNS-Servers benoetigt).
+ddnsup=`getconfdata $conffile "ddnsOn" "2"`
+nameserver=`getconfdata $conffile "nameServer" "2"`
+fqdn=`getconfdata $conffile "fqdn" "2"`
+keynumber=`getconfdata $conffile "keyNumber" "2"`
+
+# Wenn noch nicht vorhanden die Datei lastip anlegen.
+if [[ ! -f $directory/lastip ]]; then
+    echo "0.0.0.0" > $directory/lastip
+fi
+
+# Testen ob Internetverbindung über Router oder DSL-Modem hergestellt wird
+dsl=`ls /etc/sysconfig/network|grep dsl|cut -d "-" -f 2`
+
+if [[ $dsl == "" ]];then
+    #ownip=`wget -q -O - "http://myip.dtdns.com"`
+    ownip=`lynx --dump http://www.meineip.org|tr -d " "|grep ^[1-9]|head -n1`
+
+    #echo $ownip
+else
+    # Testen, ob das DSL-Device vorhanden ist.
+    dsl0deviceok=`ifconfig $dsl 2>&1|cut -d " " -f 2`
+
+    # Device starten, wenn nicht vorhanden
+    if [[ $dsl0deviceok == "error" || $dsl0deviceok == "Fehler" ]]; then
+	ifup $dsl
+	ping -c 3 81.91.164.5
+	echo "$datum : Internetverbindung wurde nach Ausfall wieder hergestellt" >> /var/log/inetcheck.log
+    else
+    ownip=`ifconfig dsl0|grep "inet"| cut -d ":" -f 2|cut -d " " -f 1|head -n1`
+    fi
+fi
+
+# Verbindung prüfen
+ipok=`ping -c3 81.91.164.5|grep "received"|cut -d "," -f 2|cut -d " " -f 2`
+dnsok=`ping -c3 www.denic.de|grep "received"|cut -d "," -f 2|cut -d " " -f 2`
+
+#echo $ownip
+
+# Zum Testen
+#ipok=0
+#dnsok=0
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+  <title>Internet-Check</title>
+  <meta name="GENERATOR" content="invis Server">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body><H1 align="center">Internet-Verbindungsprüfung</H1><HR>' > /srv/www/htdocs/inetcheck.html
+
+# Auswertung
+if (( $ipok == 3 && $dnsok == 3 )); then
+    echo "<div align=\"center\"><b><font color=\"darkgreen\">Verbindung steht</font></b><br><font size=\"-1\">Ihre IP-Adresse: $ownip - Datum und Uhrzeit des Tests: $datum</font></div>" >> /srv/www/htdocs/inetcheck.html
+    echo -e "$datum\n0\n$ownip" > $directory/inetcheck
+elif (( $ipok == 3 && $dnsok == 0 )); then
+    echo "<div align=\"center\"><b><font color=\"darkorange\">Verbindung steht, Namensauflösung nicht möglich</font></b><br><font size=\"-1\">Ihre IP-Adresse: $ownip - Datum und Uhrzeit des Tests: $datum</font></div" >> /srv/www/htdocs/inetcheck.html
+    echo -e "$datum\n1\n$ownip" > $directory/inetcheck
+elif (( $ipok < 3 && $ipok > 0 )); then
+    echo "<div align=\"center\"><b><font color=\"darkorange\">Verbindung schlecht</font></b><br><font size=\"-1\">Ihre IP-Adresse: $ownip - Datum und Uhrzeit des Tests: $datum</font></div" >> /srv/www/htdocs/inetcheck.html
+    echo -e "$datum\n2\n$ownip" > $directory/inetcheck
+else
+    echo "<div align=\"center\"><b><font color=\"darkred\">Internetverbindung nicht möglich - Test wird in einer Stunde wiederholt</font></b><br><font size=\"-1\">Datum und Uhrzeit des Tests: $datum</font></div" >> /srv/www/htdocs/inetcheck.html
+    echo -e "$datum\n3" > $directory/inetcheck
+fi
+
+echo '<hr><div align="right"><font size="-2">(c) 2008 stefan@invis-server.org - www.invis-server.org</font></div></body></html>' >> /srv/www/htdocs/inetcheck.html
+
+
+# DNS-SEC Auto-Updater - Sie benoetigen hierzu einen DNS-Server der Updates von Ihnen akzeptiert.
+if [[ $ddnsup == "j" ]]; then
+        # Sicherheitshalber erst mal den NS pingen
+	ping -c 3 $nameserver
+    # Aktualisierung nur vornehmen, wenn eine Abfrage beim zuständigen Nameserver eine andere IP ergibt als die Abfrage der DSL-Schnittstelle.
+    if [[ $ownip != `dig @$nameserver +short $fqdn` ]]; then
+	# jetzt updaten
+	(
+	    echo "server $nameserver"
+	    echo "update delete $fqdn A"
+	    echo "update add $fqdn 60 A $ownip"
+	    echo "send"
+	) | nsupdate -k /etc/ssl/ddns/K$fqdn.+157+$keynumber.private
+	echo $ownip > $directory/lastip
+    fi
+fi
+

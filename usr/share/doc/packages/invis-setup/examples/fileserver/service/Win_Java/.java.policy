@@ -1,0 +1,12 @@
+
+// Permissions needed for FaxgateClient
+
+grant { 
+  permission java.awt.AWTPermission 
+		"accessClipboard";
+  permission java.awt.AWTPermission 
+		"accessEventQueue";
+  permission java.awt.AWTPermission 
+		"showWindowWithoutWarningBanner";
+};
+

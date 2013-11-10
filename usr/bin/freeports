@@ -1,0 +1,53 @@
+#!/bin/bash
+# Script zur zufälligen Bestimmung eines freien Ports
+# Etwa für die Verschiebung des SSH oder HTTPS Ports
+# Ziel ist, dass nicht aus Gewohnheit immer die gleichen 
+# Ports verwendet werden.
+# Als Basis dienen die in der Datei /etc/services als
+# "Unassigned" gekennzeichneten Port-Bereiche.
+# Einzelne freie Ports werden nicht berücksichtigt.
+# (c)2009,2012 Stefan Schäfer invis-server.org
+# License GPLv3
+# Questions: stefan@invis-server.org
+
+# Größe der Teilmenge aller freien Ports ausgeben
+# Einfach eine Zahl zwischen 10 und 150 eingeben.
+# Je größer die Zahl, desto länger läuft das Script
+# - allerdings wird die Menge der gefundenen Ports 
+# entsprechend größer
+menge=100
+
+# Freie hohe Ports aufspüren und einen per Zufallsgenerator auswählen
+freeports=`cat /etc/services|grep "Unassigned"|grep "-"|tr -s " "|cut -d " " -f 2|tail -n $menge`
+freeportareas=`echo $freeports|wc -w`
+zufallsbereich=$((( $RANDOM * 32768 + $RANDOM ) % $freeportareas ))
+#echo $(( $zufallsbereich + 1 ))
+freeports=`echo $freeports|cut -d " " -f $(( $zufallsbereich + 1 ))`
+#echo $freeports
+n=1
+# Alle Zeilen die freie Portbereiche kennzeichnen aus /etc/services auslesen
+for ports in $freeports; do
+    minport=`echo $ports|cut -d "-" -f 1`
+    maxport=`echo $ports|cut -d "-" -f 2`
+    #echo $minport:$maxport
+    
+    for (( i=$minport; i<=$maxport; i++)); do
+	#echo $i
+	allfreeports[$n]=$i
+	#echo ${allfreeports[$n]}
+	(( n=$n+1 ))
+    done
+done
+
+# Anzahl der ermittelten Ports = Anzahl der Elemente im Array
+anzahl=${#allfreeports[@]}
+#echo $anzahl
+
+# Zufallswert bestimmen, darf nicht 0 sein
+zahl=0
+while (( $zahl == 0 )); do
+    zahl=$((( $RANDOM * 32768 + $RANDOM ) % $anzahl ))
+done
+
+# Freien Port ausgeben
+echo ${allfreeports[$zahl]}

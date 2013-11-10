@@ -1,0 +1,141 @@
+--- Sammlung wichtiger Konfigurationsdateien für FSP invis 6.9 Server ---
+
+Konfigurationsdateien Paket zum Nachbau von FSP invis6 Smallbusiness Servern.
+Copyright (c) 2008 Stefan Schäfer -- FSP Computer & Netzwerke
+Copyright (c) 2009,2010,2011 Stefan Schäfer -- invis-server.org
+ 
+mail: stefan@invis-server.org
+
+Anschrift & Kontakt
+
+invis-server.org
+Dipl.-Ing. Stefan Schäfer
+Otto-Müller-Str. 10
+63679 Schotten
+
+URL: www.invis-server.org
+Fragen: http://forum.invis-server.org
+
+FSP Computer & Netzwerke
+Dipl.-Ing. Stefan Schäfer
+Ludwigstr. 1-3
+63679 Schotten
+Germany
+
+URL: www.fsproductions.de
+Tel.: 06044/989 0000
+Fax: 06044/989 0003
+
+Alle Dateien unterliegen der GNU Public License (GPL) bzw. der Free Documentation License (FDL)
+(Beide Lizenzen liegen zum Nachlesen bei!)
+
+Sie dürfen alle im Paket enthaltenen Dateien nach Belieben verwenden, bearbeiten und
+weitergeben. Auch gegen kommerzielle Nutzung haben wir nichts einzuwenden.
+Wir bitten Sie lediglich darum uns über die Verwendung zu informieren. Auch wären wir 
+Ihnen Dankbar, wenn Sie uns an "genialen" oder auch nur "ganz netten" Erweiterungen und
+Ideen Ihrerseits teilhaben lassen würden.
+Nur so kann OpenSource funktionieren - schließlich stecken in diesen Dateien hunderte 
+von Arbeitsstunden, die wir niemandem in Rechnung stellen. Uns an Ihrer Arbeit teilhaben 
+zu lassen ist also nur fair. 
+Darüber hinaus sind die Bedingungen von GPL & FDL durchaus einklagbar. 
+
+Hilfreich für die Umsetzung Ihres Server-Projekts könnte der Kauf meines Buches:
+"Der Linux Server", erschienen im C&L Verlag (ISBN: 978-3936546-44-6), sein. Mehr dazu 
+unter: www.linuxserverbuch.de (Ist leider nicht mehr aktuell.)
+
+Empfohlene Zusatz-Software
+Leider sind nicht alle von uns als nützlich und gut angesehenen Software-Pakete Teil der openSuSE 
+Distribution, daher ist es erforderlich weitere Software nachzuinstallieren. Wir empfehlen:
+
+Groupware: Group-e ab 1.725
+Warenwirtschaft: LX-ERP ab V. 2.6.3
+
+Wer mit sine installiert, muss die genannte Software nicht manuell herunterladen. Dass erledigt sine.
+
+
+Alle Konfigurationen gehen von folgenden Vorgaben aus:
+
+Hostname des Servers:		invis5
+Domain des Servers:		i5-net.loc
+Netzwerk:			192.168.220.0/24
+IP des Servers:			192.168.220.10
+IP-Adressbereich für PCs:	192.168.220.100 - 150
+Dyn-DHCP Adressbereich:		192.168.220.200 - 220
+
+Die Konfiguration der Dienste DHCP, DNS, Samba, Horde usw. setzen einen laufenden LDAP-Server
+voraus.
+
+LDAP Basis DN:			dc=i5-net,dc=loc
+LDAP-Manager:			cn=Manager,dc=i5-net,dc=loc
+LDAP-Admin:			uid=Admin,dc=i5-net,dc=loc
+
+Es existieren folgende Knoten:
+
+Automount:			ou=Automount,dc=i5-net,dc=loc
+Benutzerverwaltung:		ou=Benutzerverwaltung,dc=i5-net,dc=loc
+DHCP-Server:			ou=DHCP-Server,dc=i5-net,dc=loc
+DNS-Server:			ou=DNS-Server,dc=i5-net,dc=loc
+Kontaktmanager:			ou=Kontakt,dc=i5-net,dc=loc
+
+Alle Knoten verfügen über einen eigenen Administrationsaccount nach dem Schema:
+
+    uid=Admin,ou=Knotenname,dc=i5-net,dc=loc
+
+Zur Verwendung der Dateien müssen Sie diese selbstverständlich an Ihre Gegebenheiten anpassen.
+Dies betrifft vor allem IP-Adressen, Host- und Netzwerknamen sowie Passworte.
+
+In den zugehörigen LDIF-Dateien sind keine Passwort-Hashes eingetragen sondern lediglich
+Platzhalter, die Sie natürlich mit Passwort-Hashes ersetzen müssen. Verwenden Sie dazu das 
+Tool "slappaswd". Es existieren folgende Platzhalter:
+
+LDAP-Manager:			manager-secret-hash
+LDAP-Admin:			master-secret-hash
+LDAP-Sub-Admins:		admin-secret-hash
+
+In einigen anderen Dateien werden eben diese LDAP Passwörter zum Zugriff auf den LDAP-Server benötigt.
+Auch hier haben Platzhalter eingefügt. Da diese Passwörter allerdings nur im Klartext eingetragen
+sein dürfen, fehlt den Platzhaltern die Erweiterung "-hash". So können Sie die Platzhalter einfach per
+Suchen & Ersetzen gegen Passwort oder Passwort-Hash austauschen.
+
+Derzeit ist es aus Kompatibilitätsgründen nicht möglich einen OnAccess-Virenscanner für die Fileserver-
+Freigaben zu realisieren. Samba-vscan lässt sich nicht gegen aktuelle Samba-Versionen kompillieren
+und dazuko verweigert ebenfalls den Dienst. Daher verfügt Ihr invis Server nur über einen einge-
+schränkten Virenschutz. Aus der smb.shares.conf Datei habe ich derzeit alle vscan-Einträge entfernt.
+Um wenigstens ein Stück Sicherheit in Sachen Viren zu gewährleisten empfehle ich die Einrichtung
+eines Cronjobs, der nächtlich alle Fileserver-Freigaben auf Schädlinge scannt. Alles weitere bleibt
+den Viren-Scannern auf Client-Seite überlassen. Der Virenschutz im Mailserver bleibt davon unberührt
+und funktioniert weiterhin.
+
+Die beiliegende Firewall Konfiguration definiert ein vorhandenes eth1 als internes Device, sowie 
+ein eth0 und ein dsl0 als externe Devices. Routing und Masquerading werden aktiviert. Von "trusted
+networks" wird kein Gebrauch gemacht und der Server wird generell auch vor Zugriffen aus dem
+internen Netz - unter Berücksichtigung der laufenden Server-Dienste - geschützt.
+
+Wir raten jedoch davon ab diese Datei einfach zu übernehmen, da sich Situationen nie gleichen. 
+Betrachten diese Datei eher als ein Konfigurationsbeispiel. Weitere Beispiele finden Sie unter:
+/usr/share/doc/packages/SuSEfirewall2.
+
+Denken Sie bitte daran, dass eine Firewall besonderes Augenmerk verdient und nicht mal eben kurz
+vor Feierabend eingerichtet werden sollte.
+
+Bevor Sie einen Server basierend auf diesen Konfigurationsdateien in Betrieb nehmen, kontrollieren
+Sie bitte die Zugriffsrechte der verwendeten Dateien!
+
+Die Sammlung wird parallel zur Entwicklung unserer Server weiter gepflegt und entsprechend in
+unregelmäßigen Abständen aktualisiert. Dabei berücksichtigen wir auch Ihre Verbesserungen und
+Erweiterungen.
+
+Derzeit basieren die Konfigurationsdateien auf openSuSE 11.3
+
+In einigen Dateien haben wir zur besseren Auffindbarkeit unsere Anpassungen durch eine voran-
+gestellte Zeile "## FSP" gekennzeichnet. 
+
+Wenn Sie die beiliegenden Portal-Seiten für Ihren Webserver verwenden, achten Sie bitte darauf, 
+dass diese auf unsere Zwecke angepasst sind. Sie dürfen durchaus unser Logo weiter verwenden, 
+allerdings bitten wir Sie dann darum sich nicht mit fremden Federn zu schmücken. Wenn Sie den
+in die Seiten integrierten mailto-Link belassen, sollten Sie damit rechnen, dass unsere Arbeits-
+zeit nicht kostenlos ist.
+
+Haftungsausschluß:
+Für etwaige Schäden (wie z.B. Datenverlust) die durch die Verwendung unserer Dateien entstehen,
+übernehmen wir keinerlei Haftung. Die Verwendung geschieht auf eigene Gefahr.

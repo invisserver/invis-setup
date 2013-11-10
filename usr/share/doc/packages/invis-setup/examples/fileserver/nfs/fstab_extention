@@ -1,0 +1,5 @@
+
+# NFSv4 Binds
+/home			/srv/nfs4_base/home	none	bind		0 0
+/srv/shares		/srv/nfs4_base/shares	none	bind		0 0
+

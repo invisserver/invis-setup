@@ -1,0 +1,6 @@
+cups
+cups-client
+cups-backends
+foomatic-filters
+manufacturer-PPDs
+udev-configure-printer

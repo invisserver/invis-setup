@@ -1,0 +1,26 @@
+#!/bin/bash
+## Automatischer Import oeffentlicher Schluessel von Buildservice-Repos
+## für RPM-Paketmanager
+# (c) 2009 Stefan Schäfer invis-server.org
+# License GPLv3
+# Questions: stefan@invis-server.org
+# Last Modification: 09.01.2010
+
+# Repository Verzeichnisse
+zypperdir="/etc/zypp/repos.d"
+
+## Channel-Verzeichnis durchsuchen
+for x in $zypperdir/*; do
+    if [[ ! -d $x ]]; then
+	#echo $x
+        repotype=`cat "$x"|grep type|cut -d "=" -f 2`
+        if [[ $repotype = "rpm-md" ]]; then
+            gpgurl=`cat "$x"|grep gpgkey|cut -d "=" -f 2`
+            #echo $gpgurl
+            if [[ -n $gpgurl ]]; then
+        	#wget $gpgurl
+        	rpm --import $gpgurl 2>/dev/null
+    	    fi
+        fi
+    fi
+done

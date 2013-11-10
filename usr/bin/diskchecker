@@ -1,0 +1,111 @@
+#!/bin/bash
+# diskcheker V. 1.2
+# Kleines Tool zur Ueberwachung aller Festplatten und SW-RAID Verbuende
+# (C) 2009 Stefan Schaefer -- invis-server.org
+# Licence GPLv3
+# Qustions: stefan@invis-server.org
+
+#Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+#passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+# Verzeichnis für Testergebnisse
+directory="/var/spool/results/diskchecker"
+
+# Spooldirectory anlegen
+if [[ ! -d $directory ]]; then
+    mkdir -p $directory
+    chown -R .www /var/spool/results
+fi
+
+# Alte Status- und Alarmmeldung löschen
+rm -f $directory/alarm
+
+# Servernamen ermitteln
+server=`hostname -f`
+sender=info@`hostname -d`
+
+# Empfänger der Warnmails
+adminmail=`getconfdata $conffile "adMail" "2"`
+
+# aktuelles Datum ermitteln
+datum=`date +%d.%m.%Y" "%R`
+
+#echo "Letzter Prüflauf: $datum Uhr" > $directory/status
+echo "$datum" > $directory/status
+
+# No SMART Support
+nosmart=`getconfdata $conffile "noSMART" "2"`
+
+# Alle Festplatten finden
+for x in /sys/block/*; do
+	smartpossible=`udevadm info --query=all --path=$x|grep "$nosmart"`
+	#echo $x:$smartpossible
+	x=`basename $x`
+	if [[ -n $smartpossible ]]; then
+	    #echo $x
+	    # Festplatten testen
+	    if [[ `echo $x|cut -c1,2` == "sd" ]]; then
+		selftest=`smartctl -H /dev/$x|cut -d " " -f6|tail -n 2|head -n 1`
+		#echo $selftest
+		if [[ $selftest == "PASSED" ]]; then
+		    temp=`smartctl -A /dev/$x|grep 194|tr -s " "|cut -d " " -f 10`
+		    #echo "Festplatte \"$x\" ist OK - Aktuelle Festplattentemperatur ist $temp °C" >> $directory/status
+		    echo "$x OK $temp" >> $directory/status
+		else
+		    #echo "Festplatte \"$x\" ist Fehlerhaft - bitte sofort Ihrem Administrator melden!" >> $directory/status
+		    temp=`smartctl -A /dev/$x|grep 194|tr -s " "|cut -d " " -f 10`
+		    echo "$x nOK $temp" >> $directory/status
+		    echo "Festplatte $x auf Server $server meldet Fehler: $selftest" >> $directory/alarm 
+		fi
+	    fi
+	fi
+	# RAID Verbuende testen
+	if [[ `echo $x|cut -c1,2` == "md" ]]; then
+	    status=`mdadm -D /dev/$x|grep "State :"|tr -d " "|cut -d ":" -f 2`
+	    if [[ $status == "active" || $status == "clean" ]]; then
+		#echo "RAID Verbund \"$x\" ist OK" >> $directory/status
+		echo "$x OK" >> $directory/status
+	    else 
+		#echo "RAID Verbund \"$x\" ist Fehlerhaft - Bitte melden Sie den Status: \"$status\" Ihrem Administrator" >> $directory/status
+		echo "$x nOK $status" >> $directory/status
+		echo -e "RAID Verbund \"$x\" auf Server $server ist ausgefallen. \n mdadm-Ausgabe:" >> $directory/alarm
+		mdadm -D /dev/$x >> $directory/alarm
+	    fi
+	fi
+done 
+
+# Testen ob innerhalb der letzten drei Tage bereits ein Alarm gesendet wurde
+oldsent=`find $directory/sent -ctime +3 2> /dev/null`
+
+# Wenn ein Alarm vor ueber drei Tagen oder noch gar nicht gesendet wurde $sent auf 1 setzen 
+ 
+if [[ $oldsent != "" || ! -f $directory/sent ]]; then
+    sent=1
+fi
+
+# email senden, wenn Alarm v
+if [[ -f $directory/alarm && $sent == 1 ]]; then
+    cat $directory/alarm|mailx -s "Alarm!" -r $sender $adminmail 
+    echo $datum > $directory/sent
+fi
+
+# Wenn kein Alarm vorliegt, alte sent Datei löschen
+if [[ ! -f $directory/alarm ]]; then
+    rm $directory/sent 2> /dev/null
+fi
+

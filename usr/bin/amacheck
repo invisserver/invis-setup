@@ -1,0 +1,33 @@
+#!/bin/bash
+# Script zur Wiederbelebung eines gestorbenen Amavis-Daemons
+# Amavis kann bei vorhandenem verwaistem pidfile nicht immer starten.
+# (C) 2009,2012 Stefan Schaerfer -- invis-server.org
+# Author Stefan Schaefer
+# Questions: stefan@invis-server.org
+# License: GPLv3
+# Version: 2.0
+
+pidfile="/var/spool/amavis/amavisd.pid"
+initscript="/etc/init.d/amavis"
+
+# laeuft amavisd
+pid=`ps ax|grep "amavisd"|grep -v "grep"| grep -v "("|tr -d " "|cut -d "?" -f1`
+
+# Wenn kein pid file vorhanden, dann anlegen
+if [[ ! -f $pidfile && -n $pid ]]; then
+    echo $pid > $pidfile
+fi
+
+# Status ermitteln
+status=`$initscript status 2>&1 |tr -s " "|cut -d ":" -f 2| tr -d "."|tr -d " "`
+
+# Reagieren wenn Amavis nicht laeuft
+if [[ $status != "running" ]]; then
+    # Wenn verwaistes pidfile vorhanden ist, dieses loeschen
+    if [[ -f $pidfile ]]; then
+	rm -f $pidfile
+    fi
+    # amavisd neustarten
+    $initscript start
+fi
+

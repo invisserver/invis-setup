@@ -1,0 +1,142 @@
++++ sine +++
+Version 8.0 R1
+Ein "kleines" Setup-Script für invis-Server der Version 7.0
+
+(c) 2008 Stefan Schäfer / FSP Computer & Netzwerke
+(c) 2009, 2010, 2011  Stefan Schäfer / invis-server.org
+email: stefan@invis-server.org
+License: GPLv3
+
+invis-server.org
+Ludwigstr. 1-3
+63679 Schotten
+
+Eine recht umfangreiche Anleitung zur Installation eines invis-Servers ist
+unter http://wiki.invis-server.org zu finden. Fragen oder Anregungen zu Script und
+Projekt oder auch Bugreports können unter http://forum.invis-server.org gestellt
+werden.
+
+!! Achtung !! 
+Das vorliegende invis Setup-Paket: 8.0 R1 ist ein "Hot Needle" Paket! Es 
+ist nicht für den Produktiveinsatz gedacht!
+
+Für Version 8.0 R1 / openSUSE 12.2 stehen die Sernet Samba-Pakete bereits zur Verfuegung.
+
+Version 8.x basiert auf openSUSE 12.2 angepasst.
+
+In Version 7.0 R1 wurde das Sernet Repository für Samba entfernt, da es für 
+openSUSE 12.1 noch nicht zur Verfügung steht. Aufgrund des hohen Aufwands wurde Sernet 
+Samba allerdings nicht aus dem Setup entfernt. Bitte wählen Sie es nich aus.
+
+Das Script ist angepasst an openSUSE 12.1 und kann aufgrund massiver struktureller
+Änderungen nicht mehr als Basis für Updates von Versionen vor 6.9 verwendet werden.
+
+Es bietet zusätzlich zu älteren Versionen die Möglichkeit an Zarafa in der 
+Community-Version als Mail & Groupware-Server zu installieren.
+
+Weiterhin kann jetzt auch OpenERP alternativ zu LX-ERP installiert werden.
+Ab Version 6.7-R9 wird LX-Office ERP in Version 2.6.3 vorausgesetzt.
+
+Version 6.7-R5 ist ein reines Bugfix-Release. Wir sind beim Testen der R4 über ein
+paar alte Bug gestolpert, die wir hiermit behoben haben. Neues ist nicht an Bord.
+
+Mit Version 6.7-R4 ist die gesamte Bedienung des Setup-Scripts unter Verwendung
+des Tools "dialog" auf eine ncurses-Oberfläche umgestellt worden. Dies erleichtert
+die Verwendung des Scripts erheblich. Im Zuge der Umstellung haben wir das Script
+in "sine" (Server Installation Now Easy) umbenannt.
+
+Mit Version 6.7-R1 erhalten invis-Server unter /etc/invis einen zentralen Ort für
+invis-eigene Konfigurationsdateien. Schauen Sie sich unbedingt die Datei invis.conf
+im genannten Verzeichnis an. Ab sofort können die Helper-Scripts aus der invis
+Toolbox aktualisiert werden, ohne im ganzen System nach den Scripts nach den Scripts
+zusuchen um diese einzeln wieder zu konfigurieren.
+
+Ebenso wurden alle zeitlich gesteuerten Aufgaben in einer einzigen Cron-Datei 
+invis.cron unter /etc/cron.d zusammengefasst. Auch das vereinfacht die Administration.
+
+!! Achtung !!
+Gelegentlich - vermutlich bei einem Update der Samba-Pakete werden die Besitzrechte
+auf alle Verzeichnisse unter /var/lib/samba geändert. So wird das Verzeichnis
+/var/lib/samba/profiles der Gruppe "users" und das Verzeichnis "drivers" der Gruppe 
+ntadmin zugeordnet, was unschöne Folgen für den Betrieb des Samba-Servers hat. So
+können servergespeicherte Profile nicht mehr geschrieben und auch keine Drucker-
+treiber mehr hochgeladen werden. Diese Verzeichnisse müssen "Domain Users" (profiles)
+bzw "Domain Admins" (drivers) gehören. 
+
+Dieses Problem wird durch ausführen des Tools "afterup" beseitigt.
+
+Als diesbezüglicher Notbehelf ist jetzt das Helfer-Script "afterup" in der Toolbox.
+Führen Sie es im Zweifelsfall nach jedem Online-Update durch.
+
+!! Achtung !!
+Es muss Group-e in Version 1.725 verwendet werden.
+
+!! Achtung !!
+Wenn Sie sich im Verlauf der Installation für Antivir als Virenscanner entscheiden,
+wird automatisch eine Lizenzdatei für die private Nutzung von Antivir installiert.
+Wenn Sie diesen Server gewerblich nutzen, stellt dies einen Verstoss gegen die 
+Avira Lizenzbedingungen dar. Für die legale Nutzung im gewerblichen Umfeld müssen
+Sie eine entsprechende Lizenz erwerben.
+
+!! Achtung !!
+Es ist derzeit nicht möglich mittels samba-vscan oder dazuko
+einen "On Access" Virenscanner zu realisieren. Ich empfehle ersatzweise
+die Einrichtung eines cronjobs zur nächtlichen Virenentfernung. 
+
+!! Hinweis !!
+Seit Version 6.5-RC9 ist das Script "inetcheck" in der Lage dynamische DNS Updates
+per ddns-sec (nsupdate) vorzunehmen. Sie benötigen dazu einen DNS-Server, der Up-
+dates von Ihnen akzeptiert, sowie einen dnssec Key bestehend aus zwei Dateien 
+(K*.+157+?????.key und K*.+157+?????.private). Kopieren Sie diese nach /etc/ssl/ddns
+und passen Sie die zugehörigen Variablen in /etc/invis/invis.conf an Ihre Bedürfnisse
+an.
+
+Voraussetzungen zur Verwendung:
+
+1. Es sollte ein openSuSE 12.2 Basisinstallation ohne weitere Metapakete installiert sein.
+
+Empfehlenswert sind zusätzliche Programme wie mc oder weitere
+Tools nach belieben. Eine grafische Oberfläche ist weder nötig noch
+sinnvoll.
+
+Alle weiteren benötigten Pakete installiert das Script bei Bedarf selbst.
+
+2. Allen vorgefertigten Konfigurationsdateien liegen diesem Script
+inzwischen im Unterordner cfiles bei. Ein gesonderter Download entfällt.
+
+#############
+Anmerkungen:
+Ist das Script einmalig vollständig durchlaufen worden, können die 6 Module:
+    groupware
+    erp
+    faxgate
+    webcdwriter
+    openvpn
+    dokuwiki
+nachträglich manuell direkt gestartet werden, etwa wenn sie während des ersten Durchlaufs 
+übersprungen wurden. Der Aufruf erwartet einfach den Modulnamen als Aufrufparameter:
+
+    ./sine modulname
+
+In der aktuellen Version des invis-Setup-Scripts werden die smbldap-tools sowie das Paket 
+perl-Unicode-MapUTF8 via smart aus unserem invis-server BuildService-Repository installiert.
+
+Das Script sine für Version 6.7 der invis-Server ist an die Anforderungen von Group-e und 
+das ERP-System LX-Office angepasst. 
+Group-e setzt leider cyrus-imap statt dovecot voraus, auch das ist im Script berücksichtigt.
+Eine dovecot Installtion ist dennoch möglich, allerdings ist bei der Group-e Mail-Konfiguration
+etwas mehr Handarbeit nötig. Auch kann Group-e dann nicht auf alle Mail-Ordner zugreifen. 
+
+Group-e und LX-Office werden inzwischen im Rahmen des Scriptes weitestgehend automatisch vor-
+installiert. Für alles Weitere empfehle ich die recht brauchbaren beiliegenden Installations-
+anleitungen. Die anschließende Konfiguration erfolgt im Browser, einfach auf die entsprechenden
+Links im Portal klicken.
+Meine Erfahrungen damit stelle ich gerne zur Verfügung.
+
+Ansonsten wünschen wir uns natürlich Feedback, Feedback & Feedback! Was wir nicht benötigen sind
+Sprüche wie: "Das kann er nicht" & "Das geht damit nicht" - Helft uns lieber dabei fehlende 
+Funktionen zu implementieren.
+
+Viel Spaß 
+
+Stefan

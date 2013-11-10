@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# /etc/init.d/CDWserver
+#
+### BEGIN INIT INFO
+# Provides:          CDWserver
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     3 5
+# Default-Stop:
+# Description:       Network CD Writing
+### END INIT INFO
+
+# directories
+export BINDIR=/usr/bin; export CONFIGDIR=/etc/CDWserver; export EXPORTDIR=/var/CDWserver/export; export HTTPDIR=/var/CDWserver/http; export INITDIR=/etc/init.d; export LOGDIR=/var/log/CDWserver; export PROJECTSDIR=/var/CDWserver/projects; export SBINDIR=/usr/sbin; export SPOOLDIR=/var/spool/CDWserver; export TOOLSDIR=/var/CDWserver/bin
+
+# the path to your PID file
+export pidFile=/var/run/CDWserver.pid
+
+test -s /etc/rc.status && . /etc/rc.status
+
+rc_reset
+
+# See how we were called.
+case "$1" in
+	start)
+		echo -n "Starting CDWserver"
+		startproc $SBINDIR/CDWserver > /dev/null 2>&1
+		rc_status -v
+		;;
+	stop)
+		echo -n "Shutting down CDWserver"
+		killproc -TERM $SBINDIR/CDWserver
+		rc_status -v
+		;;
+	restart)
+		$0 stop
+		$0 start
+		rc_status
+		;;
+	condrestart)
+		$0 restart
+		;;
+	status)
+		lynx -dump http://localhost:12411
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|condrestart|status}"
+		rc_failed 3
+		rc_status -v
+		;;
+esac
+rc_exit
