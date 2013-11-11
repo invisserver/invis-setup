@@ -1,8 +1,8 @@
 #!/bin/bash
-# invis 9.0 Server Setup Script
+# invis 9.2 Server Setup Script
 # Version R1
 # (c) August 2008 by Stefan Schäfer / FSP Computer & Netzwerke
-# (c) 2009, 2010, 2011, 2012 by Stefan Schäfer / invis-server.org / stefan@invis-server.org
+# (c) 2009, 2010, 2011, 2012, 2013 by Stefan Schäfer / invis-server.org / stefan@invis-server.org
 # License: GPLv3
 # Questions: http://forum.invis-server.org
 # Dieses Script führt alle zur Installation eines invis Servers notwendigen 
@@ -26,12 +26,9 @@ dialogshorthelp="Cursor- ([Auf]/[Ab]) und Tabulatortaste zur Navigation, Leertas
 # zentrales invis Konfigurationsverzeichnis anlegen & Konfig-Datei kopieren
 confdir="/etc/invis"
 if [[ ! -d $confdir ]]; then
-    mkdir -p $confdir/templates
-    cp $cfilesdir/invis/invis.conf $confdir
     chown -R root:root $confdir/invis.conf
     chmod 0640 $confdir/invis.conf
 
-    cp $cfilesdir/invis/invis-pws.conf $confdir
     chown root:root $confdir/invis-pws.conf
     chmod 0600 $confdir/invis-pws.conf
 fi
@@ -179,8 +176,9 @@ check() {
 
     if [[ $prepok == "0" ]]; then
 	windowtitle="Software Installation"
-	msgbox "Es werden neue Software-Repositories hinzugefügt und alle für den invis Server benötigte Software installiert." "Software Installation"
-	cp $cfilesdir/zypper_repos/*.repo /etc/zypp/repos.d/
+	msgbox "Es wird alle für den invis Server benötigte Software installiert." "Software Installation"
+	## loeschen
+	#cp $cfilesdir/zypper_repos/*.repo /etc/zypp/repos.d/
 	# Schlüssel der neuen Repositories importieren
 	./bin/rpmkeyimporter
         ## zypper repo-Cache aktualisieren und Update fahren
@@ -190,13 +188,8 @@ check() {
         pgsubtitle="Online Update wird durchgeführt" 
         zypper -n up --type package 2>&1| tee -a $setupdir/sine.log | pgbox
         zyppercheck ${PIPESTATUS[0]}
-
-#        zypper -n dup --from spins_invis 2>&1 | tee -a $setupdir/sine.log | pgbox
-#        zyppercheck ${PIPESTATUS[0]}
-
-	# Exim wird gegen postfix ausgetauscht
-	pgsubtitle="Der vorinstallierte Exim wird durch postfix ersetzt"
-	zypper -n install -n --force-resolution postfix  2>&1| tee -a $setupdir/sine.log | pgbox 25 110
+	
+	# Postfix aktivieren
 	chkservice "postfix"
 	
 	# Patterns
@@ -208,11 +201,12 @@ check() {
 	zypper -n install -n `cat $cfilesdir/zypper-package-lists/invis_base` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
         zyppercheck ${PIPESTATUS[0]}
 
+	## loeschen
         # Printserver
-	pgsubtitle="Print-Server-Pakete werden installiert" 
+	#pgsubtitle="Print-Server-Pakete werden installiert" 
 	## force-resolution wieder rausnehmen, wenn dependency bug gefixt ist!
-	zypper -n install -n --force-resolution `cat $cfilesdir/zypper-package-lists/cups` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
-        zyppercheck ${PIPESTATUS[0]}
+	#zypper -n install -n --force-resolution `cat $cfilesdir/zypper-package-lists/cups` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+        #zyppercheck ${PIPESTATUS[0]}
 
 	# Neuere Pakete aus aktuelleren Repos beziehen
         pgsubtitle="Distributions-Upgrade wird durchgeführt" 
