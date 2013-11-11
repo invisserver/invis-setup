@@ -1,0 +1,7 @@
+WebCDCreator
+
+Der webCDcreator ermöglicht es Benutzern an Computern ohne lokalen CD-Brenner
+Dateien auf eine CD-R zu kopieren. Der Benutzer stellt hierzu mit dem
+webCDcreator an seinem Arbeitsplatz die Dateien zusammen, die auf die CD sollen.
+Die CD wird anschließend unter Kontrolle von webCDcreator durch einen von den
+Benutzern gemeinsam genutzten CD-Brenner gebrannt. 

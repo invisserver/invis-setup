@@ -1,0 +1,66 @@
+DokuWiki  
+ist ein standardkonformes, einfach zu benutzendes Wiki und zielt hauptsächlich auf die
+Erstellung von Dokumentationen aller Art ab. Es richtet sich an Entwicklerteams, 
+Arbeitsgruppen und kleine Unternehmen. Seine einfache, aber mächtige Syntax gewähr-
+leistet, dass die Daten auch außerhalb des Wikis lesbar bleiben und vereinfacht die 
+Erstellung strukturierter Texte. Alle Daten werden in Textdateien gespeichert – es 
+wird keine Datenbank benötigt. 
+
+DokuWiki hat von Haus aus viele Funktionen und noch viele mehr können durch sogenannte
+Plugins hinzugefügt werden. Die Auflistung unten verschafft Dir einen ersten Überblick
+über das, was in DokuWiki vorhanden ist. Eine nahezu vollständige Liste der Features
+ist auch auf WikiMatrix verfügbar, dort kannst Du die Eigenschaften von DokuWiki auch
+mit denen anderer Wikis vergleichen.
+
+Teste einfach Dokuwiki auf dem Spielplatz. Wenn du eine Funktionalität vermisst, setze
+einfach eine Prämie aus.
+
+Grundlegendes
+
+    * Einfache Syntax!
+    * unlimitierte Revisionsstände der Inhalte
+    * Änderungslisten
+    * Farbige Markierungen/Unterscheidungen bei Änderungen (diff)
+    * Hochladen und Einbinden von Grafiken und anderen Medien.
+    * anpassbare Interwiki Verlinkungen
+    * Optionale CamelCase Unterstützung
+    * frei kategorisierbare Namensräume, frei anwählbar und automatisch erstellter 
+      Index
+
+Hohe Bedienfreundlichkeit
+
+    * Section Editing erlaubt das Editieren von kleinen/kurzen Absätzen einer Seite
+    * Schaltflächen und Tastaturkürzel erlauben einfaches Editieren für Einsteiger
+      und professionelle User
+    * Einfachste Navigation durch breadcrumbs
+    * Optionale Rechtschreibprüfung
+    * Automatische Erstellung von Inhaltsverzeichnissen
+    * Sperren von zur Bearbeitung geöffneten Seiten zur Vermeidung von
+      Speicherkonflikten
+
+International
+
+    * Unterstützung von zur Zeit über 30 Sprachen
+    * Voller UTF-8 Support
+    * Optionale, automatische Verlinkung der “Mehrzahl” (Begriff im Plural) bei
+      englischsprachigen Wikis…
+
+Schnell
+
+    * Index-basierende Volltextsuche
+    * Seiten-Cache für schnellere Darstellung
+    * Ajax-basierende Schnellsuche für Seitennamen
+
+Erweiterbar
+
+    * individuelle Layouts durch Template
+    * Funktionserweiterung durch Plugins (über 300 bereits verfügbar)
+    * Große Unterstützung aus der Community wenn Sie Hilfe benötigen
+
+Einfache Integration
+
+    * keine Datenbank erforderlich, Dokuwiki verwendet reine .txt Dateien
+    * Zusammenfassung von Dokumentenänderungen als RSS- oder ATOM-Feeds
+    * Authentication Backends zur Integration in LDAP, MySQL, Postgres u.v.m.
+    * Open Source und bestens dokumentiert! (Source Code)
+    

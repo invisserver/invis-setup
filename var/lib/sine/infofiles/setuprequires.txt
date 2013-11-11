@@ -1,0 +1,24 @@
+Für die Installation eines invis Servers 9.0 müssen folgende Voraussetzungen erfüllt sein:
+
+    - Als Basis muss openSUSE Linux 12.3, möglichst ohne grafische Oberfläche installiert sein.
+    
+    - Der Server muss über zwei Netzwerkkarten (eth0 & eth1) verfügen. Beide Karten müssen vor
+      der Ausführung dieses Scripts konfiguriert sein. Schnittstelle eth0 muss als externe
+      Schnittstelle zur Verbindung mit DSL-Modem oder Router eingerichtet sein. Bei Verbindung
+      mit einem Router empfielt es sich auf diesem einen DHCP-Server zu starten und eth0 als
+      DHCP-Client einzurichten. Wird ein DSL-Modem verwendet, muss eth0 als DSL-Schnittstelle
+      eingerichtet und die Internetverbindung funktionstüchtig sein.
+      Schnittstelle eth1 muss mit einer festen IP-Adresse versehen werden.
+      Die Einrichtung der Netzwerkkarten kann per YaST vorgenommen werden.
+    
+    - Der Server muss vor Ausführung des Setup-Scripts über einen vollständigen Hostnamen verfügen.
+      Der Hostname kann ebenfalls per YaST gesetzt werden und sollte dem Muster "Hostname.Domain.tld"
+      gehorchen.
+      
+    - Sie benötigen bis zu drei (mindestens eine) IP Adressen von Nameserversn, die Sie für den
+      DNS-Dienst Ihres invis-Servers als Forward-Nameserver nutzen können. Dies können der DNS
+      eines vorgeschalteten Routers, die für Sie zuständigen DNS-Server Ihres Internet-Zugangs-
+      Providers oder freie DNS-Server im Internet sein. Prüfen Sie bitte im Vorfeld der Instal-
+      lation, ob die von Ihnen verwendeten DNS-Server auf Anfragen antworten. Antworten diese
+      Server nicht auf Anfragen, beeinträchtig dies sowohl die Installation Ihres invis-Servers
+      als auch den späteren Betrieb.

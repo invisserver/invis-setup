@@ -1,0 +1,20 @@
+### Zypper Fehler ###
+
+Leider ist die Installation weiterer Software für Ihren Server fehlgeschlagen.
+
+Das Programm "zypper" hat Fehler 104 gemeldet. Das bedeutet, dass nicht alle
+zur Installation anstehenden Software-Pakete in den Repositories gefunden
+wurden.
+
+Meist liegt die Ursache an Problemen mit dem Internetzugang Ihres Servers.
+
+Gelegentlich werden in den openSUSE Repositories einzelne Pakete umbenannt
+oder speziell nach einem Release-Wechsel entfernt, was zum gleichen Fehler 
+führt.
+
+Sollten Sie diese Fehlermeldung zu Gesicht bekommen, sprechen Sie uns im
+invis Server Forum darauf an.
+
+http://forum.invis-server.org
+
+Ihr invis-Team.

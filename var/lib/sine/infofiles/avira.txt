@@ -1,0 +1,12 @@
+Sie haben sich für den Virenscanner "antivir" aus dem Hause
+Avira entschieden.
+
+Bedenken Sie bitte, dass es sich hierbei nicht um Open-Source-
+Software handelt. Die Nutzung von Antivir ist lediglich für
+den privaten Gebrauch oder zu vorübergehenden Testzwecken
+kostenfrei.
+
+Der Einsatz im gewerblichen Umfeld setzt den Erwerb einer
+gültigen Lizenz voraus.
+
+Sie können sich diesbezüglich unter www.avira.de informieren.

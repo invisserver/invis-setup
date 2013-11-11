@@ -1,0 +1,37 @@
+Group-e im Überblick
+
+Organisation und Kommunikation im Team
+ 
+* Persönliche und gemeinsame Terminplanung, Terminfinder, Benachrichtigungservice, Einbinden von Externen
+* Verwaltung persönlicher und gemeinsamer Adressen, umfangreiche Suche, CRM-Funktionen, Import/Export
+* Verwalten persönlicher und gemeinsamer EMail-Postfächer, Schnellablage, Abwesenheitsmeldung, Suche, 
+  Filterfunktion, Virenscanner, Spamfilter
+* Organisation privater Aufgaben und geschäftlicher Einzel- und Gruppenaufgaben, Delegierung, 
+  Fälligkeitsanzeige, integriertes Logbuch
+* Einfache und schnelle interne Mitteilungen, Systemmeldungen, Benachrichtigungsservice (Messaging Groupware)
+
+Projektmanagement mit System
+ 
+* Alle Projektinformationen auf einen Blick, zentrale Verwaltung, Mitglieder- und Rechteprofile, 
+  Schnittstelle zu allen Modulen
+* Zentrale Verwaltung der Projekte und Tätigkeiten, integrierte Stoppuhr, Auswertung und 
+  Monatsbericht pro MitarbeiterIn
+* Zentrale Erfassung von Anrufen, Benachrichtigungsservice, Auswertung
+
+Unternehmenswissen schaffen und aufbereiten
+
+* Zentrale Dokumentationsplattform mit integrierter Blackboard-Funktion, XML-Import und Export
+* Zentrale Dokumentenablage für persönliche und gemeinsame Dateien, Anbindung ans Dateisystem (Samba)
+* Linksammlung für persönliche und gemeinsame Links mit "One Klick and Save"-Funktion, Import/Export
+* Übersichtliches Diskussionswerkzeug mit Abonnement- und Benachrichtigungsservice
+
+Individueller Zugang zur Teamsoftware
+ 
+* Immer up to date, was im Team bzw. im Unternehmen läuft.
+* Die Startseite ist personalisierbar.
+* Anpassung der Benutzungsoberfläche an individuelle Bedürfnisse, Berichte der
+  Synchronisation mit syncML-fähigen Endgeräten
+
+Administration
+
+* Einfache Administration der Module, volle Kontrolle über die Accounts, Gruppen, Mailboxen, Rechte usw.

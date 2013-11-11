@@ -1,0 +1,18 @@
+Herzlichen Glückwunsch,
+Sie haben die Installation Ihres invis Servers abgeschlossen.
+
+Sollte estwas schief gegangen sein, ist ab hier leider Handarbeit
+angesagt. Wenn Sie bei der Fehlersuche Hilfe benötigen oder Fehler
+im Setup-Script feststellen, wenden Sie sich bitte an unser Forum:
+
+http://forum.invis-server.org
+
+Im Anschluss an die Installation sollten Sie beginnen die installierten
+Applikationen (Group-e, LX-Office, openVPN, Dokuwiki usw.) einzurichten.
+Hilfe dazu finden Sie in unserem Wiki:
+
+http://wiki.invis-server.org
+
+Viel Spaß mit dem Server
+
+Das invis-Server Team.

@@ -171,7 +171,7 @@ smbldappw() {
 
 # Installationsvoraussetzungen prüfen
 check() {
-    dialog --backtitle "$dialogtitle" --title "Installationvoraussetzungen" --exit-label "Weiter" --textbox "./infofiles/setuprequires.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "Installationvoraussetzungen"  --defaultno --yesno "Sind alle Voraussetungen erfüllt?" 0 0
+    dialog --backtitle "$dialogtitle" --title "Installationvoraussetzungen" --exit-label "Weiter" --textbox "$setupdir/infofiles/setuprequires.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "Installationvoraussetzungen"  --defaultno --yesno "Sind alle Voraussetungen erfüllt?" 0 0
     prepok=${?}
 
     if [[ $prepok == "0" ]]; then
@@ -815,7 +815,7 @@ sysprep() {
 	# Info einblenden
 	clear
 	windowtitle="Avira Antivir Installation"
-	dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/avira.txt" 0 0
+	dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/avira.txt" 0 0
 	zypper -n install -n antivir 2>&1| tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 	pgsubtitle="Die Antivir Lizenzdatei wird heruntergeladen und Avira Antivir wird aktualisiert"
@@ -2250,7 +2250,7 @@ nagios() {
     cd $setupdir
     clear
     windowtitle="Vorbereitung für Server Monitoring"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/nagios.txt" 18 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Planen Sie den Server via Icinga oder Nagios zu überwachen?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/nagios.txt" 18 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Planen Sie den Server via Icinga oder Nagios zu überwachen?" 0 0
     cont=${?}
     if [[ $cont == "0" ]]; then
         # Vorbereitung zur Ueberwachung des Servers via Icinga oder Nagios
@@ -2272,7 +2272,7 @@ if [[ $whichimap == "cyrus" ]]; then
     cd $setupdir
     clear
     windowtitle="Group-e Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/group-e.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Group-e installieren?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/group-e.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Group-e installieren?" 0 0
     cont=${?}
 
     if [[ $cont == "0" ]]; then
@@ -2397,7 +2397,7 @@ elif [[ $whichimap == "dovecot" ]]; then
     cd $setupdir
     clear
     windowtitle="SOGo Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/sogo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/sogo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"
 
     zypper -n install -n `cat $cfilesdir/zypper-package-lists/sogo` 2>&1 | tee -a $setupdir/sine.log | pgbox
     zyppercheck ${PIPESTATUS[0]}
@@ -2425,7 +2425,7 @@ else
     cd $setupdir
     clear
     windowtitle="Zarafa Konfiguration"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/zarafa.txt" 38 90
+    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/zarafa.txt" 38 90
 
     ## Fix Zarafa Package-Bugs
     # Spaeter wieder entfernen
@@ -2554,7 +2554,7 @@ case $whicherp in
 	    cd $setupdir
 	    clear
 	    windowtitle="LX-ERP Installation"
-	    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/lx-erp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie LX-ERP installieren?" 0 0
+	    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/lx-erp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie LX-ERP installieren?" 0 0
 	    cont=${?}
 
 	    if [[ $cont == "0" ]]; then
@@ -2660,7 +2660,7 @@ dann sinnvoll, wenn lediglich mit einer LX-Office Datenbank gearbeitet wird."  1
 	cd $setupdir
 	clear
 	windowtitle="waWision Installation"
-	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/wawision.txt" 20 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie waWision installieren?" 0 0
+	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/wawision.txt" 20 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie waWision installieren?" 0 0
 	cont=${?}
 	
 	if [[ $cont == "0" ]]; then
@@ -2687,7 +2687,7 @@ dann sinnvoll, wenn lediglich mit einer LX-Office Datenbank gearbeitet wird."  1
 	cd $setupdir
 	clear
 	windowtitle="OpenERP Installation"
-	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "./infofiles/openerp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie OpenERP installieren?" 0 0
+	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/openerp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie OpenERP installieren?" 0 0
 	cont=${?}
 
 	if [[ $cont == "0" ]]; then
@@ -2727,7 +2727,7 @@ faxgate() {
     cd $setupdir
     clear
     windowtitle="Faxgate/Capisuite Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/faxgate.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Faxgate installieren?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/faxgate.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Faxgate installieren?" 0 0
     cont=${?}
 
     if [[ $cont == "0" ]]; then
@@ -2836,7 +2836,7 @@ webcdwriter() {
     clear
     windowtitle="WebCDWriter Installation"
 
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/webcdcreator.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie WebCDCreator installieren?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/webcdcreator.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie WebCDCreator installieren?" 0 0
     cont=${?}
 
     # Weitermachen?
@@ -2880,7 +2880,7 @@ openvpn() {
     cd $setupdir
     clear
     windowtitle="OpenVPN Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/openvpn.txt" 38 92 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie OpenVPN installieren?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/openvpn.txt" 38 92 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie OpenVPN installieren?" 0 0
     cont=${?}
 
     if [[ $cont == "0" ]]; then
@@ -2983,7 +2983,7 @@ dokuwiki() {
     cd $setupdir
     clear
     windowtitle="Dokuwiki Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/dokuwiki.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Dokuwiki installieren?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/dokuwiki.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Dokuwiki installieren?" 0 0
     cont=${?}
 
     if [[ $cont == "0" ]]; then
@@ -3056,7 +3056,7 @@ etherpad() {
     clear
     windowtitle="Etherpad Lite Installation"
 
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "./infofiles/etherpad.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Etherpadd-Lite installieren?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/etherpad.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Etherpadd-Lite installieren?" 0 0
     cont=${?}
 
     # Weitermachen?

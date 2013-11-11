@@ -1,0 +1,10 @@
+Roundcubemail ist ein kleiner und moderner,
+Web-basierter IMAP-Client.
+
+Dank moderner Programmiertechniken fühlt sich
+Roundcubemail kaum wie eine Webapplikation an.
+
+Wesentliche Funtkionen:
+- Adressbuch
+- IMAP-ACLs / Shared Folders
+- Volltextsuche

@@ -1,0 +1,58 @@
+OpenVPN
+
+OpenVPN ist eine Software zur Realisation virtueller privater Netzwerke auf openSSL-
+Basis.
+
+Client-Software existiert für alle gängigen Betriebssysteme. OpenVPN ist Open-Source-
+Software.
+
+Voraussetzung zur 'Nutzung von openVPN via Internet ist die Erreichbarkeit Ihres Servers
+aus dem Internet. Sie benötigen dazu entweder eine feste IP-Adresse oder einen per DNS
+auflösbaren Hostnamen für Ihren Server. Letzteres lässt sich beispielsweise durch die
+Nutzung eines Dienstes wie DynDNS.org, DtDNS oder DNS4biz realisieren. Auch ein eigener
+DNS-Server im Internet kann genutzt werden.
+
+Hintergrund
+
+Oft soll eine sichere, von Dritten nicht lesbare Kommunikation über ein unsicheres 
+Netzwerk durchgeführt werden. Ein solches unsicheres Netz ist etwa das Internet oder
+auch ein lokales nicht verschlüsseltes Wireless LAN. Dabei sind zwei Aspekte wesentlich:
+Eine hinreichende Verschlüsselung der Kommunikationsinhalte und die Authentifizierung
+der beteiligten Kommunikationspartner.
+
+Diese Sicherheitseigenschaften können durch geeignete Protokolle (z. B. SSH, HTTPS,
+SFTP) von jeder Anwendung bereitgestellt werden. Alternativ kann diese Sicherheit
+auch von einer zentralen Stelle, unabhängig von den einzelnen Anwendungen, wünschenswert
+sein. Die Vorteile dieses zentralen Ansatzes liegen in der nur einmaligen Implemen-
+tierung der Sicherheitsfunktionen,dem geringeren Wartungsaufwand und der Möglichkeit,
+auch die Kommunikation von Software anderer Hersteller zu sichern, auf die kein 
+Einfluss besteht.
+
+Eine solche, zentral bereitgestellte Absicherung ist ein Virtual Private Network (VPN).
+OpenVPN stellt eine von vielen Implementierungen eines VPNs dar.
+
+Funktionsweise
+
+Kommunikationspartner können einzelne Computer sein oder ein Netzwerk von Computern.
+Typische Anwendungsfälle sind die Verbindung einzelner Außendienstmitarbeiter in das
+Netzwerk ihrer Firma, die Verbindung einer Filiale mit dem Rechenzentrum oder die 
+Verbindung örtlich verteilter Server oder Rechenzentren untereinander. In jedem Fall
+baut einer der beiden Kommunikationsteilnehmer die Verbindung auf (Client), und der
+andere wartet auf eingehende Verbindungen (Server). Dazu muss der Server unter einer
+festen IP-Adresse oder unter einem festen Hostnamen erreichbar sein. Dies kann für 
+Computer, die aufgrund von Einwählverbindungen mit ständig wechselnden IP-Adressen 
+konfrontiert sind, auch mit Hilfe eines dynamischen DNS-Dienstes erfolgen.
+
+Befindet sich vor dem VPN-Gateway ein Paketfilter oder Proxy, oder wird NAT durchgeführt,
+so müssen diese Dienste so konfiguriert werden, dass ein in der Konfiguration von
+OpenVPN zu vergebender UDP- oder TCP-Port (zumeist ab 5000 aufwärts, Standard ab OpenVPN 
+2.0 ist 1194/UDP) durchgelassen wird (Input, Forward und Output).
+
+OpenVPN kennt zwei Betriebsmodi: Routing und Bridging.
+
+Davon ist der Routing-Modus in erster Linie für gelegentliche Verbindungen mobiler 
+Clients (etwa Notebooks) geeignet, während der Bridging-Modus vor allem für die permanente
+Verbindung zweier Netzwerke Anwendung findet.
+
+Die OpenVPN-Vorinstallation eines invis-Servers verwendet den Routing-Modus.
+

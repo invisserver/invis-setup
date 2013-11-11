@@ -1,0 +1,43 @@
+Faxserver
+Mit der Kombination aus Faxgate und Capisuite in Verbindung mit einer AVM FritzCard
+lässt sich der invis Server zu einem ISDN Fax-Server für Ihr Unternehmen ausbauen. 
+
+Die Software besteht aus folgenden Komponenten:
+
+Die CapiSuite-Erweiterung
+
+Die CapiSuite wurde erweitert, um es zu ermöglichen, per Socketverbindung Nachrichten 
+an den Client zu übermitteln. Folgende Scripte wurden erweitert:
+
+    * cs_helpers.py: Enthält die Funktion zum Socketaufbau
+    * capisuitefax: Speichert die IP und den Port des Clients für Statusmeldungen 
+      beim Versand
+    * idle.py: Senden des Versandstatus an den Client
+    * incoming.py: Senden einer Meldung bei ankommenden Anrufen und Faxen
+
+Das CUPS-Backend
+
+Das bash-Script "faxgate" übernimmt als CUPS-Backend folgende Funktionen:
+
+    * Stellt einen Fax-Netzwerkdrucker für Linux/Mac OS X und über Samba auch für 
+      Windows bereit
+    * Überprüft die übergebenen Parameter, den Dateinamen und den Dokuemnteninhalt 
+      auf eine Faxnummer
+    * Baut mit Hilfe der oben genannten Funktionen eine Socketverbindung zum Client 
+      auf um die Faxnummer abzufragen
+    * Leitet das Dokument an die CapiSuite zum Versand weiter
+
+Die Clientsoftware
+
+Die Clientsoftware übernimmt folgende Funktionen:
+
+    * Abfrage der Faxnummer
+    * Anzeige der Meldung bei einem neuem Fax
+    * Anzeige der Meldung bei neuen Nachrichten auf dem Anrufbeantworter
+    * Abspielen der aufgesprochenen nachricht
+    * Download der faxe und Anrufe über integrierten SFTP-Client
+
+Die weitere Einrichtung des Faxempfangs wie auch der optionalen Anrufbeantworter-
+Funktion wird über YaST vorgenommen.
+
+Danke für deine Unterstützung Ingo ;-)

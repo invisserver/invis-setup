@@ -1,0 +1,13 @@
+Im Folgenden werden einige Informationen für die weitere Einrichtung Ihres invis Servers abgefragt.
+
+Wir empfehlen Ihnen sich die gegebenen Antworten, speziell wenn es sich um Passwörter handelt,
+mitzuprotokollieren.
+
+Einige in Formularfeldern enthaltenen Vorgabewerte, beispielsweise Hostname und Informationen
+zur Netzwerkkonfiguration, werden aus Ihren Voreinstellungen ermittelt und sollten hier nur dann
+davon abweichend eingegeben werden, wenn Sie die zugehörigen Systemkonfigurationen im Nachgang
+wiederum an Ihre hier getätigten Angaben anpassen.
+
+Gehen Sie bei der Beantwortung der Fragen gewissenhaft vor. Ihre Antworten beeinflussen meist
+mehrere Dienste des Servers. Ein nachträgliches Anpassen einer hier fehlerhaft eingegebenen IP-
+Adresse ist sehr mühsam und fehlerträchtig.

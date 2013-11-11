@@ -1,0 +1,16 @@
+Das Warenwirtschaftssystem für Ingenieurbüros, Agenturen, kleine Produktionen
+und Produktschmieden.
+
+WaWision ist eine Verwaltungssoftware inkl. Hardware-Anbindung (für Barcodescanner,
+Etikettendrucker, Waagen, Kameras, etc.) zur Abbildung von Firmenprozessen für
+kleine und mittlere Unternehmen.
+
+waWision organisiert sowohl das umfangreiche Alltagsgeschäft vom Auftragseingang
+bis hin zum Lager, als auch dokumentarische Prozesse wie Verwaltung und Buchhaltung. 
+
+Der spezielle Fokus liegt dabei auf der automatisierten und effizienten Abwicklung
+von Aufträgen und alltäglichen Prozessen, die durch eine intelligente Kombination
+von Soft- und Hardware erreicht wird. 
+
+waWision wird entwickelt von embedded Projects GmbH Augsburg.
+

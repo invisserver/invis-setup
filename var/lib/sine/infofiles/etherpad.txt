@@ -1,0 +1,7 @@
+
+Etherpad-Lite ist ein webbasierter Editor zur kollaborativen Bearbeitung von Texten.
+Etherpad-Lite erlaubt es mehreren Personen, in Echtzeit einen Text zu bearbeiten,
+wobei alle Änderungen sofort bei allen Teilnehmern sichtbar werden. Dabei
+können die Änderungen der verschiedenen Bearbeiter farblich unterschieden werden.
+Eine weitere komfortable Funktion ist die Möglichkeit neben der Textbearbeitung
+im Bearbeitungsfenster zu chatten.

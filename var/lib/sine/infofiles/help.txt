@@ -1,0 +1,15 @@
+Hilfe zur Navigation in Formularen und Auswahlmenüs.\n
+\n
+1. Mit den Cursortasten [Auf] und [Ab] wird zwischen den Eingabefeldern
+   und Auswahlpunkten gewechselt.\n
+\n
+2. Mit der Tabulatortaste kann zwischen den einzelnen Fenstern eines
+   Dialogs gewechselt werden. Beispielsweise zwischen Eingabefenster
+   und Bestätigungsmenü.\n
+\n
+3. Checkboxen und Radiolisteneinträge werden mit der Leertaste aus-
+   gewählt.\n
+\n
+4. Mit der Enter-Taste bestätigen Sie alle Eingaben eines Dialog-
+   fensters. Sie wird nicht benötigt um einzelne Eingaben, etwa in
+   einem Formularfeld zu bestätigen.\n

@@ -1,0 +1,20 @@
+SOGo is a free and modern scalable groupware server. It offers shared calendars, address books,
+and emails through your favourite Web browser and by using a native client such as Mozilla
+Thunderbird and Lightning.
+
+SOGo is standard-compliant. It supports CalDAV, CardDAV, GroupDAV, iMIP and iTIP and
+reuses existing IMAP, SMTP and database servers - making the solution easy to deploy and
+interoperable with many applications.
+
+SOGo features :
+
+- Scalable architecture suitable for deployments from dozens to many thousands of users
+
+- Rich Web-based interface that shares the look and feel, the features and the data of Mozilla
+Thunderbird and Lightning
+
+- Improved integration with Mozilla Thunderbird and Lightning by using the SOGo Connector
+and the SOGo Integrator
+
+- Two-way synchronization support with any SyncML-capable devices (BlackBerry, Palm,
+Windows CE, etc.) by using the Funambol SOGo Connector

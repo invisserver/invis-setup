@@ -1,0 +1,41 @@
+Überblick über Zarafa Groupware
+
+Zarafa-Groupware ist eine MAPI-basierte Groupware
+
+Zarafa kombiniert die Usability von Outlook mit der Stabilität und
+Flexibilität eines Linux Servers. Zusätzlich zum Outlook, welches
+nativ unterstützt wird, können die Benutzer den WebAccess im Outlook
+„Look & Feel“, ActiveSync kompatible Mobiltelefone und Blackberry 
+Geräte über den Blackberry Enterprise Server nutzen.
+
+Hauptfunktionen von Zarafa:
+
+E-Mail
+Sie können nicht nur direkt auf Ihre privaten E-Mails zugreifen, 
+sondern können Ihren Posteingang über ein modernes Rechtesystem 
+auch für Ihre Kollegen freigeben.
+Gruppenpostfächer und Öffentliche Ordner z.B. können genutzt werden
+für E-Mails an bestimmte Gruppen (z.B. Support und Sales) und durch 
+serverseitige Regeln können Sie automatisch Ihre E-Mails sortieren.
+ 
+Kalender
+Teilen Sie Ihren Kalender, planen Sie Meetings mit Ihren Kollegen inkl.
+Frei/Gebucht Informationen, senden Sie Termineinladungen oder buchen
+Sie Ressourcen, egal ob per Outlook oder dem Zarafa Webaccess. 
+Mittels des CalDAV Gateway können Sie sogar Ihren Kalender mit anderen
+Programmen synchronisieren.
+
+Kontakte
+Alle internen Zarafa Nutzer und Gruppen sind über ein globales Adressbuch
+zugänglich. Natürlich können Sie Ihre persönlichen Kontakte und Verteiler
+selbst verwalten, auch zentral verwaltete Kontaktordner sind möglich.
+
+Aufgaben
+Sie können eigene Aufgabenlisten erstellen oder Aufgaben mit Ihren
+Kollegen teilen, um effektiver zu arbeiten.
+
+Die hier vorinstallierte Community-Version erlaubt das Anbinden von
+Outlook-Clients nur als Mail-Client via IMAP.
+
+Um die Leistungsfähigkeit von MAPI zu nutzen müssen entsprechende
+Subskriptionen erworben werden.

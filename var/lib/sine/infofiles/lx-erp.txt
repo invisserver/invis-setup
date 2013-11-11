@@ -1,0 +1,54 @@
+Lx-Office ERP - Freie Warenwirtschaft und Finanzbuchhaltung.
+
+Lx-Office ERP ist eine browserbasierte Warenwirtschafts- und
+Finanzbuchhaltungssoftware. Die OpenSource Software hat einen modularen Aufbau
+und ist innerhalb kurzer Zeit auf den Einsatz in ihrem Unternehmen angepaßt.
+Erweiterung um individuelle Funktionen ist jederzeit möglich.
+Durch die Verwendung eines Webbrowsers als Client ist Lx-Office
+betriebssystemunabhängig einsetzbar.
+Linzenz: GPL
+Features der Warenwirtschaft
+
+    * Kunden-, Lieferanten, Artikelverwaltung
+    * Ausgangs- und Eingangsrechnungen
+    * Gutschriften
+    * Angebotswesen
+    * Bestellungsverwaltung
+    * Mehrsprachige Artikelbeschreibungen
+    * Individuelle Druckvorlagen (auch mehrsprachig)
+    * Individuelle Artikellangtexte
+    * Zentrale, intelligente Einheitenverwaltung
+    * Preisgruppen für Waren und Erzeugnisse
+    * Verschiedenste Auswertungen
+    * und vieles mehr
+
+Lx-Office ERP wird seit 2003 aktiv entwickelt. Die enge Verbindung zwischen
+Entwicklern und Anwendern gewährleistet eine zielgerichtete Weiterentwicklung
+des Produkts. Ein besonderer Pluspunkt von Lx-Office ist die sehr gute
+Verknüpfung von Warenwirtschaft und Finanzbuchhaltung. Viele Vorgänge können auf
+diese Art automatisiert und Fehlerquellen eliminiert werden.
+Features der Finanzbuchhaltung
+
+    * Buchungen werden automatisch aus Warenwirtschaft übernommen
+    * Mehrstufiges Mahnwesen
+    * Beliebig viele Zahlungsbedingungen
+    * Verschiedene Erlöskonten für Auslandslieferungen
+    * Bequeme Artikelkontenverwaltung über Buchungsgruppen
+    * Beliebig viele Steuersätze pro Konto
+    * Einnahmen-, Überschußrechnung
+    * Bilanzierung
+    * SKR03 und SKR04 enthalten
+    * Kontenrahmen frei anpassbar
+    * Splitbuchungen
+    * Unterstützung von WINSTON und Taxbird
+    * Verschiedene Auswertungen
+    * und vieles mehr
+
+weitere Funktionen
+
+    * Unterstützung von OpenOffice.org
+    * Direkter Artikelimport in xt::Commerce, osCommerce und PHPepperShop *
+    * Import von Kundendaten und Bestellungen aus Shopsystemen *
+    * Anbindung eines Barverkaufmoduls *
+
+      * kostenpflichtige Zusatzmodule von Lx-System

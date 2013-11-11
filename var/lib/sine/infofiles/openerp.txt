@@ -1,0 +1,14 @@
+OpenERP im Überblick
+
+OpenERP ist eine freie und hoch modulare Business-Software.
+
+In der Grunausstattung deckt sie die Bereiche:
+
+ - Warenwirtschaft,
+ - Finanzbuchhaltung,
+ - Lagerhaltung,
+ - Produktion,
+ - Projektverwaltung und 
+ - Customer-Relationship-Management (CRM)
+
+ab.
