@@ -20,7 +20,7 @@ setupdir="/var/lib/sine"
 cfilesdir="/usr/share/doc/packages/invis-setup/examples"
 
 # Setup-Dialog Titel
-dialogtitle="invis Server 9.0 Release 2 Setup"
+dialogtitle="invis Server 9.2 Setup"
 dialogshorthelp="Cursor- ([Auf]/[Ab]) und Tabulatortaste zur Navigation, Leertaste zum auswählen und Enter-Taste zum Bestätigen verwenden."
 
 # zentrales invis Konfigurationsverzeichnis anlegen & Konfig-Datei kopieren
@@ -178,7 +178,7 @@ check() {
 	windowtitle="Software Installation"
 	msgbox "Es wird alle für den invis Server benötigte Software installiert." "Software Installation"
 	## loeschen
-	#cp $cfilesdir/zypper_repos/*.repo /etc/zypp/repos.d/
+	#cp $setupdir/zypper_repos/*.repo /etc/zypp/repos.d/
 	# Schlüssel der neuen Repositories importieren
 	./bin/rpmkeyimporter
         ## zypper repo-Cache aktualisieren und Update fahren
@@ -194,18 +194,18 @@ check() {
 	
 	# Patterns
 	pgsubtitle="Software-Gruppen werden installiert" 
-	zypper -n install -t pattern `cat $cfilesdir/zypper-package-lists/invis_schemes` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install -t pattern `cat $setupdir/zypper-package-lists/invis_schemes` 2>&1 | tee -a $setupdir/sine.log | pgbox
         zyppercheck ${PIPESTATUS[0]}
         # Basis Software
 	pgsubtitle="Basis Software wird installiert" 
-	zypper -n install -n `cat $cfilesdir/zypper-package-lists/invis_base` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+	zypper -n install -n `cat $setupdir/zypper-package-lists/invis_base` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
         zyppercheck ${PIPESTATUS[0]}
 
 	## loeschen
         # Printserver
 	#pgsubtitle="Print-Server-Pakete werden installiert" 
 	## force-resolution wieder rausnehmen, wenn dependency bug gefixt ist!
-	#zypper -n install -n --force-resolution `cat $cfilesdir/zypper-package-lists/cups` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+	#zypper -n install -n --force-resolution `cat $setupdir/zypper-package-lists/cups` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
         #zyppercheck ${PIPESTATUS[0]}
 
 	# Neuere Pakete aus aktuelleren Repos beziehen
@@ -780,14 +780,14 @@ sysprep() {
     sambapackages=`getconfdata "SambaPakete" "2"`
     if [[ $sambapackages == "sernet" ]]; then
 	rpm -e --nodeps libwbclient0 samba-client
-	zypper -n install -n --from sernet-samba `cat $cfilesdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n --from sernet-samba `cat $setupdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
     else
-	zypper -n install -n `cat $cfilesdir/zypper-package-lists/opensuse_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n `cat $setupdir/zypper-package-lists/opensuse_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
     fi
     
     # NFS-Server
     pgsubtitle="Zusätzliche Fileserver Software wird installiert" 
-    zypper -n install -n `cat $cfilesdir/zypper-package-lists/fileserver_additional` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
+    zypper -n install -n `cat $setupdir/zypper-package-lists/fileserver_additional` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
     zyppercheck ${PIPESTATUS[0]}
 
     # Der ausgewählte Virenscanner wird in invis.conf eingetragen
@@ -1333,7 +1333,7 @@ mailserver() {
     pgsubtitle="Mailserver wird eingerichtet"
     clear
     windowtitle="Mail Server"
-    zypper -n install -n `cat $cfilesdir/zypper-package-lists/mailserver_additional` 2>&1| tee -a $setupdir/sine.log | pgbox
+    zypper -n install -n `cat $setupdir/zypper-package-lists/mailserver_additional` 2>&1| tee -a $setupdir/sine.log | pgbox
     zyppercheck ${PIPESTATUS[0]}
 
     # amavisd-new und clamav einrichten
@@ -1425,7 +1425,7 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    pgsubtitle="Cyrus IMAP wird installiert und eingerichtet"
 	    zypper -n install -n cyrus-imapd 2>&1| tee -a $setupdir/sine.log | pgbox
 	    zyppercheck ${PIPESTATUS[0]}
-	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/sasl_mechs` 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zypper -n install -n `cat $setupdir/zypper-package-lists/sasl_mechs` 2>&1| tee -a $setupdir/sine.log | pgbox
 	    zyppercheck ${PIPESTATUS[0]}
 	    cp $cfilesdir/mailserver/cyrus/*.conf /etc 2>&1| tee -a $setupdir/sine.log
 	    #cp $cfilesdir/syslog-ng/syslog-ng.conf /etc/syslog-ng 2>&1| tee -a $setupdir/sine.log
@@ -1447,7 +1447,7 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    zyppercheck ${PIPESTATUS[0]}
 	    zypper -n in mysql-community-server mysql-community-server-client mysql-community-server-tools  2>&1| tee -a $setupdir/sine.log | pgbox
 	    zyppercheck ${PIPESTATUS[0]}
-	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/zarafa` 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zypper -n install -n `cat $setupdir/zypper-package-lists/zarafa` 2>&1| tee -a $setupdir/sine.log | pgbox
 	    zyppercheck ${PIPESTATUS[0]}
 	    # Zarafa konfigurieren hier, Starten der Dienste erfolgt im Groupware Abschnitt
 	    # Apache Confs fuer Webaccess kopieren
@@ -2254,7 +2254,7 @@ nagios() {
     cont=${?}
     if [[ $cont == "0" ]]; then
         # Vorbereitung zur Ueberwachung des Servers via Icinga oder Nagios
-	zypper -n install -n `cat $cfilesdir/zypper-package-lists/nagios_plugins` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n `cat $setupdir/zypper-package-lists/nagios_plugins` 2>&1 | tee -a $setupdir/sine.log | pgbox
 	groupadd -g 9000 nagios 2>&1 | tee -a $setupdir/sine.log | pgbox
 	useradd -u 9000 -g nagios -d /home/nagios -m -c "Nagios Admin" nagios 2>&1 | tee -a $setupdir/sine.log | pgbox
 	mkdir /home/nagios/.ssh 2>&1 | tee -a $setupdir/sine.log
@@ -2278,7 +2278,7 @@ if [[ $whichimap == "cyrus" ]]; then
     if [[ $cont == "0" ]]; then
 	pgsubtitle="Zusätzliche Software wird installiert"
 	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
-	zypper -n install -n `cat $cfilesdir/zypper-package-lists/group-e` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n `cat $setupdir/zypper-package-lists/group-e` 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
         dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen Group-e automatisch herunterzuladen?" 0 0
 	download=${?}
@@ -2399,7 +2399,7 @@ elif [[ $whichimap == "dovecot" ]]; then
     windowtitle="SOGo Installation"
     dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/sogo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"
 
-    zypper -n install -n `cat $cfilesdir/zypper-package-lists/sogo` 2>&1 | tee -a $setupdir/sine.log | pgbox
+    zypper -n install -n `cat $setupdir/zypper-package-lists/sogo` 2>&1 | tee -a $setupdir/sine.log | pgbox
     zyppercheck ${PIPESTATUS[0]}
     cp $cfilesdir/sogo/SOGo /etc/sysconfig/SOGo
     mkdir /etc/sogo
@@ -2560,7 +2560,7 @@ case $whicherp in
 	    if [[ $cont == "0" ]]; then
 		pgsubtitle="Zusätzliche Software wird installiert"
 		zypper refresh 2>&1 |pgbox
-		zypper -n install -n `cat $cfilesdir/zypper-package-lists/lx-office` 2>&1 |pgbox
+		zypper -n install -n `cat $setupdir/zypper-package-lists/lx-office` 2>&1 |pgbox
 		zyppercheck ${PIPESTATUS[0]}
 	
 		# Apache FCGID-Modul aktivieren
@@ -2666,7 +2666,7 @@ dann sinnvoll, wenn lediglich mit einer LX-Office Datenbank gearbeitet wird."  1
 	if [[ $cont == "0" ]]; then
 	    pgsubtitle="Zusätzliche Software wird installiert"
 	    zypper refresh 2>&1 |pgbox
-	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/wawision` 2>&1 |pgbox
+	    zypper -n install -n `cat $setupdir/zypper-package-lists/wawision` 2>&1 |pgbox
 	    zyppercheck ${PIPESTATUS[0]}
 	    # Hier Datenbank installation einfügen
 	    wawipass=`mkdbsilent wawision1 wawision a`
@@ -2696,7 +2696,7 @@ dann sinnvoll, wenn lediglich mit einer LX-Office Datenbank gearbeitet wird."  1
 	    windowtitle="OpenERP Installation"
 	
 	    pgsubtitle="Benötigte Software wird installiert"
-	    zypper -n install -n `cat $cfilesdir/zypper-package-lists/openerp` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	    zypper -n install -n `cat $setupdir/zypper-package-lists/openerp` 2>&1 | tee -a $setupdir/sine.log | pgbox
 
 	    msgbox "Es wird ein Postgresql-Benutzer - openerp - für OpenERP angelegt. 
 Vergessen Sie bitte nicht das hierbei von Ihnen zu vergebende Passwort. ;-)" "$windowtitle"
@@ -2747,7 +2747,7 @@ faxgate() {
 	cp /usr/bin/fcinst /usr/local/sbin
 	/usr/bin/fcinst 2>&1 | tee -a $setupdir/sine.log | pgbox
 	pgsubtitle="Zusätzliche Software wird installiert"
-	zypper -n install -n `cat $cfilesdir/zypper-package-lists/faxgate`  2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n `cat $setupdir/zypper-package-lists/faxgate`  2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 	
 	# System fuer AVM-Treiber vorbereiten

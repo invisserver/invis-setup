@@ -1,4 +1,4 @@
-Für die Installation eines invis Servers 9.0 müssen folgende Voraussetzungen erfüllt sein:
+Für die Installation eines invis Servers 9.2 müssen folgende Voraussetzungen erfüllt sein:
 
     - Als Basis muss openSUSE Linux 12.3, möglichst ohne grafische Oberfläche installiert sein.
     
