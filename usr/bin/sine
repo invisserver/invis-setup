@@ -121,10 +121,10 @@ waitinfobox() {
 zyppercheck() {
     # Argument $1 = Exit Corde
     if (( $1 == 104 )); then
-	textbox "./infofiles/zypper104.txt" "Zypper hat einen Fehler bei der Software-Installation gemeldet"
+	textbox "$setupdir/infofiles/zypper104.txt" "Zypper hat einen Fehler bei der Software-Installation gemeldet"
 	exit 1
     elif (( $1 != 0 )); then 
-	textbox "./infofiles/zypperunex.txt" "Zypper hat einen Fehler bei der Software-Installation gemeldet"
+	textbox "$setupdir/infofiles/zypperunex.txt" "Zypper hat einen Fehler bei der Software-Installation gemeldet"
 	exit 1
     fi
 }
@@ -177,10 +177,8 @@ check() {
     if [[ $prepok == "0" ]]; then
 	windowtitle="Software Installation"
 	msgbox "Es wird alle für den invis Server benötigte Software installiert." "Software Installation"
-	## loeschen
-	#cp $setupdir/zypper_repos/*.repo /etc/zypp/repos.d/
 	# Schlüssel der neuen Repositories importieren
-	./bin/rpmkeyimporter
+	/usr/bin/rpmkeyimporter
         ## zypper repo-Cache aktualisieren und Update fahren
         pgsubtitle="Repository-Cache wird aktualisiert"
         zypper refresh 2>&1| tee -a $setupdir/sine.log | pgbox
@@ -192,6 +190,11 @@ check() {
 	# Postfix aktivieren
 	chkservice "postfix"
 	
+	# Neuere Pakete aus spins_invis Repo beziehen
+        pgsubtitle="Distributions-Upgrade wird durchgeführt" 
+        zypper -n dup --from spins_invis 2>&1| tee -a $setupdir/sine.log | pgbox
+        zyppercheck ${PIPESTATUS[0]}
+
 	# Patterns
 	pgsubtitle="Software-Gruppen werden installiert" 
 	zypper -n install -t pattern `cat $setupdir/zypper-package-lists/invis_schemes` 2>&1 | tee -a $setupdir/sine.log | pgbox
@@ -201,18 +204,7 @@ check() {
 	zypper -n install -n `cat $setupdir/zypper-package-lists/invis_base` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
         zyppercheck ${PIPESTATUS[0]}
 
-	## loeschen
-        # Printserver
-	#pgsubtitle="Print-Server-Pakete werden installiert" 
-	## force-resolution wieder rausnehmen, wenn dependency bug gefixt ist!
-	#zypper -n install -n --force-resolution `cat $setupdir/zypper-package-lists/cups` 2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
-        #zyppercheck ${PIPESTATUS[0]}
-
-	# Neuere Pakete aus aktuelleren Repos beziehen
-        pgsubtitle="Distributions-Upgrade wird durchgeführt" 
-        zypper -n dup --from spins_invis 2>&1| tee -a $setupdir/sine.log | pgbox
-        zyppercheck ${PIPESTATUS[0]}
-
+	# NTP Dienst wird konfiguriert
 	windowtitle="Grundkonfiguration"
 	pgsubtitle="Die Systemuhr wird gestellt und Zeit-Server wird gestartet." 
 	file="config"
@@ -259,7 +251,7 @@ quest() {
 
     # zentrales invis Konfigurationsverzeichnis anlegen
     #mkdir -p /etc/invis
-    textbox "./infofiles/setupquestions.txt" "Wir hätten da ein paar Fragen an Sie." "Weiter"
+    textbox "$setupdir/infofiles/setupquestions.txt" "Wir hätten da ein paar Fragen an Sie." "Weiter"
 
     # Vorgaben ermitteln
     vhn=`hostname -s`
@@ -409,7 +401,9 @@ Geben Sie midestens eine IP-Adresse ein.\n\n" 28 70 7 \
 	i=0
 	# Pruefen ob die eingegebenen Werte korrekte IP-Adressen sind.
 	for dns in ${fdns[@]}; do
-	    if [[ ! $dns =~ ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
+	    # IPv4 and IPv6 (full and compressed): ^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?\s*$
+	    # IPv4: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+	    if [[ ! $dns =~ ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ && ! $dns =~ ^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$ ]]; then
 		fdns[$i]=""
 		((ok=$ok - 1))
 	    fi
@@ -756,7 +750,7 @@ sysprep() {
     timestamp=`date +%s`
     windowtitle="Systemvorbereitung"
     pgsubtitle="Es wird eine Sicherung des /etc Verzeichnisses ertellt."
-    tar -czf ./etc-backup-$timestamp.tar.gz /etc 2>&1| tee -a $setupdir/sine.log | pgbox
+    tar -czf $setupdir/etc-backup-$timestamp.tar.gz /etc 2>&1| tee -a $setupdir/sine.log | pgbox
 
     # Verzeichnisse in /etc/skel anlegen
     mkdir /etc/skel/Dokumente
@@ -765,10 +759,7 @@ sysprep() {
     mkdir /etc/skel/Musik
     mkdir /etc/skel/Videos
     
-    # Den dämlichen nscd rauswerfern
-    chkservice nscd d
-
-    # Virenscanner einrichten
+    ## Virenscanner einrichten
 
     # Quarantäneverzeichnis anlegen
     mkdir /var/spool/infected
@@ -1076,13 +1067,13 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 
     # Vorbereiten der LDIF Dateien
     pgsubtitle="LDAP System wird konfiguriert"
-    mkdir ./ldif 2>&1| tee -a $setupdir/sine.log | pgbox
+    mkdir $setupdir/ldif 2>&1| tee -a $setupdir/sine.log | pgbox
     
     { for x in `find $cfilesdir/LDAP -name *.ldif`; do
-	cp $x ./ldif| tee -a $setupdir/sine.log
+	cp $x $setupdir/ldif| tee -a $setupdir/sine.log
     done } 2>&1| tee -a $setupdir/sine.log | pgbox
     
-    path=./ldif
+    path="$setupdir/ldif"
     { for x in $path/*; do
 	file=`basename $x`
 	echo "Bereite Datei $file vor."
@@ -3113,7 +3104,7 @@ else
 fi
 
 # Und Tschuess
-textbox "./infofiles/aftersetup.txt" "Installation abgeschlossen" "Beenden"
+textbox "$setupdir/infofiles/aftersetup.txt" "Installation abgeschlossen" "Beenden"
 
 # Auräumen -- Evtl. verwaiste dialog Prozesse killen
 killall dialog > /dev/null 2>&1
