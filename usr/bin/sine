@@ -1,6 +1,6 @@
 #!/bin/bash
 # invis 9.2 Server Setup Script
-# Version R1
+# Version R2
 # (c) August 2008 by Stefan Schäfer / FSP Computer & Netzwerke
 # (c) 2009, 2010, 2011, 2012, 2013 by Stefan Schäfer / invis-server.org / stefan@invis-server.org
 # License: GPLv3
@@ -1567,7 +1567,7 @@ samba() {
     cp $cfilesdir/fileserver/samba/smb.conf /etc/samba 2>&1| tee -a $setupdir/sine.log
     # Scriptvorlage fuer das Verschieben der Windows-Bibliotheken kopieren
     cp $cfilesdir/fileserver/service/Win_Scripts/movelibdirs.cmd /etc/invis/templates/ 2>&1| tee -a $setupdir/sine.log
-
+    unix2dos /etc/invis/templates/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
     # Anpassen der Datei smb.conf
 
     ipaddr=`getconfdata "IP" "2"`
@@ -1603,31 +1603,6 @@ samba() {
     file="smb.shares.conf"
     strings="vscan-av%vscan-$av"
     changevalues $path $file "$strings"
-    # Samba Pakete von Sernet ermöglichen, Abfrage in Modul Quest
-
-    # vscan wird nicht mehr verwendet!
-    # Hier vscan vfs-Module kopieren, wenn Sernet-Samba eingesetzt wird
-    #yesno "Nutzen Sie die openSUSE Samba Pakete?" "Samba Installation"
-    #sernet=${?}
-
-    # Ist das noch nötig?
-    #if [[ $sernet == "1" ]]; then
-#	if [[ $libdir == "/usr/lib" ]]; then
-#	    cp ~/prepdir/cfiles/fileserver/samba/samba-vscan/32bit/* $libdir/samba/vfs
-#	else
-#	    cp ~/prepdir/cfiles/fileserver/samba/samba-vscan/64bit/* $libdir/samba/vfs
-#	fi
-#    fi
-    
-    mkdir -p -m 2770 /srv/shares/verwaltung 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 2775 /srv/shares/archiv 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 2775 /srv/shares/archiv/projektarchiv 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 0770 /srv/shares/projekte 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 2775 /srv/shares/aktuell 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 2775 /srv/shares/service 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 2777 /srv/shares/transfer 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 2775 /srv/shares/media 2>&1| tee -a $setupdir/sine.log
-    mkdir -p -m 0775 /srv/shares/gruppen 2>&1| tee -a $setupdir/sine.log
     
     # Verzeichnis fuer Windows-Batch-Scripts anlegen
     mkdir -p -m 2775 /srv/shares/service/winscripts 2>&1| tee -a $setupdir/sine.log
@@ -1641,8 +1616,10 @@ samba() {
     pgsubtitle="Samba erhält das LDAP-Administrationspasswort"
     /usr/bin/smbpasswd -w $masterpw 2>&1| tee -a $setupdir/sine.log | pgbox
 
-    # Logon-Scripts werden kopiert
+    # Logon-Scripts werden kopiert und ins DOS-Format ueberfuehrt
     cp $cfilesdir/fileserver/samba/logon-scripts/*.cmd /var/lib/samba/netlogon
+    unix2dos /var/lib/samba/netlogon/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
+    
     hn=`getconfdata "Hostname" "2"`
     path="/var/lib/samba/netlogon"
     file="user.cmd"
