@@ -1,0 +1,14 @@
+#! /bin/bash
+wdir="/var/lib/cornaz"
+# Test auf angelegte .forward-Dateien
+if [ -n "`ls $wdir/vacation/*.binda 2>/dev/null`" ]
+then
+	name=`ls $wdir/vacation/*.binda 2>/dev/null | sed s/.binda//`  
+	name=`basename $name`
+	rm /home/$name/.forward
+	rm /home/$name/.vacation.msg
+	rm $wdir/vacation/$name.binda
+	rm $wdir/vacation/$name.binweg
+else 
+	exit
+fi

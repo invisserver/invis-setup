@@ -39,7 +39,7 @@ if(isset($corpassword)) {
 	$unx = 0;
 	// echo "$un<br>";
 	// Einlesen der Datei .fetchmailrc in ein Array
-	$fetchmailrc_b = file ("/var/cornaz/build/.fetchmailrc");
+	$fetchmailrc_b = file ("/var/lib/cornaz/build/.fetchmailrc");
 	$stat = 0;
 	// Statusüberprüfung
 	foreach ($fetchmailrc_b as $zeile) {
@@ -58,7 +58,7 @@ if(isset($corpassword)) {
 	
 	// Anwesend aber trotzdem im Urlaub
 	if ($status == "Anwesend") {
-		if (file_exists ("/var/cornaz/vacation/$corusername.binweg")) {
+		if (file_exists ("/var/lib/cornaz/vacation/$corusername.binweg")) {
 			$status="Urlaub";
 		}}
 

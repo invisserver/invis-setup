@@ -12,8 +12,8 @@ $margin = "Ihre Abwesenheitsnachricht";
 	site_info($margin, $info);
 
 # Erzeugen der Datei
-$datei = "/var/cornaz/vacation/$corusername.msg";
-	if (!file_exists ("/var/cornaz/vacation/$corusername.msg")) {
+$datei = "/var/lib/cornaz/vacation/$corusername.msg";
+	if (!file_exists ("/var/lib/cornaz/vacation/$corusername.msg")) {
 		$fp = fopen ($datei, "w");
 		$inhalt = utf8_decode("Subject: $mysubject\n$mymessage");
 		fputs ($fp, "$inhalt");
@@ -28,11 +28,11 @@ $datei = "/var/cornaz/vacation/$corusername.msg";
 		fputs ($fp, "$inhalt");
 		fclose($fp);
 	}}
-	$datei = "/var/cornaz/vacation/$corusername.forward";
+	$datei = "/var/lib/cornaz/vacation/$corusername.forward";
 	$vorgang = "Sie treten Ihren Urlaub <b>an</b>. Wirklich?";
 	$fp = fopen ($datei, "w");
 	$inhalt = "\\$corusername, \"|/usr/bin/vacation $corusername\"";
 	fputs ($fp, "$inhalt");
 	fclose($fp);
-	exec ("sudo /var/cornaz/bin/holiday");
+	exec ("sudo /var/lib/cornaz/bin/holiday");
 ?>

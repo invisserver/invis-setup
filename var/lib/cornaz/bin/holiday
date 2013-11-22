@@ -1,18 +1,18 @@
 #! /bin/bash
-
+wdir="/var/lib/cornaz"
 # Test auf angelegte .forward-Dateien
-if [ -n "`ls /var/cornaz/vacation/*.forward 2>/dev/null`" ]
+if [ -n "`ls $wdir/vacation/*.forward 2>/dev/null`" ]
 then
-	name=`ls /var/cornaz/vacation/*.forward 2>/dev/null | sed s/.forward//`  
+	name=`ls $wdir/vacation/*.forward 2>/dev/null | sed s/.forward//`  
 	name=`basename $name`
-	mv /var/cornaz/vacation/$name.forward /home/$name/.forward
-	mv /var/cornaz/vacation/$name.msg /home/$name/.vacation.msg
+	mv $wdir/vacation/$name.forward /home/$name/.forward
+	mv $wdir/vacation/$name.msg /home/$name/.vacation.msg
 	sudo chown $name.Domain\ Users /home/$name/.forward
 	sudo chown $name.Domain\ Users /home/$name/.vacation.msg
 	sudo chmod 0600 /home/$name/.forward
 	sudo chmod 0644 /home/$name/.vacation.msg
 	sudo -u $name vacation -I
-	touch /var/cornaz/vacation/$name.binweg
+	touch $wdir/vacation/$name.binweg
 else 
 	exit
 fi

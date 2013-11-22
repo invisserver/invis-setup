@@ -1,11 +1,11 @@
 <?php
 //Anwesend
-		$datei = "/var/cornaz/vacation/$corusername.binda";
+		$datei = "/var/lib/cornaz/vacation/$corusername.binda";
 		$vorgang = "Willkommen zurück <font color=\"#EE4000\"><b>$corusername</b></font>. Sie hatten hoffentlich einen erholsamen Urlaub.";
 		$fp = fopen ($datei, "w");
 		fputs ($fp, " ");
 		fclose($fp);
-		exec ("sudo /var/cornaz/bin/backhome");
+		exec ("sudo /var/lib/cornaz/bin/backhome");
 
 #Info Zeile
 $margin = "";

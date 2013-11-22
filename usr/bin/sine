@@ -2041,36 +2041,23 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
         changevalues $path $file "$strings"
 
     fi
-    # CorNAz installieren
-    # Verzeichnisse werden angelegt.
-    mkdir -p /var/cornaz/bin
-    mkdir /var/cornaz/build
-    mkdir /var/cornaz/bu
-    mkdir /var/cornaz/inuse		2>&1|tee -a $setupdir/sine.log |pgbox
-    mkdir /var/cornaz/sysconfig
-    mkdir /var/cornaz/vacation
-    mkdir -p /srv/www/htdocs/cornaz/inc
-    mkdir /srv/www/htdocs/cornaz/pics
+    # CorNAz einrichten
 
     # Mailproviderdatei an lokales LDAP-Verzeichnis anpassen
     # Dateien werden kopiert
     # Quellverzeichnis
-    sourcedir="$cfilesdir/webserver/cornaz"
-    cp $sourcedir/fetchmail/fetchmail /etc/init.d/
-    cp $sourcedir/sysconfig/fetchmail /var/cornaz/sysconfig/
-    cp $sourcedir/var/* /var/cornaz/bin/
+    #sourcedir="$cfilesdir/webserver/cornaz"
+    #cp $sourcedir/fetchmail/fetchmail /etc/init.d/
+    #cp $sourcedir/sysconfig/fetchmail /var/lib/cornaz/sysconfig/
+    #cp $sourcedir/var/* /var/cornaz/bin/
     # /etc/sudoers wird angepasst.
     cp /etc/sudoers /etc/sudoers.bak
-echo "Cmnd_Alias FETCHPHP = /var/cornaz/bin/fetchcopy
+echo "Cmnd_Alias FETCHPHP = /var/lib/cornaz/bin/fetchcopy
 wwwrun ALL=NOPASSWD:FETCHPHP" >> /etc/sudoers
-echo "Cmnd_Alias HOLIDAY = /var/cornaz/bin/holiday
+echo "Cmnd_Alias HOLIDAY = /var/lib/cornaz/bin/holiday
 wwwrun ALL=NOPASSWD:HOLIDAY" >> /etc/sudoers
-echo "Cmnd_Alias BACKHOME = /var/cornaz/bin/backhome
+echo "Cmnd_Alias BACKHOME = /var/lib/cornaz/bin/backhome
 wwwrun ALL=NOPASSWD:BACKHOME" >> /etc/sudoers
-
-    cp $sourcedir/htdocs/*.php /srv/www/htdocs/cornaz/
-    cp $sourcedir/htdocs/pics/* /srv/www/htdocs/cornaz/pics/
-    cp $sourcedir/htdocs/inc/* /srv/www/htdocs/cornaz/inc/
 
     # Konfigurationsdaten ermitteln.
     domain=`getconfdata "Domain" "2"`
@@ -2086,27 +2073,23 @@ wwwrun ALL=NOPASSWD:BACKHOME" >> /etc/sudoers
     changevalues $path $file "$strings"
 
     # Sysconfig Datei bearbeiten
-    path="/var/cornaz/sysconfig"
+    path="/var/lib/cornaz/sysconfig"
     file="fetchmail"
     strings="localdomain%$domain"
     changevalues $path $file "$strings"
 
     # Dummy fetchmailrc anlegen.
-    echo 'poll pop.example.com protocol pop3 user dummy pass . is junk here' > /var/cornaz/build/.fetchmailrc
+    echo 'poll pop.example.com protocol pop3 user dummy pass . is junk here' > /var/lib/cornaz/build/.fetchmailrc
     
-    #Dateirechte anpassen
-    chown -R wwwrun:root /var/cornaz
-    chown -R wwwrun:www /srv/www/htdocs/cornaz
-    chmod 0700 /var/cornaz/bin/fetchcopy
-    chmod 0700 /var/cornaz/bin/holiday
-    chmod 0700 /var/cornaz/bin/backhome
-# needless   chmod 0700 /var/cornaz/inuse/.fetchmailrc		2>&1|tee -a $setupdir/sine.log |pgbox
-# needless   chown fetchmail /var/cornaz/inuse/.fetchmailrc	2>&1|tee -a $setupdir/sine.log |pgbox
+    ##RPM
+    #Dateirechte anpassen -- testen, wenn notwendig, dann ins specfile
+    #chown -R wwwrun:root /var/lib/cornaz
+    #chown -R wwwrun:www /srv/www/htdocs/cornaz
 
     # fetchcopy ausfuehren
-    /var/cornaz/bin/fetchcopy				2>&1|tee -a $setupdir/sine.log |pgbox
-    chmod 0700 /var/cornaz/inuse/.fetchmailrc		2>&1|tee -a $setupdir/sine.log |pgbox
-    chown fetchmail /var/cornaz/inuse/.fetchmailrc	2>&1|tee -a $setupdir/sine.log |pgbox
+    /var/lib/cornaz/bin/fetchcopy				2>&1|tee -a $setupdir/sine.log |pgbox
+    chmod 0700 /var/lib/cornaz/inuse/.fetchmailrc		2>&1|tee -a $setupdir/sine.log |pgbox
+    chown fetchmail /var/lib/cornaz/inuse/.fetchmailrc	2>&1|tee -a $setupdir/sine.log |pgbox
 
     # Webserver fuer worker-MPM konfigurieren
     a2enmod -d php5

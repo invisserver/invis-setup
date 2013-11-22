@@ -27,7 +27,7 @@ if ($status == "Anwesend") {
 		array_shift($entries);
 		$i=0;
 		foreach ($entries as $zugangsdaten) {
-			$fh = fopen("/var/cornaz/build/.fetchmailrc","a");
+			$fh = fopen("/var/lib/cornaz/build/.fetchmailrc","a");
 			$Server = $entries[$i]["fspextmailserver"][0];
 			$Proto = $entries[$i]["fspextmailproto"][0];
 			$Extuser = $entries[$i]["fspextmailusername"][0];
@@ -38,7 +38,7 @@ if ($status == "Anwesend") {
 			fclose($fh);
 			$i++;
 		}
-		exec ("sudo /var/cornaz/bin/fetchcopy");
+		exec ("sudo /var/lib/cornaz/bin/fetchcopy");
 		$ausgabe = "<b>Status:</b> Das regelmäßige Abrufen Ihrer eMails wurde für folgende Adressen aktiviert:<p>";
 		$i=0;
 		foreach ($entries as $zugangsdaten) {
