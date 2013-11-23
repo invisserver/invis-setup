@@ -1,0 +1,79 @@
+#!/bin/bash
+# Mini Script zum Starten und Stoppen von Diensten
+# im Stil der alten rc-Kommandos
+# (c) 2013 - Stefan Schäfer - invis-server.org
+# License: GPLv3
+
+# Eingabe pruefen
+usage() {
+	echo "Befehlszeile: rc {start|stop|reload|restart|status} servicename"
+	exit
+}
+
+sctl() {
+	# Systemd Aufruf
+	systemctl $1 $2.service
+	exitcode=${?}
+}
+
+
+if [[ -z $1 || -z $2 ]]; then
+	usage
+fi
+
+service="$1"
+command="$2"
+
+case "$command" in
+
+"start")
+	sctl $command $service
+	if [[ $exitcode == 0 ]]; then
+		echo -e "Dienst $service \033[32merfolgreich\033[0m gestartet"
+	else
+		echo -e "Start des Dienstes \033[31mfehlgeschlagen\033[0m"
+		echo -e "Journal des systemd wird angezeigt, verlassen mit \"Q\"\n"
+		sleep 3
+		journalctl -n
+	fi
+	;;
+"stop")
+	sctl $command $service
+	if [[ $exitcode == 0 ]]; then
+		echo -e "Dienst $service \033[32merfolgreich\033[0m beendet" 
+	else
+		echo -e "Beenden des Dienstes \033[31mfehlgeschlagen\033[0m"
+		echo -e "Journal des systemd wird angezeigt, verlassen mit \"Q\"\n"
+		sleep 3
+		journalctl -n
+	fi
+	;;
+"reload")
+	sctl $command $service
+	if [[ $exitcode == 0 ]]; then
+		echo -e "Dienst $service hat seine Konfiguration \033[32merfolgreich\033[0m neu geladen" 
+	else
+		echo -e "Neuladen des Dienstes \033[31mfehlgeschlagen\033[0m"
+		echo -e "Journal des systemd wird angezeigt, verlassen mit \"Q\"\n"
+		sleep 3
+		journalctl -n
+	fi
+	;;
+"restart")
+	sctl $command $service
+	if [[ $exitcode == 0 ]]; then
+		echo -e "Dienst $service \033[32merfolgreich\033[0m neu gestartet"
+	else
+		echo -e "Neustart des Dienstes \033[31mfehlgeschlagen\033[0m"
+		echo -e "Journal des systemd wird angezeigt, verlassen mit \"Q\"\n"
+		sleep 3
+		journalctl -n
+	fi
+	;;
+"status")
+	sctl $command $service
+	;;
+*)
+	usage
+	;;
+esac

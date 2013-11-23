@@ -1,4 +1,10 @@
 invis 9.x-dev
+- LDAP Schema Dateien reduziert.
+- Windows-Batchscripts liegen jetzt im Unix-Format vor und werden von sine bei der Installation wieder ins DOS Format umgewandelt.
+- Ordnerstruktur des Setup-Paketes an RPM angepasst.
+- Umbau des sine Scripts auf Basis eines invis-Setup RPMs begonnen.
+- cornaz Arbeitsverzeichnis nach /var/lib verschoben
+- Script "rc" hinzugefuegt. Es kann Dienste trotz systemd nach altem rcxyc Stil starten und Stoppen
 - Bug: "Windows 7 und 8 koennen keine Profilverzeichnisse anlegen" gefixt.
 - Daten des Mailproviders Strato in LDIF Vorlage für CorNAz aktualisiert.
 - Bug: "Suchen und Ersetzen beim smtp-Relayhost schlägt fehl" gefixt.
