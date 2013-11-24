@@ -517,16 +517,13 @@ Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
 	cyruspw="${cyrussecrets[0]}"
     fi
 
-	#Sernet "Konstante Version (3.5), hart getestet, Long Term Support" off\
-
-
 #---# Samba Pakete
     # Es kann entschieden werden, welche Samba-Pakete verwendet werden.
     # Zur Auswahl stehen Pakete des openSUSE-Samba:Stable Repos oder die Pakete von Sernet
     dialog --backtitle "$dialogtitle" --title "Samba File Server" --radiolist "$dialogshorthelp\n\n
 Wählen Sie die von Ihnen bevorzugten Samba Pakete aus." 14 85 5 \
 	openSUSE-Stable "Immer aktuelle Versionen, kürzere Maintenance." on\
-	Sernet "Samba LTS-Pakete für openSUSE 12.3 von Sernet." off\
+	Sernet "Samba4 LTS-Pakete für openSUSE 13.1 von Sernet." off\
 	2>$0_temp
 	whichsamba=`cat $0_temp`
 	whichsamba=`tolower $whichsamba`
@@ -770,8 +767,11 @@ sysprep() {
     pgsubtitle="Die gewählten Samba-Pakete werden installiert"
     sambapackages=`getconfdata "SambaPakete" "2"`
     if [[ $sambapackages == "sernet" ]]; then
-	rpm -e --nodeps libwbclient0 samba-client
-	zypper -n install -n --from sernet-samba `cat $setupdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
+	#rpm -e --nodeps libwbclient0 samba-client
+	#zypper -n install -n --from sernet-samba `cat $setupdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
+	### Temporaer
+	echo "Samba Pakete von Sernet stehen fuer openSUSE 13.1 noch nicht zur Verfügung. Installiere openSUSE Stable Pakete" | pgbox
+	zypper -n install -n `cat $setupdir/zypper-package-lists/opensuse_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
     else
 	zypper -n install -n `cat $setupdir/zypper-package-lists/opensuse_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
     fi
