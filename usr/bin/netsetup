@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Variablen
+syspath="/sys/class/net"
+rulefile="/etc/udev/rules.d/30-invis-net.rules"
+
+i=0
+for device in $(ls $syspath); do
+    if [[ $device != "lo" ]]; then
+	udevcrit[$i]=$(udevadm info -a -p $syspath/$device|grep "ATTR{address}"|tr -s " ")
+	i=$i+1
+    fi
+done
+
+# Regeldatei erzeugen (wird immer neu geschrieben)
+count=${#udevcrit[*]}
+
+case $count in
+1)
+    echo "Ihr Server verfuegt lediglich ueber eine Netzwerkkarte, damit ist kein invis-Setup möglich."
+    ;;
+2)
+    echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ${udevcrit[0]}, ATTR{type}==\"1\" NAME=\"extern\", OPTIONS=\"last_rule\"" > $rulefile
+    echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ${udevcrit[1]}, ATTR{type}==\"1\" NAME=\"intern\", OPTIONS=\"last_rule\"" >> $rulefile
+    ;;
+*)
+    echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ${udevcrit[0]}, ATTR{type}==\"1\", NAME=\"dmz\", OPTIONS=\"last_rule\"" > $rulefile
+    echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ${udevcrit[1]}, ATTR{type}==\"1\", NAME=\"extern\", OPTIONS=\"last_rule\"" >> $rulefile
+    echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ${udevcrit[2]}, ATTR{type}==\"1\", NAME=\"intern\", OPTIONS=\"last_rule\"" >> $rulefile
+    ;;
+esac
+
+echo -e "Es wurden Regeln zur Benennung der vorhandenen Netzwerkkarten erzeugt.\n\nBitte starten Sie den Server jetzt neu und konfigurieren\nSie Ihre Netzwerkkarten anschließend mit YaST."

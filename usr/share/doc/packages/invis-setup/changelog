@@ -1,4 +1,6 @@
 invis 9.x-dev
+- Script "netsetup" hinzugefuegt. Es erzeugt UDEV-Regeln zur Bennenung der Netzwerk-Devices
+- afterup-Script abgespeckt.
 - LDAP Schema Dateien reduziert.
 - Windows-Batchscripts liegen jetzt im Unix-Format vor und werden von sine bei der Installation wieder ins DOS Format umgewandelt.
 - Ordnerstruktur des Setup-Paketes an RPM angepasst.

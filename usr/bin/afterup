@@ -32,22 +32,18 @@ if [[ -f /sbin/mount.cifs ]]; then
 fi
 
 # Link zur Zarafa-Client-Library erneuern
-if [[ -d /etc/zarafa ]]; then
-    fixzarafaclientlib
-fi
+#if [[ -d /etc/zarafa ]]; then
+#    fixzarafaclientlib
+#fi
 
 # fetchmail Updates verändern das init-Script des fetchmail Daemons
-path="/etc/init.d"
-file="fetchmail"
-strings="/etc/fetchmailrc%/var/cornaz/inuse/.fetchmailrc"
-changevalues $path $file $strings
+#path="/etc/init.d"
+#file="fetchmail"
+#strings="/etc/fetchmailrc%/var/cornaz/inuse/.fetchmailrc"
+#changevalues $path $file $strings
 
-strings="/etc/sysconfig/fetchmail%/var/cornaz/sysconfig/fetchmail"
-changevalues $path $file $strings
+#strings="/etc/sysconfig/fetchmail%/var/cornaz/sysconfig/fetchmail"
+#changevalues $path $file $strings
 
-chmod a+x $path/$file
+#chmod a+x $path/$file
 
-# Fuer den Fall eines Kernel-Updates wird die Grub Konfigurationsdatei wieder
-# hergestellt
-mv /boot/grub/menu.lst /boot/grub/menu.lst.afterup
-cp /boot/grub/menu.lst.invis /boot/grub/menu.lst
