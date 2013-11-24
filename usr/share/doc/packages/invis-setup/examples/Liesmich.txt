@@ -106,8 +106,16 @@ eines Cronjobs, der nächtlich alle Fileserver-Freigaben auf Schädlinge scannt.
 den Viren-Scannern auf Client-Seite überlassen. Der Virenschutz im Mailserver bleibt davon unberührt
 und funktioniert weiterhin.
 
-Die beiliegende Firewall Konfiguration definiert ein vorhandenes eth1 als internes Device, sowie 
-ein eth0 und ein dsl0 als externe Devices. Routing und Masquerading werden aktiviert. Von "trusted
+Mit Erscheinen von openSUSE 13.1 wurde das Benennungsschema der Netzwerkschnittstellen geändert.
+Die Änderung bewirkt eine Bennennung nach BIOS-Informationen. Da daraus keine einheitliche,
+Hardware-unabhängige Bennenung erfolgt, wurde das Script "netsetup" zum invis-Setup-Paket
+hinzugefügt. Es erzeugt UDEV-Regeln zur einheitlichen Bennenung der Schnittstellen. Sind zwei 
+Netzwerkkarten vorhanden wird die erste "extern" und die zweite "intern" benannt. 
+Bei drei oder mehr Netzwerkkarten wird die erste "dmz", die zweite "extern" und die dritte 
+"intern" benannt.
+Entsprechend Ihrer Bennennung erfolgt die zuteilung zu den entsprechenden Firewall-Zonen.
+
+Routing und Masquerading werden aktiviert. Von "trusted
 networks" wird kein Gebrauch gemacht und der Server wird generell auch vor Zugriffen aus dem
 internen Netz - unter Berücksichtigung der laufenden Server-Dienste - geschützt.
 

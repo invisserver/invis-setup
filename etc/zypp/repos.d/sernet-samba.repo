@@ -1,6 +1,6 @@
 [sernet-samba]
-name=SerNet Samba Team packages (SUSE Linux 12.3)
+name=SerNet Samba Team packages (SUSE Linux 13.1)
 type=rpm-md
-baseurl=http://ftp.sernet.de/pub/samba/3.6/suse/12.3
+baseurl=http://ftp.sernet.de/pub/samba/3.6/suse/13.1
 enabled=1
 gpgcheck=0

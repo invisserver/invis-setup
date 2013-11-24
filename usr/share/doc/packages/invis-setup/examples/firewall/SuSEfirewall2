@@ -98,7 +98,7 @@
 # Note: alias interfaces (like eth0:1) are ignored
 #
 ## invis-server.org
-FW_DEV_EXT="any eth0 dsl0"
+FW_DEV_EXT="any extern dsl0"
 
 ## Type:	string
 #
@@ -114,7 +114,7 @@ FW_DEV_EXT="any eth0 dsl0"
 # Examples: "tr0", "eth0 eth1"
 #
 ## invis-server.org
-FW_DEV_INT="eth1 wlan0 tun1"
+FW_DEV_INT="intern wlan0 tun1"
 
 ## Type:	string
 #
@@ -135,7 +135,7 @@ FW_DEV_INT="eth1 wlan0 tun1"
 #
 # Examples: "tr0", "eth0 eth1"
 #
-FW_DEV_DMZ=""
+FW_DEV_DMZ="dmz"
 
 ## Type:	yesno
 ## Default:	no

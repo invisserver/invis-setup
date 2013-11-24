@@ -7,7 +7,7 @@
 #
 # Specifies the network interface used by ntop
 #
-NTOPD_IFACE='eth1'
+NTOPD_IFACE='intern'
 
 ## Type:	ip
 ## Default:	127.0.0.1:3000

@@ -1,16 +1,19 @@
 Für die Installation eines invis Servers 9.2 müssen folgende Voraussetzungen erfüllt sein:
 
-    - Als Basis muss openSUSE Linux 12.3, möglichst ohne grafische Oberfläche installiert sein.
+    - Als Basis muss openSUSE Linux 13.1, möglichst ohne grafische Oberfläche installiert sein.
     
-    - Der Server muss über zwei Netzwerkkarten (eth0 & eth1) verfügen. Beide Karten müssen vor
-      der Ausführung dieses Scripts konfiguriert sein. Schnittstelle eth0 muss als externe
+    - Der Server muss über zwei Netzwerkkarten (extern & intern) verfügen. Beide Karten müssen vor
+      der Ausführung dieses Scripts konfiguriert sein. Schnittstelle 1 muss als externe
       Schnittstelle zur Verbindung mit DSL-Modem oder Router eingerichtet sein. Bei Verbindung
-      mit einem Router empfielt es sich auf diesem einen DHCP-Server zu starten und eth0 als
+      mit einem Router empfielt es sich auf diesem einen DHCP-Server zu starten und "extern" als
       DHCP-Client einzurichten. Wird ein DSL-Modem verwendet, muss eth0 als DSL-Schnittstelle
       eingerichtet und die Internetverbindung funktionstüchtig sein.
-      Schnittstelle eth1 muss mit einer festen IP-Adresse versehen werden.
+      Schnittstelle 2 (intern) muss mit einer festen IP-Adresse versehen werden.
       Die Einrichtung der Netzwerkkarten kann per YaST vorgenommen werden.
-    
+      
+      Zur Erzeugung von Udev-Regeln zur korrekten Bennenung der Netzwerkschnittstellen ist das
+      Script "netsetup" anzuwenden.
+      
     - Der Server muss vor Ausführung des Setup-Scripts über einen vollständigen Hostnamen verfügen.
       Der Hostname kann ebenfalls per YaST gesetzt werden und sollte dem Muster "Hostname.Domain.tld"
       gehorchen.
@@ -22,3 +25,7 @@ Für die Installation eines invis Servers 9.2 müssen folgende Voraussetzungen e
       lation, ob die von Ihnen verwendeten DNS-Server auf Anfragen antworten. Antworten diese
       Server nicht auf Anfragen, beeinträchtig dies sowohl die Installation Ihres invis-Servers
       als auch den späteren Betrieb.
+      
+    - Wenn Sie Samba4 Pakete des Anbieters Sernet GmbH nutzen möchten, müssen Sie sich zunächst
+      unter https://portal.enterprisesamba.com/users/sign_in Registrieren. Das invis-Setup-Script
+      "sine" wird Sie nach "Username" und "Accesskey" fragen. Die Registrierung ist kostenlos.

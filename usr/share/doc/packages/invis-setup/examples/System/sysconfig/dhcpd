@@ -12,7 +12,7 @@
 # Examples: DHCPD_INTERFACE="eth0 eth1 eth2"
 #           DHCPD_INTERFACE="ANY"
 #
-DHCPD_INTERFACE="eth1"
+DHCPD_INTERFACE="intern"
 
 ## Path: 	Network/DHCP/DHCP server
 ## Description: DHCPv6 server settings
@@ -28,7 +28,7 @@ DHCPD_INTERFACE="eth1"
 # Examples: DHCPD6_INTERFACE="eth0 eth1 eth2"
 #           DHCPD6_INTERFACE="ANY"
 #
-DHCPD6_INTERFACE="eth1"
+DHCPD6_INTERFACE="intern"
 
 ## Type:        list(yes,no,auto,)
 ## Default:     
