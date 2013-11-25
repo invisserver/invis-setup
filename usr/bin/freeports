@@ -15,20 +15,22 @@
 # Je größer die Zahl, desto länger läuft das Script
 # - allerdings wird die Menge der gefundenen Ports 
 # entsprechend größer
-menge=100
+#menge=100
 
 # Freie hohe Ports aufspüren und einen per Zufallsgenerator auswählen
-freeports=`cat /etc/services|grep "Unassigned"|grep "-"|tr -s " "|cut -d " " -f 2|tail -n $menge`
-freeportareas=`echo $freeports|wc -w`
-zufallsbereich=$((( $RANDOM * 32768 + $RANDOM ) % $freeportareas ))
+#freeports=`cat /etc/services|grep "Unassigned"|grep "-"|tr -s " "|cut -d " " -f 2|tail -n $menge`
+#freeportareas=`echo $freeports|wc -w`
+#zufallsbereich=$((( $RANDOM * 32768 + $RANDOM ) % $freeportareas ))
 #echo $(( $zufallsbereich + 1 ))
-freeports=`echo $freeports|cut -d " " -f $(( $zufallsbereich + 1 ))`
+#freeports=`echo $freeports|cut -d " " -f $(( $zufallsbereich + 1 ))`
 #echo $freeports
 n=1
 # Alle Zeilen die freie Portbereiche kennzeichnen aus /etc/services auslesen
-for ports in $freeports; do
-    minport=`echo $ports|cut -d "-" -f 1`
-    maxport=`echo $ports|cut -d "-" -f 2`
+#for ports in $freeports; do
+    #minport=`echo $ports|cut -d "-" -f 1`
+    #maxport=`echo $ports|cut -d "-" -f 2`
+    minport=50001
+    maxport=65535
     #echo $minport:$maxport
     
     for (( i=$minport; i<=$maxport; i++)); do
@@ -37,7 +39,7 @@ for ports in $freeports; do
 	#echo ${allfreeports[$n]}
 	(( n=$n+1 ))
     done
-done
+#done
 
 # Anzahl der ermittelten Ports = Anzahl der Elemente im Array
 anzahl=${#allfreeports[@]}
