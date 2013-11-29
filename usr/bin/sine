@@ -134,19 +134,19 @@ chkservice() {
     if [[ -n $2 ]]; then
 	    pgsubtitle="$1-Daemon wird aus der Runlevelkonfiguration entfernt"
 	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl disable $1.service 2>&1| tee -a sine.log | pgbox
+		systemctl disable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
 	    else
-    		chkconfig --del "$1" 2>&1| tee -a sine.log | pgbox
+    		chkconfig --del "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
     	    fi
 	    pgsubtitle="$1-Daemon wird gestoppt"
-    	    service "$1" stop 2>&1| tee -a sine.log | pgbox
+    	    service "$1" stop 2>&1| tee -a $setupdir/sine.log | pgbox
     else
 	if [[ `chkconfig $1|tr -s " "|cut -d " " -f2` != "on" ]];then 
     	    pgsubtitle="$1-Daemon wird in die Runlevelkonfiguration eingetragen"
 	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl enable $1.service 2>&1| tee -a sine.log | pgbox
+		systemctl enable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
 	    else
-    		chkconfig --add "$1" 2>&1| tee -a sine.log | pgbox
+    		chkconfig --add "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
     	    fi
 	fi
     	pgsubtitle="$1-Daemon wird neu gestartet"
@@ -256,8 +256,8 @@ quest() {
     # Vorgaben ermitteln
     vhn=`hostname -s`
     vdomname=`hostname -d`
-    vipaddr=`ifconfig eth1|grep "Bcast:"| cut -d ":" -f 2| cut -d " " -f 1`
-    vlongnmask=`ifconfig eth1|grep "Mask"| cut -d ":" -f 4`
+    vipaddr=`ifconfig intern|grep "Bcast:"| cut -d ":" -f 2| cut -d " " -f 1`
+    vlongnmask=`ifconfig intern|grep "Mask"| cut -d ":" -f 4`
     country="DE"
 
 #---# openSSL
@@ -322,7 +322,7 @@ Wenn Sie hier Änderungen vornehmen, müssen Sie diese nachträglich in Ihre Sys
 Achtung: Fehlerhafte Eingaben sind nach der vollständigen Installation nur sehr schwer zu korrigieren." 29 80 5 \
 	"Hostname:" 2 2 "$vhn" 2 13 20 0\
 	"Domain:" 2 35 "$vdomname" 2 43 27 0\
-	"IP (eth1):" 4 2 "$vipaddr" 4 13 20 0\
+	"IP (intern):" 4 2 "$vipaddr" 4 13 20 0\
 	"Netzwerkmaske:" 4 35 "$vlongnmask" 4 50 20 0\
 	2>$0_temp
 	netvalues=(`cat $0_temp`)
@@ -364,7 +364,7 @@ Achtung: Fehlerhafte Eingaben sind nach der vollständigen Installation nur sehr
 	done
 	
 	yesno "Prüfen Sie bitte genau ob die folgenden Angaben korrekt sind.\n
-	\nIP-Adresse(eth1):     $ipaddr
+	\nIP-Adresse(intern):   $ipaddr
 	\nNetzwerkbasis:        $netaddr
 	\nNetzwerkmaske (lang): $longnmask / (kurz): $shortnmask
 	\nBroadcast-Adresse:    $bcastaddr
