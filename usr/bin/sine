@@ -886,7 +886,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
 
     # Systemüberwachungstools werden installiert
     cp /usr/bin/inetcheck /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/diskchecker /usr/local/bin/ 2>&1| tee -a $setupdir/sine.log
+#DA#    cp /usr/bin/diskchecker /usr/local/bin/ 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/freeports /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/alldump /usr/local/sbin/	2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/dwdatasnapshot /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
