@@ -1953,11 +1953,14 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     cp /usr/bin/deletehome /usr/local/sbin/
     
     # sudoers Datei anpassen
+    # Sicherheitskopie der sudoers-Datei erzeugen
+    cp /etc/sudoers $setupdir/sudoers.ori
     cat $cfilesdir/webserver/sudoers-expansion >> /etc/sudoers
     
+    # to be removed
     # Upload-Verzeichnis anlegen und Rechte anpassen
-    mkdir -m 2770 /srv/uploads
-    chown wwwrun:www /srv/uploads
+    #mkdir -m 2770 /srv/uploads
+    #chown wwwrun:www /srv/uploads
     
     #aschenputtel installieren
     cp /usr/bin/aschenputtel /usr/local/sbin/
@@ -1965,7 +1968,8 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     chown root:root /usr/local/sbin/aschenputtel
     
     # Kopieren und anpassend der Konfigurationsdateien
-    cp $cfilesdir/webserver/invis.conf /etc/apache2/conf.d/
+    # to be removed
+    #cp $cfilesdir/webserver/invis.conf /etc/apache2/conf.d/
     cp $cfilesdir/webserver/invis-vh.conf /etc/apache2/vhosts.d/
     path="/etc/apache2/vhosts.d"
     file="invis-vh.conf"
@@ -2022,6 +2026,7 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     fi
     # CorNAz einrichten
 
+    # to be removed
     # Mailproviderdatei an lokales LDAP-Verzeichnis anpassen
     # Dateien werden kopiert
     # Quellverzeichnis
@@ -2030,13 +2035,13 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     #cp $sourcedir/sysconfig/fetchmail /var/lib/cornaz/sysconfig/
     #cp $sourcedir/var/* /var/cornaz/bin/
     # /etc/sudoers wird angepasst.
-    cp /etc/sudoers /etc/sudoers.bak
-echo "Cmnd_Alias FETCHPHP = /var/lib/cornaz/bin/fetchcopy
-wwwrun ALL=NOPASSWD:FETCHPHP" >> /etc/sudoers
-echo "Cmnd_Alias HOLIDAY = /var/lib/cornaz/bin/holiday
-wwwrun ALL=NOPASSWD:HOLIDAY" >> /etc/sudoers
-echo "Cmnd_Alias BACKHOME = /var/lib/cornaz/bin/backhome
-wwwrun ALL=NOPASSWD:BACKHOME" >> /etc/sudoers
+#    cp /etc/sudoers /etc/sudoers.bak
+#echo "Cmnd_Alias FETCHPHP = /var/lib/cornaz/bin/fetchcopy
+#wwwrun ALL=NOPASSWD:FETCHPHP" >> /etc/sudoers
+#echo "Cmnd_Alias HOLIDAY = /var/lib/cornaz/bin/holiday
+#wwwrun ALL=NOPASSWD:HOLIDAY" >> /etc/sudoers
+#echo "Cmnd_Alias BACKHOME = /var/lib/cornaz/bin/backhome
+#wwwrun ALL=NOPASSWD:BACKHOME" >> /etc/sudoers
 
     # Konfigurationsdaten ermitteln.
     domain=`getconfdata "Domain" "2"`

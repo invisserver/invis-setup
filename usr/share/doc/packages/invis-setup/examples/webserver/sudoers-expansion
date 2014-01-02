@@ -4,3 +4,10 @@ Cmnd_Alias DELETEHOME = /usr/local/sbin/deletehome
 wwwrun ALL=NOPASSWD:DELETEHOME
 Cmnd_Alias CREATEGROUPSHARE = /usr/local/sbin/creategroupshare
 wwwrun ALL=NOPASSWD:CREATEGROUPSHARE
+Cmnd_Alias FETCHPHP = /var/lib/cornaz/bin/fetchcopy
+wwwrun ALL=NOPASSWD:FETCHPHP
+Cmnd_Alias HOLIDAY = /var/lib/cornaz/bin/holiday
+wwwrun ALL=NOPASSWD:HOLIDAY
+Cmnd_Alias BACKHOME = /var/lib/cornaz/bin/backhome
+wwwrun ALL=NOPASSWD:BACKHOME
+
