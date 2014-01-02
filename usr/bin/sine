@@ -1952,10 +1952,9 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     cp /usr/bin/createhome /usr/local/sbin/
     cp /usr/bin/deletehome /usr/local/sbin/
     
+    # to be removed
     # sudoers Datei anpassen
-    # Sicherheitskopie der sudoers-Datei erzeugen
-    cp /etc/sudoers $setupdir/sudoers.ori
-    cat $cfilesdir/webserver/sudoers-expansion >> /etc/sudoers
+    #cp $cfilesdir/webserver/invis.sudoers >> /etc/sudoers.d/
     
     # to be removed
     # Upload-Verzeichnis anlegen und Rechte anpassen
