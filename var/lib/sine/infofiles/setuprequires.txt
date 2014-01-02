@@ -18,7 +18,7 @@ Für die Installation eines invis Servers 9.2 müssen folgende Voraussetzungen e
       Der Hostname kann ebenfalls per YaST gesetzt werden und sollte dem Muster "Hostname.Domain.tld"
       gehorchen.
       
-    - Sie benötigen bis zu drei (mindestens eine) IP Adressen von Nameserversn, die Sie für den
+    - Sie benötigen bis zu drei (mindestens eine) IP Adressen von Nameservern, die Sie für den
       DNS-Dienst Ihres invis-Servers als Forward-Nameserver nutzen können. Dies können der DNS
       eines vorgeschalteten Routers, die für Sie zuständigen DNS-Server Ihres Internet-Zugangs-
       Providers oder freie DNS-Server im Internet sein. Prüfen Sie bitte im Vorfeld der Instal-
