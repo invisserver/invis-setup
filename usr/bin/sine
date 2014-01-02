@@ -2845,6 +2845,9 @@ openvpn() {
 	zypper -n install -n openvpn 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 
+	unix2dos $cfilesdir/openvpn/vpn-client.ovpn
+	unix2dos $cfilesdir/openvpn/jowi_openvpnmanager/vpn-client-management.ovpn
+
 	# openVPN Key-Center einrichten
 	domain=`getconfdata "Domain" "2"`
 	echo $domain
