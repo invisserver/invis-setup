@@ -2852,12 +2852,13 @@ openvpn() {
 	# openVPN Key-Center einrichten
 	domain=`getconfdata "Domain" "2"`
 	echo $domain
-	path="/usr/share/openvpn/easy-rsa/2.0"
+	path="$cfilesdir/openvpn/easy-rsa/2.0"
 	file="Makefile"
 	cp $path/$file $path/$file.ori
-	strings="DESTDIR=%DESTDIR=/etc/openvpn"
-        changevalues $path $file "$strings"
-	strings="PREFIX=%PREFIX=$domain"
+	# to be removed
+	#strings="DESTDIR=%DESTDIR=/etc/openvpn"
+        #changevalues $path $file "$strings"
+	strings="openvpndomain%$domain"
         changevalues $path $file "$strings"
 	cd $path
 	pgsubtitle="easy-rsa wird installiert"
