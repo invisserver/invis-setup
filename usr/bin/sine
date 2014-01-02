@@ -2083,12 +2083,13 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     strings="APACHE_MPM=\"\"%APACHE_MPM=\"worker\""
     changevalues $path $file "$strings"
     a2enflag FCGID
+    a2enflag SSL
     
     # Webserver, shellinabox, fetchmail und Mailman neustarten und in Runlevel integrieren
     chkservice "fetchmail"
     chkservice "shellinabox"
     chkservice "apache2"
-    chkservice "mailman"
+    #chkservice "mailman"
 
     writeprepstat "mysqlserver"
     waitbox "webserver" "mysqlserver"
