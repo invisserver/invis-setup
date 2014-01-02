@@ -897,10 +897,10 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     cp /usr/bin/clean_transfer /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/clean_recycle /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/serverkeys /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/fixpearchannel /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/fixbindchroot /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/fixpearchannel /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/fixbindchroot /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/mkdbsilent /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/umtsup /usr/local/sbin 	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/umtsup /usr/local/sbin 	2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/fetchavkey /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/safebootpart /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
 
@@ -932,7 +932,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
 #    /usr/local/sbin/fixpearchannel 2>&1 | tee -a $setupdir/sine.log | pgbox
 
     # invis cron-file wird installiert
-    cp $cfilesdir/invis/invis.cron /etc/cron.d/ 2>&1| tee -a $setupdir/sine.log
+    #cp $cfilesdir/invis/invis.cron /etc/cron.d/ 2>&1| tee -a $setupdir/sine.log
 
     # invis permissions-file wird installiert.
     cp $cfilesdir/System/permissions.d/invis-server /etc/permissions.d/ 2>&1| tee -a $setupdir/sine.log
