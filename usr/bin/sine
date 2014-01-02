@@ -134,19 +134,19 @@ chkservice() {
     if [[ -n $2 ]]; then
 	    pgsubtitle="$1-Daemon wird aus der Runlevelkonfiguration entfernt"
 	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl disable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
+		systemctl disable $1.service 2>&1| tee -a sine.log | pgbox
 	    else
-    		chkconfig --del "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
+    		chkconfig --del "$1" 2>&1| tee -a sine.log | pgbox
     	    fi
 	    pgsubtitle="$1-Daemon wird gestoppt"
-    	    service "$1" stop 2>&1| tee -a $setupdir/sine.log | pgbox
+    	    service "$1" stop 2>&1| tee -a sine.log | pgbox
     else
 	if [[ `chkconfig $1|tr -s " "|cut -d " " -f2` != "on" ]];then 
     	    pgsubtitle="$1-Daemon wird in die Runlevelkonfiguration eingetragen"
 	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl enable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
+		systemctl enable $1.service 2>&1| tee -a sine.log | pgbox
 	    else
-    		chkconfig --add "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
+    		chkconfig --add "$1" 2>&1| tee -a sine.log | pgbox
     	    fi
 	fi
     	pgsubtitle="$1-Daemon wird neu gestartet"
@@ -364,7 +364,7 @@ Achtung: Fehlerhafte Eingaben sind nach der vollständigen Installation nur sehr
 	done
 	
 	yesno "Prüfen Sie bitte genau ob die folgenden Angaben korrekt sind.\n
-	\nIP-Adresse(intern):   $ipaddr
+	\nIP-Adresse(intern):     $ipaddr
 	\nNetzwerkbasis:        $netaddr
 	\nNetzwerkmaske (lang): $longnmask / (kurz): $shortnmask
 	\nBroadcast-Adresse:    $bcastaddr
@@ -839,8 +839,8 @@ sysprep() {
     changevalues $path $file "$strings"
 
     #Admin PW fuer ntop-user wwwrun setzen
-    # Achtung Bug im ntop Paket: ntop versucht die user-db in /var/ntop anzulegen, falsch!. Workaround:
-    ln -s /var/lib/ntop /var/ntop
+    # Achtung Bug im ntop Paket: Das Verzeichnis ind dem ntop versucht die user-db anzulegen existiert nicht. Workaround:
+    mkdir /var/lib/ntop
     ntoppw=`getconfdata "NtopPw" "2"`
     ntop --set-admin-password=$ntoppw -u wwwrun 2>&1| tee -a $setupdir/sine.log | pgbox
 
@@ -885,24 +885,24 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     mkdir -p /etc/ssl/ddns 2>&1| tee -a $setupdir/sine.log
 
     # Systemüberwachungstools werden installiert
-#DA#    cp /usr/bin/inetcheck /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/diskchecker /usr/local/bin/ 2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/freeports /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/alldump /usr/local/sbin/	2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/dwdatasnapshot /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/scanleases /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/afterup /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/amacheck /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/avrun /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/clean_transfer /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/clean_recycle /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/serverkeys /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/inetcheck /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/diskchecker /usr/local/bin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/freeports /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/alldump /usr/local/sbin/	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/dwdatasnapshot /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/scanleases /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/afterup /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/amacheck /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/avrun /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/clean_transfer /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/clean_recycle /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/serverkeys /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/fixpearchannel /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/fixbindchroot /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/mkdbsilent /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/mkdbsilent /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
     cp /usr/bin/umtsup /usr/local/sbin 	2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/fetchavkey /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-#DA#    cp /usr/bin/safebootpart /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/fetchavkey /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/safebootpart /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
 
     # Konfiguration fuer Notfall-Internetzugang via Handy und T-Mobile (Teathering)
     cp $cfilesdir/invis/wvd_tmobile.conf /etc/invis 2>&1| tee -a $setupdir/sine.log
@@ -1214,9 +1214,9 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
     # Installation entfaellt, da es per rpm installiert wird.
     cp $cfilesdir/LDAP/phpldapadmin/config.php /srv/www/htdocs/phpldapadmin/config/
 
-#DA#    cp /usr/bin/addaddress /usr/local/sbin/
-#DA#    cp /usr/bin/addcn.pl /usr/local/sbin/
-#DA#    cp /usr/bin/buildpostaladdress.pl /usr/local/sbin/
+    cp /usr/bin/addaddress /usr/local/sbin/
+    cp /usr/bin/addcn.pl /usr/local/sbin/
+    cp /usr/bin/buildpostaladdress.pl /usr/local/sbin/
     
     chown -R root:root /usr/local/sbin
     chmod -R ug+x /usr/local/sbin
@@ -1448,8 +1448,8 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    ln -s /srv/www/htdocs/z-push2 /srv/www/htdocs/z-push
 	    
 	    # Datensicherungstools installieren
-#DA#	    cp /usr/bin/zbackup /usr/local/sbin
-#DA#	    cp /usr/bin/zdbdump /usr/local/sbin
+	    cp /usr/bin/zbackup /usr/local/sbin
+	    cp /usr/bin/zdbdump /usr/local/sbin
 	    chown root:root /usr/local/sbin/z*
 	
 	    rm -f `ls /etc/postfix/ |grep "main.[dovecot|cyrus]"` 2>&1| tee -a $setupdir/sine.log
@@ -1756,26 +1756,26 @@ samba() {
     
     path="/usr/local/sbin"
     file="manipgroups"
-#DA#    cp /usr/bin/$file $path/ 2>&1| tee -a $setupdir/sine.log
+    cp /usr/bin/$file $path/ 2>&1| tee -a $setupdir/sine.log
     chown root:root $path/$file 2>&1| tee -a $setupdir/sine.log
     chmod 0700 $path/$file 	2>&1| tee -a $setupdir/sine.log
 
     if [[ $whichimap != "zarafa" ]]; then
         path="/usr/local/sbin"
 	file="addgeg"
-#DA#	cp /usr/bin/$file $path/
+	cp /usr/bin/$file $path/
 	chown root:root $path/$file
 	chmod 0700 $path/$file
 	$path/$file 2>&1|tee -a $setupdir/sine.log
     else
         path="/usr/local/sbin"
 	file="addzag"
-#DA#	cp /usr/bin/$file $path/
+	cp /usr/bin/$file $path/
 	chown root:root $path/$file
 	chmod 0700 $path/$file
 	$path/$file 2>&1|tee -a $setupdir/sine.log
 	file="extzu"
-#DA#	cp /usr/bin/$file $path/ 	2>&1| tee -a $setupdir/sine.log
+	cp /usr/bin/$file $path/ 	2>&1| tee -a $setupdir/sine.log
 	chown root:root $path/$file 	2>&1| tee -a $setupdir/sine.log
 	chmod 0700 $path/$file 		2>&1| tee -a $setupdir/sine.log
     fi
@@ -1946,9 +1946,9 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     cp /etc/ssl/CA/cacert.pem /srv/www/htdocs/portal/inc/
     
     # Shellscripts installieren
-#DA#    cp /usr/bin/creategroupshare /usr/local/sbin/
-#DA#    cp /usr/bin/createhome /usr/local/sbin/
-#DA#    cp /usr/bin/deletehome /usr/local/sbin/
+    cp /usr/bin/creategroupshare /usr/local/sbin/
+    cp /usr/bin/createhome /usr/local/sbin/
+    cp /usr/bin/deletehome /usr/local/sbin/
     
     # sudoers Datei anpassen
     cat $cfilesdir/webserver/sudoers-expansion >> /etc/sudoers
@@ -1958,7 +1958,7 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     chown wwwrun:www /srv/uploads
     
     #aschenputtel installieren
-#DA#    cp /usr/bin/aschenputtel /usr/local/sbin/
+    cp /usr/bin/aschenputtel /usr/local/sbin/
     chmod 755 /usr/local/sbin/aschenputtel
     chown root:root /usr/local/sbin/aschenputtel
     
@@ -2395,7 +2395,7 @@ else
     fi
 
     ## Helfer-Scripts kopieren
-#DA#    cp /usr/bin/*zarafa* /usr/local/sbin/
+    cp /usr/bin/*zarafa* /usr/local/sbin/
     #cp /usr/bin/runzarafa /usr/local/sbin/
 
     chown root:root /usr/local/sbin/*zarafa*
