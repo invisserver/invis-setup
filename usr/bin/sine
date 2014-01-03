@@ -2609,7 +2609,7 @@ dann sinnvoll, wenn lediglich mit einer Kivitendo Datenbank gearbeitet wird."  1
 		    strings="admin_secret%$ldapadminpw"
 		    changevalues $path $file "$strings"
 		fi
-		strings="lxpass%$lxpw"
+		strings="lxpw%$lxpw"
 		changevalues $path $file "$strings"
 	    #else 
 		#msgbox "LX-ERP Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
