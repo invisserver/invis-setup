@@ -2927,12 +2927,16 @@ openvpn() {
 	pgsubtitle="Diffie-Hellmann Parameter werden erzeugt"
 	./build-dh 2>&1 |pgbox
 	./build-key-server $ddns
-
+	# Leere CRL erzeugen.
+	openssl ca -config ./openssl-1.0.0.cnf -gencrl -keyfile ./keys/ca.key -cert ./keys/ca.crt -out ./keys/crl.pem
 	msgbox "Beispiel Client-Konfigurationsdateien finden Sie im cfiles Unterverzeichnis.
 Um Schlüssel für einen Client zu erzeugen wechseln Sie nach /etc/openvpn/$domain und führen Sie 
 build-key \"clienthostname\" aus. Weitere Infos unter wiki.invis-server.de." "openVPN Clients einrichten"
     # openvpn ins Runlevel-Konzept integrieren und starten
-	chkservice "openvpn"
+	# Seit openSUSE 13.1 bekommt jede openvpn-Konfiguration ein eigenes systemd Service-File
+	# Start und Stop koennen damit fuer jede Konfiguration einzeln erfolgen.
+	cp /usr/lib/systemd/system/openvpn@.service /usr/lib/systemd/system/openvpn@$domain.service
+	chkservice "openvpn@$domain"
     else
 	msgbox "Wenn Sie es sich zu einem späteren Zeitpunkt anders überlegen, können Sie diesen Schritt durch erneutes Aufrufen des Setup-Scripts mit dem Parameter \"openvpn\" wiederholen." "OpenVPN Installation übersprungen"
 
@@ -3049,6 +3053,12 @@ etherpad() {
 
 # Einlesen des aktuellen Setup-Status
 read -a prepstat < $setupdir/prepstat
+
+# Status ausgabe
+if [[ $1 == "status" ]]; then
+    echo "Nächstes sine Modul ist: $prepstat"
+    exit
+fi
 
 # Testen, ob dialog installiert ist.
 
