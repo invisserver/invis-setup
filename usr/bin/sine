@@ -3073,6 +3073,7 @@ if [[ $1 == "status" ]]; then
 	echo "Nächstes sine Modul ist: $prepstat"
     else
 	echo "sine wurde noch nie aufgerufen. Es wird mit Modul \"check\" begonnen."
+    fi
     exit
 fi
 
