@@ -1278,7 +1278,8 @@ dns() {
     changevalues $path $file "$strings"    
 
     # Chroot Umgebung fuer bind 9.8.x fixen -- hoffentlich nur temporaer notwendig
-    /usr/bin/fixbindchroot 2>&1| tee -a $setupdir/sine.log
+    ## to be removed
+    #/usr/bin/fixbindchroot 2>&1| tee -a $setupdir/sine.log
 
     # DNS Dienst starten und ins Runlevel-Konzept einbinden.
     chkservice "named"
@@ -1351,7 +1352,7 @@ mailserver() {
     domain=`getconfdata "Domain" "2"`
     strings="invis-net.loc%$domain"
     changevalues $path $file "$strings"
-    chkservice "amavisd"
+    chkservice "amavis"
 
     # Mailkonto fuer SPAM-Mails kann erst nach Einrichtung der Samba-Domäne angelegt werden
     
@@ -1928,6 +1929,7 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     # Putty bereitstellen
     cp $cfilesdir/putty/putty.exe /srv/www/htdocs/portal/
     
+    # to be removed
     # Shell-in-a-Box einrichten
     #sshport=`getconfdata "SSHPORT" "2"`
     #path="/etc/init.d/"
@@ -1942,6 +1944,7 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     a2enmod proxy
     a2enmod proxy_http
     a2enmod proxy_html
+    a2enmod socache_shmcb
     cp -a /etc/apache2/conf.d/mod_proxy_html.conf.in /etc/apache2/conf.d/mod_proxy_html.conf
     
     # Stammzertifikat der Server-CA bereitstellen
