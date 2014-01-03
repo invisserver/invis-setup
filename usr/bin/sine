@@ -134,19 +134,19 @@ chkservice() {
     if [[ -n $2 ]]; then
 	    pgsubtitle="$1-Daemon wird aus der Runlevelkonfiguration entfernt"
 	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl disable $1.service 2>&1| tee -a sine.log | pgbox
+		systemctl disable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
 	    else
-    		chkconfig --del "$1" 2>&1| tee -a sine.log | pgbox
+    		chkconfig --del "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
     	    fi
 	    pgsubtitle="$1-Daemon wird gestoppt"
-    	    service "$1" stop 2>&1| tee -a sine.log | pgbox
+    	    service "$1" stop 2>&1| tee -a $setupdir/sine.log | pgbox
     else
 	if [[ `chkconfig $1|tr -s " "|cut -d " " -f2` != "on" ]];then 
     	    pgsubtitle="$1-Daemon wird in die Runlevelkonfiguration eingetragen"
 	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl enable $1.service 2>&1| tee -a sine.log | pgbox
+		systemctl enable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
 	    else
-    		chkconfig --add "$1" 2>&1| tee -a sine.log | pgbox
+    		chkconfig --add "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
     	    fi
 	fi
     	pgsubtitle="$1-Daemon wird neu gestartet"
@@ -2851,7 +2851,7 @@ openvpn() {
 
 	# openVPN Key-Center einrichten
 	domain=`getconfdata "Domain" "2"`
-	echo $domain
+	#echo $domain
 	path="$cfilesdir/openvpn/easy-rsa/2.0"
 	file="Makefile"
 	cp $path/$file $path/$file.ori
@@ -2935,8 +2935,8 @@ build-key \"clienthostname\" aus. Weitere Infos unter wiki.invis-server.de." "op
     # openvpn ins Runlevel-Konzept integrieren und starten
 	# Seit openSUSE 13.1 bekommt jede openvpn-Konfiguration ein eigenes systemd Service-File
 	# Start und Stop koennen damit fuer jede Konfiguration einzeln erfolgen.
-	cp /usr/lib/systemd/system/openvpn@.service /usr/lib/systemd/system/openvpn@$domain.service
-	chkservice "openvpn@$domain"
+	cp /usr/lib/systemd/system/openvpn@.service /usr/lib/systemd/system/openvpn@invis-server.service
+	chkservice "openvpn@invis-server"
     else
 	msgbox "Wenn Sie es sich zu einem späteren Zeitpunkt anders überlegen, können Sie diesen Schritt durch erneutes Aufrufen des Setup-Scripts mit dem Parameter \"openvpn\" wiederholen." "OpenVPN Installation übersprungen"
 
@@ -3054,9 +3054,45 @@ etherpad() {
 # Einlesen des aktuellen Setup-Status
 read -a prepstat < $setupdir/prepstat
 
-# Status ausgabe
+# Hilfe ausgeben
+if [[ $1 == "help" ]]; then
+    echo -e "sine Aufrufe:\n"
+    echo "\"sine\" ohne weitere Argumente startet das Script regulär."
+    echo "\"sine status\" gibt das nächste zu startende Modul aus."
+    echo "\"sine log\" gibt das Logfile aus."
+    echo "\"sine showconf\" gibt die gespeicherten Konfigurationsdaten aus."
+    echo -e "\"sine modulname\" ruft das angegebene Modul auf. Dies ist nur\nfür optionale Module möglich, nachdem sine einmal vollständig\ndurchgelaufen ist."
+    echo -e "Optionale Module: nagios, groupware, erp, faxgate, webcdwriter,\nopenvpn, dokuwiki, etherpad.\n"
+    exit
+fi
+
+
+# Status Ausgabe
 if [[ $1 == "status" ]]; then
-    echo "Nächstes sine Modul ist: $prepstat"
+    if [[ -f $setupdir/prepstat ]]; then
+	echo "Nächstes sine Modul ist: $prepstat"
+    else
+	echo "sine wurde noch nie aufgerufen. Es wird mit Modul \"check\" begonnen."
+    exit
+fi
+
+# Logfile Ausgabe
+if [[ $1 == "log" ]]; then
+    if [[ -f $setupdir/sine.log ]]; then
+	less $setupdir/sine.log
+    else
+	echo "Es ist noch kein Logfile vorhanden."
+    fi
+    exit
+fi
+
+# Konfigurationsdaten ausgeben
+if [[ $1 == "showconf" ]]; then
+    if [[ -f $setupdir/sine.log ]]; then
+	less $setupdir/invis_confdata
+    else
+	echo "Es sind noch keine Konfigurationsdaten vorhanden."
+    fi
     exit
 fi
 
