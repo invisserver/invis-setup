@@ -2393,8 +2393,9 @@ else
     mkdir -p /var/lib/zarafa-webaccess/tmp
     mkdir -p /var/lib/zarafa-webaccess/plugins
     chmod a+rwx /var/lib/zarafa-webaccess/tmp
-    libzarafaclient=`ls $libdir | grep "libzarafaclient-"`
-    ln -s $libdir/$libzarafaclient $libdir/libzarafaclient.so
+    # to be removed
+    #libzarafaclient=`ls $libdir | grep "libzarafaclient-"`
+    #ln -s $libdir/$libzarafaclient $libdir/libzarafaclient.so
 
     # htaccess-Dateien entfernen, wenn Apache Worker MPM aktiv ist
     isworker=`ps ax |grep httpd2-worker |grep -v grep|wc -l`
