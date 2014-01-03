@@ -2960,7 +2960,7 @@ dokuwiki() {
     #wget `lynx --dump http://www.splitbrain.org/projects/dokuwiki|grep "http"|grep ".tgz"|head -n1|tr -s " "|cut -d " " -f3` 2>&1 |pgbox
     wget http://download.dokuwiki.org/src/dokuwiki/dokuwiki-stable.tgz
     
-    getpath=`find ~ -name "dokuwiki*.tgz"`
+    getpath=`find $setupdir -name "dokuwiki*.tgz"`
     tar -xzf $getpath -C /srv/www/htdocs 2>&1 |pgbox
     mv /srv/www/htdocs/dokuwiki* /srv/www/htdocs/dokuwiki
 
@@ -2968,18 +2968,18 @@ dokuwiki() {
     # Vorübergehender Link fuer Displaywikipage
     pgsubtitle="Dokuwiki-Erweiterungen werden heruntergeladen und installiert"
     wget http://cloud.github.com/downloads/tatewake/dokuwiki-plugin-displaywikipage/displaywikipage-stable.tar.gz 2>&1 |pgbox
-    getpath=`find ~ -name "display*.tar.gz"`
+    getpath=`find $setupdir -name "display*.tar.gz"`
     tar -xzf $getpath -C /srv/www/htdocs/dokuwiki/lib/plugins/ 2>&1 |pgbox
 
     # Display Wiki Page Plugin herunterladen
     # Voruebergehender Link fuer Monobook Template
     wget http://cloud.github.com/downloads/tatewake/dokuwiki-template-monobook/monobook-stable.tar.gz 2>&1 |pgbox
-    getpath=`find ~ -name "monobook*.tar.gz"`
+    getpath=`find $setupdir -name "monobook*.tar.gz"`
     tar -xzf $getpath -C /srv/www/htdocs/dokuwiki/lib/tpl/ 2>&1 |pgbox
 
     # Encrypt Password Plugin
     wget http://www.werbeagentur-willers.de/download/dokuwiki-plugins/encryptedpasswords.zip
-    getpath=`find ~ -name "encrypted*.zip"`
+    getpath=`find $setupdir -name "encrypted*.zip"`
     unzip $getpath -d /srv/www/htdocs/dokuwiki/lib/plugins/ 2>&1 |pgbox
 
     chown -R wwwrun:www /srv/www/htdocs/dokuwiki
