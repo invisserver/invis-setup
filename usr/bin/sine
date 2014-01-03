@@ -2522,7 +2522,7 @@ case $whicherp in
 		zyppercheck ${PIPESTATUS[0]}
 	
 		# Apache FCGID-Modul aktivieren, wenn nicht bereits geschehen
-		if [[ -z `a2enmod -l | grep fcgid`]]; then
+		if [[ -z `a2enmod -l | grep fcgid` ]]; then
 			a2enmod fcgid
 		    /etc/init.d/apache2 reload 2>&1 |pgbox
 		fi
