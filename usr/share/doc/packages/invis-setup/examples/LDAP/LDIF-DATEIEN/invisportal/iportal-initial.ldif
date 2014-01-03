@@ -40,7 +40,7 @@ objectClass: iPortEntry
 iPortEntryName: ZarafaAcc
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/webaccess
-iPortEntryDescription: Die Groupware "Zarafa" bietet auf E-Mails, Terminkalender, Augabenverwaltung und Notizen im Oulook "Look & Feel". 
+iPortEntryDescription: Der klassische Webaccess der Groupware "Zarafa" bietet auf E-Mails, Terminkalender, Augabenverwaltung und Notizen im Oulook "Look & Feel". 
 iPortEntryActive: ZARAFATRUE
 iPortEntryPosition: Lokal
 iPortEntryButton: Groupware
@@ -53,21 +53,20 @@ objectClass: iPortEntry
 iPortEntryName: ZarafaApp
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/webapp
-iPortEntryDescription: Die Groupware "Zarafa" bietet auf E-Mails, Terminkalender, Augabenverwaltung und Notizen im Oulook "Look & Feel". 
+iPortEntryDescription: Die moderne Webapp der Groupware "Zarafa" bietet auf E-Mails, Terminkalender, Augabenverwaltung und Notizen in frischem "Look & Feel". 
 iPortEntryActive: ZARAFATRUE
 iPortEntryPosition: Lokal
 iPortEntryButton: Groupware
 iPortEntryPriv:	user
 
-
-# ERP LX-Office
-dn: iPortEntryName=LX-Office,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+# ERP Kivitendo
+dn: iPortEntryName=Kivitendo,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
 objectClass: iPortEntry
-iPortEntryName: LX-Office
+iPortEntryName: Kivitendo
 iPortEntrySSL: FALSE
-iPortEntryURL: [servername]/lxerp
-iPortEntryDescription: Das ERP Progamm LX-Office umfasst Warenwirtschaft, Rechnungswesen, Umsatzsteuervoranmeldung, Einnahme-Überschuss-Berechnung und Bilanzen inklusive DATEV-Export.
+iPortEntryURL: [servername]/kivitendo-erp
+iPortEntryDescription: Das ERP Progamm Kivitendo umfasst Warenwirtschaft, Rechnungswesen, Umsatzsteuervoranmeldung, Einnahme-Überschuss-Berechnung und Bilanzen inklusive DATEV-Export.
 iPortEntryActive: LXTRUE
 iPortEntryPosition: Lokal
 iPortEntryButton: Warenwirtschaft
