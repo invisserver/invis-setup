@@ -2077,13 +2077,13 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     chmod 0700 /var/lib/cornaz/inuse/.fetchmailrc		2>&1|tee -a $setupdir/sine.log |pgbox
     chown fetchmail /var/lib/cornaz/inuse/.fetchmailrc	2>&1|tee -a $setupdir/sine.log |pgbox
 
-    # Webserver fuer worker-MPM konfigurieren
-    a2enmod -d php5
+    # Webserver fuer prefork-MPM konfigurieren
+    #a2enmod -d php5
     a2enmod fcgid
     a2enmod rewrite
     path="/etc/sysconfig/"
     file="apache2"
-    strings="APACHE_MPM=\"\"%APACHE_MPM=\"worker\""
+    strings="APACHE_MPM=\"\"%APACHE_MPM=\"prefork\""
     changevalues $path $file "$strings"
     a2enflag FCGID
     a2enflag SSL
