@@ -2153,7 +2153,7 @@ firewall() {
     windowtitle="Firewall"
 
     # Kopieren und anpassen der Firewall Konfiguration
-    cp $cfilesdir/firewall/SuSEfirewall2 /etc/sysconfig/
+    cp $cfilesdir/System/sysconfig/SuSEfirewall2 /etc/sysconfig/
     file="SuSEfirewall2"
     path="/etc/sysconfig"
     nw=`getconfdata "Networkbase" "2"`
