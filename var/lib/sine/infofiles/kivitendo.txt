@@ -1,10 +1,11 @@
-Lx-Office ERP - Freie Warenwirtschaft und Finanzbuchhaltung.
+Kivitendo ERP - Freie Warenwirtschaft und Finanzbuchhaltung.
+(ehemals LX-Office)
 
-Lx-Office ERP ist eine browserbasierte Warenwirtschafts- und
+Kivitendo ERP ist eine browserbasierte Warenwirtschafts- und
 Finanzbuchhaltungssoftware. Die OpenSource Software hat einen modularen Aufbau
 und ist innerhalb kurzer Zeit auf den Einsatz in ihrem Unternehmen angepaßt.
 Erweiterung um individuelle Funktionen ist jederzeit möglich.
-Durch die Verwendung eines Webbrowsers als Client ist Lx-Office
+Durch die Verwendung eines Webbrowsers als Client ist Kivitendo
 betriebssystemunabhängig einsetzbar.
 Linzenz: GPL
 Features der Warenwirtschaft
@@ -22,9 +23,9 @@ Features der Warenwirtschaft
     * Verschiedenste Auswertungen
     * und vieles mehr
 
-Lx-Office ERP wird seit 2003 aktiv entwickelt. Die enge Verbindung zwischen
+Kivitindo ERP wird seit 2003 aktiv entwickelt. Die enge Verbindung zwischen
 Entwicklern und Anwendern gewährleistet eine zielgerichtete Weiterentwicklung
-des Produkts. Ein besonderer Pluspunkt von Lx-Office ist die sehr gute
+des Produkts. Ein besonderer Pluspunkt von Kivitendo ist die sehr gute
 Verknüpfung von Warenwirtschaft und Finanzbuchhaltung. Viele Vorgänge können auf
 diese Art automatisiert und Fehlerquellen eliminiert werden.
 Features der Finanzbuchhaltung

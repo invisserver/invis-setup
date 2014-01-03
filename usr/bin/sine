@@ -533,7 +533,7 @@ Wählen Sie die von Ihnen bevorzugten Samba Pakete aus." 14 85 5 \
     dialog --backtitle "$dialogtitle" --title "Enterprise Ressource Planning Software" --radiolist "$dialogshorthelp\n\n
 Wählen Sie die von Ihnen bevorzugte ERP-Software (Warenwirtschaftssystem) aus." 14 85 5 \
 	OpenERP "Modern und Modular" off\
-	LX-ERP "Konzentriert sich auf Handel und Finazbuchhaltung, wenig modular." off\
+	Kivitendo "Konzentriert sich auf Handel und Finanzbuchhaltung, wenig modular." off\
 	waWision "Moderne ERP Lösung für Handel und Dienstleistung inkl. Webshop-Schnittstelle." on\
 	Keine "Sie verwenden ein eigenes System" off\
 	2>$0_temp
@@ -2504,112 +2504,119 @@ erp() {
 whicherp=`getconfdata "ERPSoftware" "2"`
 case $whicherp in
 
-    "lx-erp" )
+    "kivitendo" )
 	# PostgreSQL in RL eintragen, wenn noch nicht geschehen
 	srvon=`chkconfig postgresql|grep " on"`
 	if [[ -z $srvon ]]; then chkservice "postgresql"; fi
-	    lxerpversion="2.7.0"
+	    #lxerpversion="2.7.0"
 	    cd $setupdir
 	    clear
-	    windowtitle="LX-ERP Installation"
-	    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/lx-erp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie LX-ERP installieren?" 0 0
+	    windowtitle="Kivitendo Installation"
+	    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/kivitendo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie LX-ERP installieren?" 0 0
 	    cont=${?}
 
 	    if [[ $cont == "0" ]]; then
 		pgsubtitle="Zusätzliche Software wird installiert"
 		zypper refresh 2>&1 |pgbox
-		zypper -n install -n `cat $setupdir/zypper-package-lists/lx-office` 2>&1 |pgbox
+		zypper -n install -n `cat $setupdir/zypper-package-lists/kivitendo` 2>&1 |pgbox
 		zyppercheck ${PIPESTATUS[0]}
 	
-		# Apache FCGID-Modul aktivieren
-		a2enmod fcgid
-		/etc/init.d/apache2 reload 2>&1 |pgbox
-	
+		# Apache FCGID-Modul aktivieren, wenn nicht bereits geschehen
+		if [[ -z `a2enmod -l | grep fcgid`]]; then
+			a2enmod fcgid
+		    /etc/init.d/apache2 reload 2>&1 |pgbox
+		fi
+		# to be removed
 		# Automatischer Download
-    		dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen LX-Office automatisch herunterzuladen?" 0 0
-		download=${?}
-		if [[ $download == "0" ]]; then
+    		#dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen LX-Office automatisch herunterzuladen?" 0 0
+		#download=${?}
+		#if [[ $download == "0" ]]; then
 		    # Link für Download mit wget:
 		    #http://downloads.sourceforge.net/project/lx-office/Lx-Office%20ERP/2.7.0/lx-office-erp-2.7.0.tar.gz
-		    wget http://downloads.sourceforge.net/project/lx-office/Lx-Office%20ERP/$lxerpversion/lx-office-erp-$lxerpversion.tar.gz 2>&1 |pgbox
-		fi
+		#    wget http://downloads.sourceforge.net/project/lx-office/Lx-Office%20ERP/$lxerpversion/lx-office-erp-$lxerpversion.tar.gz 2>&1 |pgbox
+		#fi
 
 		# Entpacken des lx-office-erp Archivs
-    		getpath=`find $setupdir -name "lx-office-erp*.tar*"`
-		if [[ ! -f $getpath ]]; then
-        	    dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Das LX-ERP Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum LX-ERP Archiv an:" 0 0 \ 2> $0_temp
-        	    getpath=`cat $0_temp`
-    		fi
-		if [[ -f $getpath ]]; then
-		    pgsubtitle="LX-ERP wird entpackt und installiert."
-		    tar -xvf $getpath -C . 2>&1 | tee -a $setupdir/sine.log | pgbox
-		    mv $setupdir/lxoffice-erp-$lxerpversion /srv/www/htdocs/lxerp
-		    chown -R wwwrun:www /srv/www/htdocs/lxerp
-		    cp $cfilesdir/lxerp/lx_office.conf /srv/www/htdocs/lxerp/config/lx_office.conf
-		    cp $cfilesdir/lxerp/lx-office-task-server /etc/init.d/
+    		#getpath=`find $setupdir -name "lx-office-erp*.tar*"`
+		#if [[ ! -f $getpath ]]; then
+        	#    dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Das LX-ERP Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum LX-ERP Archiv an:" 0 0 \ 2> $0_temp
+        	#    getpath=`cat $0_temp`
+    		#fi
+		#if [[ -f $getpath ]]; then
+		#    pgsubtitle="LX-ERP wird entpackt und installiert."
+		#    tar -xvf $getpath -C . 2>&1 | tee -a $setupdir/sine.log | pgbox
+		#    mv $setupdir/lxoffice-erp-$lxerpversion /srv/www/htdocs/lxerp
+		#    chown -R wwwrun:www /srv/www/htdocs/lxerp
+		#    cp $cfilesdir/lxerp/lx_office.conf /srv/www/htdocs/lxerp/config/lx_office.conf
+		#    cp $cfilesdir/lxerp/lx-office-task-server /etc/init.d/
 
-		    msgbox "Der LX-Office Taskserver wird ins Runklevelkonzept integriert.
-Sein Start wird solange fehlschlagen, bis Sie einen gültigen LX-Office Benutzernamen in
-/srv/www/htdocs/lxerp/config/lx_office.conf eingetragen haben." "$windowtitle"
+		# Kivitendo Konfiguration vorbereiten
+		cp $cfilesdir/kivitendo-erp/kivitendo.conf /srv/www/htdocs/kivitendo-erp/config/kivitendo.conf
 
-		    chkservice "lx-office-task-server"
+		msgbox "Der Kivitendo Taskserver wird ins Runklevelkonzept integriert.
+Sein Start wird solange fehlschlagen, bis Sie einen gültigen Kivitendo Benutzernamen in
+/srv/www/htdocs/kivitendo-erp/config/kivitendo.conf eingetragen haben." "$windowtitle"
 
-		    msgbox "Es wird ein Postgresql-Benutzer - lxoffice - für LX-Office angelegt. 
+		#cp /srv/www/htdocs/kivitendo-erp/scripts/boot/systemd/kivitendo-task-server.service /usr/lib/systemd/system/
+		chkservice "kivitendo-task-server"
+
+		msgbox "Es wird ein Postgresql-Benutzer - kivitendo - für Kivitendo angelegt. 
 Vergessen Sie bitte nicht das hierbei von Ihnen zu vergebende Passwort. ;-)" "$windowtitle"
-		    sudo -u postgres createuser -d -r -S -P lxoffice
-		    ok=0
-		    while (( $ok != "1" ));do
-			dialog --backtitle "$dialogtitle" --title "LX-Office-DB Passwort" --insecure --passwordform "$dialogshorthelp\n\n
+		sudo -u postgres createuser -d -r -S -P kivitendo
+		ok=0
+		while (( $ok != "1" ));do
+		    dialog --backtitle "$dialogtitle" --title "Kivitendo-DB Passwort" --insecure --passwordform "$dialogshorthelp\n\n
 Bitte geben Sie dass soeben vergebene Passwort für den LX-Office Datenbankbenutzer zur weiteren Verwendung erneut ein.\n\n" 17 64 2 \
-			"LX-Office-DB-Passwort:" 2 2 "" 2 23 10 0\
-			"Kontrolle:" 2 36 "" 2 47 10 0\
-			2>$0_temp
-			lxpassword=(`cat $0_temp`)
-			if [[ ${lxpassword[0]} == ${lxpassword[1]} ]];then
-			    ok=1
-			fi
-		    done
-		    lxpw="${lxpassword[0]}"
-
-		    pgsubtitle="Datenbanken werden angelegt"
-		    cp /$cfilesdir/lxerp/function.sql /tmp
-		    chmod o+r /tmp/function.sql
-		    cd /tmp
-		    sudo -u postgres psql template1 -f /tmp/function.sql 2>&1 | tee -a $setupdir/sine.log | pgbox
-		    rm -f /tmp/function.sql
-		    cd $setupdir
-		    dialog --backtitle "$dialogtitle" --title "$windowtitle" --radiolist "$dialogshorthelp\n\n
-Legen Sie jetzt bitte fest auf welche Art LX-Office Benutzer authentifiziert werden.\n
-Da LX-Office nur eine 1 zu 1 Zuordnung von Benutzer zu Datenbank zulässt, ist die LDAP-Authentifizierung nur
-dann sinnvoll, wenn lediglich mit einer LX-Office Datenbank gearbeitet wird."  16 80 8 \
-		    SQL "Benutzerverwaltung über eigene Authentifizierungsdatenbank" on\
-		    LDAP "Anbindung an die vorhandene LDAP Benutzerverwaltung" off\
+		    "Kivitendo-DB-Passwort:" 2 2 "" 2 23 10 0\
+		    "Kontrolle:" 2 36 "" 2 47 10 0\
 		    2>$0_temp
-		    lxauth=`cat $0_temp`
-		    path="/srv/www/htdocs/lxerp/config"
-		    file="lx_office.conf"
-		    if [[ $lxauth == "LDAP" ]]; then
-			basedn=`getconfdata "baseDN" "2"`
-			strings="dc=invis-net,dc=loc%$basedn"
-			changevalues $path $file "$strings"
-			strings="module = DB%module = LDAP"
-			changevalues $path $file "$strings"
-			ldapadminpw=`getconfdata "AdminPW" "2"`
-			strings="admin_secret%$ldapadminpw"
-			changevalues $path $file "$strings"
+		    lxpassword=(`cat $0_temp`)
+		    if [[ ${lxpassword[0]} == ${lxpassword[1]} ]];then
+			ok=1
 		    fi
+		done
+		lxpw="${lxpassword[0]}"
+
+		pgsubtitle="Datenbanken werden angelegt"
+		# to be removed
+		#cp /$cfilesdir/lxerp/function.sql /tmp
+		#chmod o+r /tmp/function.sql
+		#cd /tmp
+		#sudo -u postgres psql template1 -f /tmp/function.sql 2>&1 | tee -a $setupdir/sine.log | pgbox
+		#rm -f /tmp/function.sql
+		cd $setupdir
+		dialog --backtitle "$dialogtitle" --title "$windowtitle" --radiolist "$dialogshorthelp\n\n
+Legen Sie jetzt bitte fest auf welche Art Kivitendo Benutzer authentifiziert werden.\n
+Da Kivitendo nur eine 1 zu 1 Zuordnung von Benutzer zu Datenbank zulässt, ist die LDAP-Authentifizierung nur
+dann sinnvoll, wenn lediglich mit einer Kivitendo Datenbank gearbeitet wird."  16 80 8 \
+		SQL "Benutzerverwaltung über eigene Authentifizierungsdatenbank" on\
+		LDAP "Anbindung an die vorhandene LDAP Benutzerverwaltung" off\
+		2>$0_temp
+		lxauth=`cat $0_temp`
+		path="/srv/www/htdocs/kivitendo-erp/config"
+		file="kivitendo.conf"
+		if [[ $lxauth == "LDAP" ]]; then
+		    basedn=`getconfdata "baseDN" "2"`
+		    strings="dc=invis-net,dc=loc%$basedn"
+		    changevalues $path $file "$strings"
+		    strings="module = DB%module = LDAP"
+		    changevalues $path $file "$strings"
+		    ldapadminpw=`getconfdata "AdminPW" "2"`
+		    strings="admin_secret%$ldapadminpw"
+		    changevalues $path $file "$strings"
+		fi
 		strings="lxpass%$lxpw"
 		changevalues $path $file "$strings"
-	    else 
-		msgbox "LX-ERP Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
-		exit
-	    fi
+	    #else 
+		#msgbox "LX-ERP Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
+		#exit
+	    #fi
 
 	    writeprepstat "faxgate"
 	    waitbox "erp" "faxgate"
 	
 	else
-	    msgbox "LX-ERP Installation übersprungenen" "$windowtitle"
+	    msgbox "Kivitendo Installation übersprungenen" "$windowtitle"
 	    writeprepstat "faxgate"
 	fi 
 	;;
