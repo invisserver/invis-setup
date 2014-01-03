@@ -2131,7 +2131,7 @@ postgresqlserver() {
     pgsubtitle="PostgreSQL \"vorübergehend\" starten."
     /etc/init.d/postgresql start 2>&1|tee -a $setupdir/sine.log |pgbox
 
-    # Konfigurationsdateien kopieren -> sind für lx-office vorbereitet.
+    # Konfigurationsdateien kopieren -> sind fuer kivitendo vorbereitet.
     cp $cfilesdir/sql/postgresql/*.conf /var/lib/pgsql/data 2>&1 |tee -a $setupdir/sine.log
     chown -R postgres:postgres /var/lib/pgsql/ 2>&1 |tee -a $setupdir/sine.log
     # Postgresql neu starten
