@@ -364,7 +364,7 @@ Achtung: Fehlerhafte Eingaben sind nach der vollständigen Installation nur sehr
 	done
 	
 	yesno "Prüfen Sie bitte genau ob die folgenden Angaben korrekt sind.\n
-	\nIP-Adresse(intern):     $ipaddr
+	\nIP-Adresse(intern):   $ipaddr
 	\nNetzwerkbasis:        $netaddr
 	\nNetzwerkmaske (lang): $longnmask / (kurz): $shortnmask
 	\nBroadcast-Adresse:    $bcastaddr
@@ -522,7 +522,7 @@ Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
     # Zur Auswahl stehen Pakete des openSUSE-Samba:Stable Repos oder die Pakete von Sernet
     dialog --backtitle "$dialogtitle" --title "Samba File Server" --radiolist "$dialogshorthelp\n\n
 Wählen Sie die von Ihnen bevorzugten Samba Pakete aus." 14 85 5 \
-	openSUSE-Stable "Immer aktuelle Versionen, kürzere Maintenance." on\
+	openSUSE "Distributionsversion, kürzere Maintenance." on\
 	Sernet "Samba4 LTS-Pakete für openSUSE 13.1 von Sernet." off\
 	2>$0_temp
 	whichsamba=`cat $0_temp`
@@ -532,9 +532,9 @@ Wählen Sie die von Ihnen bevorzugten Samba Pakete aus." 14 85 5 \
     # Es kann zwischen LX-ERP, OpenERP oder keiner ERP-Software entschieden werden
     dialog --backtitle "$dialogtitle" --title "Enterprise Ressource Planning Software" --radiolist "$dialogshorthelp\n\n
 Wählen Sie die von Ihnen bevorzugte ERP-Software (Warenwirtschaftssystem) aus." 14 85 5 \
-	OpenERP "Modern und Modular" off\
 	Kivitendo "Konzentriert sich auf Handel und Finanzbuchhaltung, wenig modular." off\
 	waWision "Moderne ERP Lösung für Handel und Dienstleistung inkl. Webshop-Schnittstelle." on\
+	OpenERP "Modern und Modular (noch nicht implementiert)" off\
 	Keine "Sie verwenden ein eigenes System" off\
 	2>$0_temp
 	whicherp=`cat $0_temp`
@@ -649,7 +649,7 @@ Sollen alte Dateien und Verzeichnisse automatisch aus der Transfer-Freigabe gel�
     if [[ $cleantr == "0" ]]; then
 	dialog --backtitle "$dialogtitle" --title "Transferverzeichnis aufräumen" --radiolist "Wie alt dürfen Dateien und Verzeichnisse in der Transferfreigabe maximal werden?" 12 50 4\
 	"21 Tage" "3 Wochen" on\
-	"62 Tage" "6 Wochen" off\
+	"42 Tage" "6 Wochen" off\
 	"90 Tage" "3 Monate" off\
 	2>$0_temp
 	trdays=`cat $0_temp|cut -d " " -f1`
