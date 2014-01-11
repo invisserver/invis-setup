@@ -1,8 +1,8 @@
-Cmnd_Alias CREATEHOME  = /usr/local/sbin/createhome
+Cmnd_Alias CREATEHOME  = /usr/sbin/createhome
 wwwrun ALL=NOPASSWD:CREATEHOME
-Cmnd_Alias DELETEHOME = /usr/local/sbin/deletehome
+Cmnd_Alias DELETEHOME = /usr/sbin/deletehome
 wwwrun ALL=NOPASSWD:DELETEHOME
-Cmnd_Alias CREATEGROUPSHARE = /usr/local/sbin/creategroupshare
+Cmnd_Alias CREATEGROUPSHARE = /usr/sbin/creategroupshare
 wwwrun ALL=NOPASSWD:CREATEGROUPSHARE
 Cmnd_Alias FETCHPHP = /var/lib/cornaz/bin/fetchcopy
 wwwrun ALL=NOPASSWD:FETCHPHP

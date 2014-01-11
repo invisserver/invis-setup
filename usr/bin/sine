@@ -164,7 +164,7 @@ smbldappw() {
     exitcode=1
     clear
     while [[ $exitcode != 0 ]]; do
-	/usr/sbin/smbldap-passwd $1
+	smbldap-passwd $1
 	exitcode=${?}
     done
 }
@@ -178,7 +178,7 @@ check() {
 	windowtitle="Software Installation"
 	msgbox "Es wird alle für den invis Server benötigte Software installiert." "Software Installation"
 	# Schlüssel der neuen Repositories importieren
-	/usr/bin/rpmkeyimporter
+	rpmkeyimporter
         ## zypper repo-Cache aktualisieren und Update fahren
         pgsubtitle="Repository-Cache wird aktualisiert"
         zypper refresh 2>&1| tee -a $setupdir/sine.log | pgbox
@@ -215,7 +215,7 @@ check() {
 	changevalues $path $file "$strings"
 	cp $cfilesdir/System/sysconfig/network/servers-netconfig /var/run/ntp
 	chkservice "ntp"
-        /sbin/hwclock --systohc
+        hwclock --systohc
 
         # cron & at-Daemon in Runlevel integrieren und starten
 	chkservice "cron"
@@ -332,7 +332,7 @@ Achtung: Fehlerhafte Eingaben sind nach der vollständigen Installation nur sehr
 	domain="${netvalues[1]}"
 	ipaddr="${netvalues[2]}"
 	longnmask="${netvalues[3]}"
-	shortnmask=`/usr/bin/netcalc $longnmask`
+	shortnmask=`netcalc $longnmask`
 	netaddr=`ipcalc -bn ${netvalues[2]}/$longnmask | grep "^Network:"|tr -s " "| cut -d " " -f2|cut -d "/" -f1`
 	bcastaddr=`ipcalc -bn ${netvalues[2]}/$longnmask | grep "^Broadcast:"|tr -s " "| cut -d " " -f2`
 	dp1=`echo "$domain" | cut -d "." -f 1`
@@ -660,10 +660,10 @@ Sollen alte Dateien und Verzeichnisse automatisch aus der Transfer-Freigabe gel�
 
 #---# Ende der Fragestunde
 
-    sshport=`/usr/bin/freeports`
-    httpsport=`/usr/bin/freeports`
+    sshport=`freeports`
+    httpsport=`freeports`
     while [[ $sshport == $httpsport ]]; do
-	httpsport=`/usr/bin/freeports`
+	httpsport=`freeports`
     done
  
     msgbox "Für den externen Zugriff auf Server per SSH oder HTTPS wurden per Zufallsgenerator vom Standard abweichende Ports ermittelt. Dies erhöht die Sicherheit des Servers.\n\n
@@ -693,11 +693,11 @@ Aus Ihrem lokalen Netz heraus kann für SSH weiter Port 22 verwendet werden." "S
     echo "ReverseDom:$revnet" >> $setupdir/invis_confdata
     echo "Forwarders:$forwarders"  >> $setupdir/invis_confdata
 
-    manpasshash=`/usr/sbin/slappasswd -s $manpass`
+    manpasshash=`slappasswd -s $manpass`
     echo "ManagerPW:$manpass:$manpasshash" >> $setupdir/invis_confdata
-    masterpasshash=`/usr/sbin/slappasswd -s $masterpass`
+    masterpasshash=`slappasswd -s $masterpass`
     echo "MasterPW:$masterpass:$masterpasshash" >> $setupdir/invis_confdata
-    adminpasshash=`/usr/sbin/slappasswd -s $adminpass`
+    adminpasshash=`slappasswd -s $adminpass`
     echo "AdminPW:$adminpass:$adminpasshash" >> $setupdir/invis_confdata
     echo "MySQLpw:$mysqlpw" >> $setupdir/invis_confdata
     echo "NtopPw:$ntoppw" >> $setupdir/invis_confdata
@@ -810,8 +810,8 @@ sysprep() {
 	zypper -n install -n antivir 2>&1| tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 	pgsubtitle="Die Antivir Lizenzdatei wird heruntergeladen und Avira Antivir wird aktualisiert"
-	/usr/local/sbin/fetchavkey 2>&1| tee -a $setupdir/sine.log | pgbox
-		cp /usr/bin/avupdate /etc/cron.hourly/ 2>&1| tee -a $setupdir/sine.log
+	fetchavkey 2>&1| tee -a $setupdir/sine.log | pgbox
+		cp avupdate /etc/cron.hourly/ 2>&1| tee -a $setupdir/sine.log
 	# Quick'n'Dirty -- SUID-Bit für avscan setzen
 	chmod u+s /usr/lib/AntiVir/guard/avscan 2>&1| tee -a $setupdir/sine.log
 	# Antivir-Konfiguration anpassen
@@ -884,34 +884,35 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     # Verzeichnis fuer dnssec Schluessel erzeugen
     mkdir -p /etc/ssl/ddns 2>&1| tee -a $setupdir/sine.log
 
+    # to be removed
     # Systemüberwachungstools werden installiert
-    cp /usr/bin/inetcheck /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/diskchecker /usr/local/bin/ 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/freeports /usr/local/bin/ 	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/alldump /usr/local/sbin/	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/dwdatasnapshot /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/scanleases /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/afterup /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/amacheck /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/avrun /usr/local/sbin/ 	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/clean_transfer /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/clean_recycle /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/serverkeys /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/fixpearchannel /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/fixbindchroot /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/mkdbsilent /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/umtsup /usr/local/sbin 	2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/fetchavkey /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
-    cp /usr/bin/safebootpart /usr/local/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/inetcheck /usr/bin/ 	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/diskchecker /usr/bin/ 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/freeports /usr/bin/ 	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/alldump /usr/sbin/	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/dwdatasnapshot /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/scanleases /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/afterup /usr/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/amacheck /usr/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/avrun /usr/sbin/ 	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/clean_transfer /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/clean_recycle /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/serverkeys /usr/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/fixpearchannel /usr/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/fixbindchroot /usr/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/mkdbsilent /usr/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/umtsup /usr/sbin 	2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/fetchavkey /usr/sbin 2>&1| tee -a $setupdir/sine.log
+    #cp /usr/bin/safebootpart /usr/sbin 2>&1| tee -a $setupdir/sine.log
 
     # Konfiguration fuer Notfall-Internetzugang via Handy und T-Mobile (Teathering)
     cp $cfilesdir/invis/wvd_tmobile.conf /etc/invis 2>&1| tee -a $setupdir/sine.log
 
-    chown -R root:root /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-    chmod -R ug+x /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #chown -R root:root /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #chmod -R ug+x /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
 
-    chown -R root:root /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
-    chmod -R a+x /usr/local/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #chown -R root:root /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
+    #chmod -R a+x /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
 
     # PHP ini-Dateien anpassen
     cp $cfilesdir/webserver/apache2/php.ini /etc/php5/apache2/ 2>&1| tee -a $setupdir/sine.log
@@ -929,7 +930,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     ln -s /etc/php5/fastcgi /etc/php5/fpm
 
 #    pgsubtitle="PHP PEAR Channel Konfiguration wird aktualisiert"
-#    /usr/local/sbin/fixpearchannel 2>&1 | tee -a $setupdir/sine.log | pgbox
+#    /usr/sbin/fixpearchannel 2>&1 | tee -a $setupdir/sine.log | pgbox
 
     # invis cron-file wird installiert
     #cp $cfilesdir/invis/invis.cron /etc/cron.d/ 2>&1| tee -a $setupdir/sine.log
@@ -1057,7 +1058,7 @@ ldap() {
     msgbox "Es wird jetzt ein SSL-Schlüsselsatz für Ihren LDAP-Server erzeugt.\n\n
 Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." "Erzeugen des LDAP-Server Schlüsselsatzes"
 
-    /usr/local/sbin/serverkeys ldap 2>&1| tee -a $setupdir/sine.log
+    serverkeys ldap 2>&1| tee -a $setupdir/sine.log
     chown -R :pkeys /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
     chmod g+rx /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
     usermod -a -G pkeys ldap 2>&1| tee -a $setupdir/sine.log
@@ -1202,24 +1203,25 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
     pgsubtitle="Das LDAP Verzeichnis wird aufgebaut"
     { for x in $path/*; do
 	#echo $x
-	/usr/sbin/slapadd -l $x
+	slapadd -l $x
     done } 2>&1| tee -a $setupdir/sine.log | pgbox
     
     #Der openLDAP-Server wird ins Runlevel-Konzept übernommen und gestartet
     pgsubtitle="Der LDAP Dienst wird initialisiert"
-    /usr/sbin/slapindex -f /etc/openldap/slapd.conf 2>&1| tee -a $setupdir/sine.log | pgbox
+    slapindex -f /etc/openldap/slapd.conf 2>&1| tee -a $setupdir/sine.log | pgbox
     chkservice "ldap"
     
     # phpldapadmin konfigurieren
     # Installation entfaellt, da es per rpm installiert wird.
     cp $cfilesdir/LDAP/phpldapadmin/config.php /srv/www/htdocs/phpldapadmin/config/
 
-    cp /usr/bin/addaddress /usr/local/sbin/
-    cp /usr/bin/addcn.pl /usr/local/sbin/
-    cp /usr/bin/buildpostaladdress.pl /usr/local/sbin/
+    # to be removed
+    #cp /usr/bin/addaddress /usr/sbin/
+    #cp /usr/bin/addcn.pl /usr/sbin/
+    #cp /usr/bin/buildpostaladdress.pl /usr/sbin/
     
-    chown -R root:root /usr/local/sbin
-    chmod -R ug+x /usr/local/sbin
+    #chown -R root:root /usr/sbin
+    #chmod -R ug+x /usr/sbin
     
     writeprepstat "dns"
     waitbox "ldap" "dns"
@@ -1361,7 +1363,7 @@ mailserver() {
     msgbox "Es wird jetzt ein SSL-Schlüsselsatz für Ihren Mailserver erzeugt.\n\n
 Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." "Erzeugen des Mailserver Schlüsselsatzes"
 
-    /usr/local/sbin/serverkeys ms 2>&1| tee -a $setupdir/sine.log
+    serverkeys ms 2>&1| tee -a $setupdir/sine.log
     chown :pkeys /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
     chmod g+rx /etc/ssl/private 2>&1| tee -a $setupdir/sine.log
     usermod -a -G pkeys postfix 2>&1| tee -a $setupdir/sine.log
@@ -1448,10 +1450,11 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    # Symbolischen Link auf das z-push2 Verzeichnis anlegen
 	    ln -s /srv/www/htdocs/z-push2 /srv/www/htdocs/z-push
 	    
+	    # to be removed
 	    # Datensicherungstools installieren
-	    cp /usr/bin/zbackup /usr/local/sbin
-	    cp /usr/bin/zdbdump /usr/local/sbin
-	    chown root:root /usr/local/sbin/z*
+	    #cp /usr/bin/zbackup /usr/sbin
+	    #cp /usr/bin/zdbdump /usr/sbin
+	    #chown root:root /usr/sbin/z*
 	
 	    rm -f `ls /etc/postfix/ |grep "main.[dovecot|cyrus]"` 2>&1| tee -a $setupdir/sine.log
 	    mv /etc/postfix/main.zarafa /etc/postfix/main.cf 2>&1| tee -a $setupdir/sine.log
@@ -1495,7 +1498,7 @@ esac
     domain=`getconfdata "Domain" "2"`
     strings="i5-net.loc%$domain"
     changevalues $path $file "$strings"
-    /usr/sbin/postmap $path/$file
+    postmap $path/$file
     
     file="s-canonical.cf"
     basedn=`getconfdata "baseDN" "2"`
@@ -1615,7 +1618,7 @@ samba() {
     # Setzen des LDAP Zugangspasswort
     masterpw=`getconfdata "MasterPW" "2"`
     pgsubtitle="Samba erhält das LDAP-Administrationspasswort"
-    /usr/bin/smbpasswd -w $masterpw 2>&1| tee -a $setupdir/sine.log | pgbox
+    smbpasswd -w $masterpw 2>&1| tee -a $setupdir/sine.log | pgbox
 
     # Logon-Scripts werden kopiert und ins DOS-Format ueberfuehrt
     cp $cfilesdir/fileserver/samba/logon-scripts/*.cmd /var/lib/samba/netlogon
@@ -1640,7 +1643,7 @@ samba() {
     changevalues $path $file "$strings"
 
     # Ermitteln der Domänen-SID und eintragen derselben in die smbldap-tools Konfiguration
-    sid=`/usr/bin/net getlocalsid|cut -d ":" -f 2`
+    sid=`net getlocalsid|cut -d ":" -f 2`
     sid=`echo $sid|tr -d " "`
     path="/etc/smbldap-tools"
     file="smbldap.conf"
@@ -1681,7 +1684,7 @@ samba() {
 
     # Bevölkern der Domäne mit den smbldap-tools. Minimale UID,GID & RID auf 3000 gesetzt, damit group-e die User gleich sieht.
     pgsubtitle="Die Samba Domäne wird aufgebaut."
-    /usr/sbin/smbldap-populate -u 3000 -g 3000 -r 3000 2>&1| tee -a $setupdir/sine.log |pgbox
+    smbldap-populate -u 3000 -g 3000 -r 3000 2>&1| tee -a $setupdir/sine.log |pgbox
 
     # Um über Samba neue Benutzer beispielsweise Maschinen-Konten beim Domaenenbeitritt on the fly erzeugen zu können
     # benötigt Samba root-Rechte. Dafür wird im LDAP ein zweites root-Benutzerkonto angelegt.
@@ -1702,16 +1705,16 @@ samba() {
 
     pgsubtitle="Es werden die Gruppen All und Verwaltung angelegt"
     # Gruppe All fuer Group-e anlegen
-    /usr/sbin/smbldap-groupadd -a All -g 3000 2>&1| tee -a $setupdir/sine.log |pgbox
+    smbldap-groupadd -a All -g 3000 2>&1| tee -a $setupdir/sine.log |pgbox
     # Anlegen der Gruppe Verwaltung
-    /usr/sbin/smbldap-groupadd -a Verwaltung 2>&1| tee -a $setupdir/sine.log |pgbox
+    smbldap-groupadd -a Verwaltung 2>&1| tee -a $setupdir/sine.log |pgbox
 
     # Anlegen der Gruppe Verwaltung
-    /usr/sbin/smbldap-groupadd -a mobilusers 2>&1| tee -a $setupdir/sine.log |pgbox
+    smbldap-groupadd -a mobilusers 2>&1| tee -a $setupdir/sine.log |pgbox
 
     pgsubtitle="Es wird ein Benutzkonto für den Domänen Administrator \"domadmin\" angelegt."
     # Anlegen des Domaenenadministrators
-    /usr/sbin/smbldap-useradd -m -a -G "Domain Admins" -E admin.cmd -c "Windows Domaenen Administrator" domadmin 2>&1| tee -a $setupdir/sine.log |pgbox
+    smbldap-useradd -m -a -G "Domain Admins" -E admin.cmd -c "Windows Domaenen Administrator" domadmin 2>&1| tee -a $setupdir/sine.log |pgbox
     msgbox "Geben Sie ein Passwort für \"domadmin\" ein."
 
     # Passwort fuer domadmin setzen
@@ -1721,13 +1724,13 @@ samba() {
     sss_cache -UG
 
     #Anpassen der Besitzrechte der Freigaben
-    /bin/chown -R root:"Domain Users" /srv/shares/archiv 2>&1| tee -a $setupdir/sine.log
-    /bin/chown -R root:"Domain Users" /srv/shares/gruppen 2>&1| tee -a $setupdir/sine.log
-    /bin/chown -R root:"Domain Users" /srv/shares/projekte 2>&1| tee -a $setupdir/sine.log
-    /bin/chown -R root:"Domain Users" /srv/shares/media 2>&1| tee -a $setupdir/sine.log
-    /bin/chown -R root:"Domain Admins" /srv/shares/service 2>&1| tee -a $setupdir/sine.log
-    /bin/chown -R root:"Domain Guests" /srv/shares/transfer 2>&1| tee -a $setupdir/sine.log
-    /bin/chown -R root:"Verwaltung" /srv/shares/verwaltung 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Domain Users" /srv/shares/archiv 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Domain Users" /srv/shares/gruppen 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Domain Users" /srv/shares/projekte 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Domain Users" /srv/shares/media 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Domain Admins" /srv/shares/service 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Domain Guests" /srv/shares/transfer 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Verwaltung" /srv/shares/verwaltung 2>&1| tee -a $setupdir/sine.log
 
     # Zielverzeichnis fuer aschenputtel anlegen
     mkdir -p -m 2770 /srv/shares/portal/uploads 2>&1| tee -a $setupdir/sine.log
@@ -1737,9 +1740,9 @@ samba() {
     chown domadmin:"Domain Users" /srv/shares/portal/downloads 2>&1| tee -a $setupdir/sine.log
 
     #Printer-Scripts kopieren
-    find /usr/share/doc/packages/ -type f -name smb*.pl -exec cp '{}' /usr/local/sbin/ \; 2>&1| tee -a $setupdir/sine.log
-    chown root:"Domain Admins" /usr/local/sbin/*printer.pl 2>&1| tee -a $setupdir/sine.log
-    chmod ug+x /usr/local/sbin/*printer.pl 2>&1| tee -a $setupdir/sine.log
+    find /usr/share/doc/packages/ -type f -name smb*.pl -exec cp '{}' /usr/bin/ \; 2>&1| tee -a $setupdir/sine.log
+    chown root:"Domain Admins" /usr/bin/*printer.pl 2>&1| tee -a $setupdir/sine.log
+    chmod ug+x /usr/bin/*printer.pl 2>&1| tee -a $setupdir/sine.log
 
     #Verzeichnisrechte anpassen - Profilverzeichnisse
     chown root:"Domain Users" /var/lib/samba/profiles 2>&1| tee -a $setupdir/sine.log
@@ -1755,33 +1758,34 @@ samba() {
     # Testen, welche Groupware zum Einsatz kommt
     whichimap=`getconfdata "IMAPserver" "2"`
     
-    path="/usr/local/sbin"
-    file="manipgroups"
-    cp /usr/bin/$file $path/ 2>&1| tee -a $setupdir/sine.log
-    chown root:root $path/$file 2>&1| tee -a $setupdir/sine.log
-    chmod 0700 $path/$file 	2>&1| tee -a $setupdir/sine.log
+    # to be removed
+    #path="/usr/bin"
+    #file="manipgroups"
+    #cp /usr/bin/$file $path/ 2>&1| tee -a $setupdir/sine.log
+    #chown root:root $path/$file 2>&1| tee -a $setupdir/sine.log
+    #chmod 0700 $path/$file 	2>&1| tee -a $setupdir/sine.log
 
-    if [[ $whichimap != "zarafa" ]]; then
-        path="/usr/local/sbin"
-	file="addgeg"
-	cp /usr/bin/$file $path/
-	chown root:root $path/$file
-	chmod 0700 $path/$file
-	$path/$file 2>&1|tee -a $setupdir/sine.log
-    else
-        path="/usr/local/sbin"
-	file="addzag"
-	cp /usr/bin/$file $path/
-	chown root:root $path/$file
-	chmod 0700 $path/$file
-	$path/$file 2>&1|tee -a $setupdir/sine.log
-	file="extzu"
-	cp /usr/bin/$file $path/ 	2>&1| tee -a $setupdir/sine.log
-	chown root:root $path/$file 	2>&1| tee -a $setupdir/sine.log
-	chmod 0700 $path/$file 		2>&1| tee -a $setupdir/sine.log
-    fi
+    #if [[ $whichimap != "zarafa" ]]; then
+    #    path="/usr/bin"
+#	file="addgeg"
+#	cp /usr/bin/$file $path/
+#	chown root:root $path/$file
+#	chmod 0700 $path/$file
+#	$path/$file 2>&1|tee -a $setupdir/sine.log
+#    else
+#        path="/usr/bin"
+#	file="addzag"
+#	cp /usr/bin/$file $path/
+#	chown root:root $path/$file
+#	chmod 0700 $path/$file
+#	$path/$file 2>&1|tee -a $setupdir/sine.log
+#	file="extzu"
+#	cp /usr/bin/$file $path/ 	2>&1| tee -a $setupdir/sine.log
+#	chown root:root $path/$file 	2>&1| tee -a $setupdir/sine.log
+#	chmod 0700 $path/$file 		2>&1| tee -a $setupdir/sine.log
+#    fi
 
-    yesno "Auf Ihrem Server wurde ein Samba-PDC eingerichtet.\n\n
+    msgbox "Auf Ihrem Server wurde ein Samba-PDC eingerichtet.\n\n
 Es wurden grundlegende Gruppen und Systemaccounts angelegt.\nDer Server verfügt über die Freigaben:\n\n
     - Verwaltung: Freigabe für Mitglieder der gleichnamigen Gruppe.\n
     - Archiv: Ablageort für nicht mehr aktuelle Dateien.\n
@@ -1791,62 +1795,67 @@ Es wurden grundlegende Gruppen und Systemaccounts angelegt.\nDer Server verfügt
     - & Media: Freigabe für Multimedia-Dateien.\n\n
 Es wurde die Gruppe Verwaltung angelegt, sowie ein Benutzer domadmin, Mitglied der Gruppe Domain Admins.\n
 Ihr Server wurde darüber hinaus an die LDAP-Benutzerdatenbank angebunden.\n\n
-Sie können jetzt Benutzer anlegen. Alternativ lässt sich dies auch bequem über das invis Portal erledigen.\n\n
-Möchten Sie jetzt Benutzer anlegen?" "Benutzerkonten anlegen"
-    nextuser=${?}
+Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation abgeschlossen."
+
+#1800
+# to be removed
+#Möchten Sie jetzt Benutzer anlegen?" "Benutzerkonten anlegen"
+#    nextuser=${?}
     
-    while [[ $nextuser == "0" ]]; do
-	username=""
-	while (( ${#username} <= 3 )); do
-	    dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --form "$dialogshorthelp\n\n
-Geben Sie die folgenden Daten für den neuen Benutzer ein:" 18 74 7 \
-	    "Benutzername:" 2 2 "$mailrelay" 2 20 45 0\
-	    "Vorname:" 4 2 "$smtpun" 4 20 45 0\
-	    "Nachname:" 6 2 "$smtppw" 6 20 45 0\
-	    2>$0_temp
-	    uservalues=(`cat $0_temp`)
-	    username=${uservalues[0]}
-	done
-	yesno "Soll der neue Benutzer ein vollwertiger Benutzer sein? (Ansonsten wird nur ein Mail-Dummy-Konto eingerichtet)" "Benutzerkonten anlegen"
-	windows=${?}
-	if [[ $windows == "0" ]]; then  
-	    yesno "Soll der neue Benutzer Mitglied der privilegierten Gruppe \"Verwaltung\" sein?" "Benutzerkonten anlegen"
-	    verwaltung=${?}
-	fi
+#    while [[ $nextuser == "0" ]]; do
+#	username=""
+#	while (( ${#username} <= 3 )); do
+#	    dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --form "$dialogshorthelp\n\n
+#Geben Sie die folgenden Daten für den neuen Benutzer ein:" 18 74 7 \
+#	    "Benutzername:" 2 2 "$mailrelay" 2 20 45 0\
+#	    "Vorname:" 4 2 "$smtpun" 4 20 45 0\
+#	    "Nachname:" 6 2 "$smtppw" 6 20 45 0\
+#	    2>$0_temp
+#	    uservalues=(`cat $0_temp`)
+#	    username=${uservalues[0]}
+#	done
+#	yesno "Soll der neue Benutzer ein vollwertiger Benutzer sein? (Ansonsten wird nur ein Mail-Dummy-Konto eingerichtet)" "Benutzerkonten anlegen"
+#	windows=${?}
+#	if [[ $windows == "0" ]]; then  
+#	    yesno "Soll der neue Benutzer Mitglied der privilegierten Gruppe \"Verwaltung\" sein?" "Benutzerkonten anlegen"
+#	    verwaltung=${?}
+#	fi
 	
 	# Alle neuen Benutzer bekommen eine Willkommens-Mail zugesandt, dies dient der automatischen Erzeugung eines Maildirs.
-	if [[ $windows == "1" ]]; then
-	    /usr/sbin/smbldap-useradd -m -s /bin/false -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
-	elif [[ $verwaltung == "0" ]]; then
-	    /usr/sbin/smbldap-useradd -m -a -G "Verwaltung" -E verwaltung.cmd -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
-	else
-	    /usr/sbin/smbldap-useradd -m -a -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
-	fi
+#	if [[ $windows == "1" ]]; then
+#	    smbldap-useradd -m -s /bin/false -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
+#	elif [[ $verwaltung == "0" ]]; then
+#	    smbldap-useradd -m -a -G "Verwaltung" -E verwaltung.cmd -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
+#	else
+#	    smbldap-useradd -m -a -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
+#	fi
 
-        echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
-        # Passwort setzen
-        smbldappw $username
-        echo "Willkommen in der Domäne $smbdom"|mailx -s Willkommen $username@localhost
-	if [[ $windows == "j" ]]; then
-	    mkdir /srv/shares/portal/downloads/$username
-	    chmod g+rwsx,o-rwx /srv/shares/portal/downloads/$username
-	fi
-	yesno "Möchten Sie einen weiteren Benutzer anlegen?" "Benutzerkonten anlegen" nextuser
-	nextuser=${?}
-    done
+#        echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
+#        # Passwort setzen
+#        smbldappw $username
+#        echo "Willkommen in der Domäne $smbdom"|mailx -s Willkommen $username@localhost
+#	if [[ $windows == "j" ]]; then
+#	    mkdir /srv/shares/portal/downloads/$username
+#	    chmod g+rwsx,o-rwx /srv/shares/portal/downloads/$username
+#	fi
+#	yesno "Möchten Sie einen weiteren Benutzer anlegen?" "Benutzerkonten anlegen" nextuser
+#	nextuser=${?}
+#    done
+
+    # to be removed
     # Gastkonto anlegen
-    yesno "Möchten Sie jetzt einen minderprivilegierten Gast-Benutzer anlegen?" "Benutzerkonten anlegen"
-    guest=${?}
+    #yesno "Möchten Sie jetzt einen minderprivilegierten Gast-Benutzer anlegen?" "Benutzerkonten anlegen"
+    #guest=${?}
     
-    if [[ $guest == "0" ]]; then
+    #if [[ $guest == "0" ]]; then
 	#read -p "Geben Sie den gewünschten Benutzernamen ein: " username
-	dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --inputbox "Geben Sie bitten den gewünschten Benutzernamen ein." 0 0 \
-	2>$0_temp
-	username=`cat $0_temp`
-	/usr/sbin/smbldap-useradd -m -a -s /bin/false -g 514 -E gast.cmd -c "Gastkonto" $username
-	echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
-	smbldappw $username
-    fi
+#	dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --inputbox "Geben Sie bitten den gewünschten Benutzernamen ein." 0 0 \
+#	2>$0_temp
+#	username=`cat $0_temp`
+#	smbldap-useradd -m -a -s /bin/false -g 514 -E gast.cmd -c "Gastkonto" $username
+#	echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
+#	smbldappw $username
+#    fi
 
     # Samba-Server starten und in Runlevel eintragen
     chkservice "nmb"
@@ -1950,10 +1959,11 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     # Stammzertifikat der Server-CA bereitstellen
     cp /etc/ssl/CA/cacert.pem /srv/www/htdocs/portal/inc/
     
+    # to be removed
     # Shellscripts installieren
-    cp /usr/bin/creategroupshare /usr/local/sbin/
-    cp /usr/bin/createhome /usr/local/sbin/
-    cp /usr/bin/deletehome /usr/local/sbin/
+    #cp /usr/bin/creategroupshare /usr/sbin/
+    #cp /usr/bin/createhome /usr/sbin/
+    #cp /usr/bin/deletehome /usr/sbin/
     
     # to be removed
     # sudoers Datei anpassen
@@ -1965,9 +1975,9 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     #chown wwwrun:www /srv/uploads
     
     #aschenputtel installieren
-    cp /usr/bin/aschenputtel /usr/local/sbin/
-    chmod 755 /usr/local/sbin/aschenputtel
-    chown root:root /usr/local/sbin/aschenputtel
+    #cp /usr/bin/aschenputtel /usr/sbin/
+    #chmod 755 /usr/sbin/aschenputtel
+    #chown root:root /usr/sbin/aschenputtel
     
     # Kopieren und anpassend der Konfigurationsdateien
     # to be removed
@@ -2005,7 +2015,7 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     if [[ $ddnshn != "none" ]]; then
 
 	msgbox "Es werden Schlüssel für den https-Zugriff erzeugt. Geben Sie bei der Frage nach dem Common-Name einen z.B. bei dyndns.org registrierten im Internet gültigen Namen, oder falls vorhanden Ihre feste IP-Adresse ein." "Webserver-Konfiguration"
-	/usr/local/sbin/serverkeys ws
+	serverkeys ws
 	
         # Kopieren und anpassend der Konfigurationsdateien
         cd $setupdir
@@ -2112,7 +2122,7 @@ mysqlserver() {
 
     #MySQL Root-Passwort setzen
     mysqlpw=`getconfdata "MySQLpw" "2"`
-    /usr/bin/mysqladmin password $mysqlpw
+    mysqladmin password $mysqlpw
 
     # Neuaufbau der Postfix chroot Umgebung zur Unsterstützung von mysql.sock 
     chkservice "postfix"
@@ -2297,7 +2307,7 @@ if [[ $whichimap == "cyrus" ]]; then
 	    ln -s /sbin/umount.cifs /bin/smbumount
 
 	    # Mail-Dummy für Projektmanagement anlegen
-	    /usr/sbin/smbldap-useradd -m -s /bin/false projekte
+	    smbldap-useradd -m -s /bin/false projekte
 	    msgbox "Es wurde ein Postfach-User für den Group-e Projektmanager angeleget, bitte geben Sie ein Passwort ein." "$windowtitle"
 	    smbldappw projekte
 	    echo "Initmail" |mailx -s Initmail projekte@localhost
@@ -2405,12 +2415,13 @@ else
 	chkservice "apache2"
     fi
 
+    # to be removed
     ## Helfer-Scripts kopieren
-    cp /usr/bin/*zarafa* /usr/local/sbin/
-    #cp /usr/bin/runzarafa /usr/local/sbin/
+    #cp /usr/bin/*zarafa* /usr/sbin/
+    #cp /usr/bin/runzarafa /usr/sbin/
 
-    chown root:root /usr/local/sbin/*zarafa*
-    chmod ug+x /usr/local/sbin/*zarafa*
+    #chown root:root /usr/sbin/*zarafa*
+    #chmod ug+x /usr/sbin/*zarafa*
     
     ## Leere Zarafa-Datenbank anlegen
     zarafadbuserpw=`mkdbsilent zarafa zarafa a`
@@ -2713,8 +2724,8 @@ faxgate() {
 	done
 	# Treiber installieren
 	pgsubtitle="Fritzcard-Treiber werden installiert"
-	cp /usr/bin/fcinst /usr/local/sbin
-	/usr/bin/fcinst 2>&1 | tee -a $setupdir/sine.log | pgbox
+	#cp /usr/bin/fcinst /usr/sbin
+	fcinst 2>&1 | tee -a $setupdir/sine.log | pgbox
 	pgsubtitle="Zusätzliche Software wird installiert"
 	zypper -n install -n `cat $setupdir/zypper-package-lists/faxgate`  2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
@@ -2781,7 +2792,7 @@ Geben Sie ein zugehöriges Passwort ein." "$windowtitle"
 	
 	# Fax-Drucker wird eingerichtet
 	pgsubtitle="Faxdrucker wird eingerichtet"
-	/usr/sbin/lpadmin -p Faxgate -v faxgate://capisuite -m Faxgate.ppd.gz -E 2>&1 |pgbox
+	lpadmin -p Faxgate -v faxgate://capisuite -m Faxgate.ppd.gz -E 2>&1 |pgbox
 	
 	# SSH-Portweiterleitung einrichten - provisorische Lösung für faxgate-Client
 	ip=`getconfdata "IP" "2"`

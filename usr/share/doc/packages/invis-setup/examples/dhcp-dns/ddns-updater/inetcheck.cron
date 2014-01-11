@@ -1,1 +1,1 @@
-*/5 * * * * /usr/local/bin/inetcheck
+*/5 * * * * /usr/bin/inetcheck

@@ -713,7 +713,7 @@ function userCreate($conn, $uid) {
 	// increase available uidNumber if successfull
 	if ($ok) {
 		modify($conn, "sambaDomainName=$SMB_DOMAIN,$BASE_DN_ACCOUNT", array('uidNumber' => ($next + 1)));
-		$val = shell_exec("sudo /usr/local/sbin/createhome $uid;");
+		$val = shell_exec("sudo /usr/bin/createhome $uid;");
 		mail("$uid@$DOMAIN", $USER_ADD_MAIL_SUB, $USER_ADD_MAIL_TXT);
 	}
 	return ($ok)?0:array(ldap_errno($conn) => ldap_error($conn));
@@ -770,7 +770,7 @@ function groupCreate($conn, $cn) {
 	// increase available gidNumber if successfull
 	if ($ok) {
 		modify($conn, "sambaDomainName=$SMB_DOMAIN,$BASE_DN_ACCOUNT", array('gidNumber' => ($next + 1)));
-		shell_exec("sudo /usr/local/sbin/creategroupshare $cn;");
+		shell_exec("sudo /usr/bin/creategroupshare $cn;");
 	}
 	
 	return ($ok)?0:array(ldap_errno($conn) => ldap_error($conn));
@@ -938,7 +938,7 @@ function userDelete($conn, $uid) {
 	$flag = intval($_POST['t']);
 	$ok = delete($conn, "uid=$uid,$BASE_DN_USER");
 	if ($ok) {
-		if ($flag == 1) shell_exec("sudo /usr/local/sbin/deletehome $uid;");
+		if ($flag == 1) shell_exec("sudo /usr/bin/deletehome $uid;");
 		removeAdmin($uid);
 	}
 	return ($ok)?0:array(ldap_errno($conn) => ldap_error($conn));

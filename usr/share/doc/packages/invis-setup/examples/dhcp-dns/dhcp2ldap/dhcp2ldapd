@@ -39,7 +39,7 @@ test -s /etc/rc.config && \
 #      rc_reset         clear local rc status (overall remains)
 #      rc_exit          exit appropriate to overall rc status
 
-D2L_BIN=/usr/local/sbin/dhcp2ldapd.pl
+D2L_BIN=/usr/bin/dhcp2ldapd.pl
 
 test -s /etc/rc.status && \
      . /etc/rc.status
