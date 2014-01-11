@@ -1,49 +1,49 @@
 # Umgebungsvariablen setzen
-PATH="/sbin:/usr/sbin:/usr/local/sbin:/root/bin:/usr/local/bin:/usr/bin:/bin:/usr/lib/mit/bin:/usr/lib/mit/sbin"
+PATH="/bin:/usr/bin:/usr/bin:/root/bin:/usr/bin:/usr/bin:/bin:/usr/lib/mit/bin:/usr/lib/mit/bin"
 # Email Versand fuer die invis cron-jobs deaktiviert. Es sind einfach zu viele Mails
 MAILTO=/dev/null
 
 # regelmaessiges Pruefen der Internetverbindung und Wiederaufbau bei Bedarf
 # alle 10 Minuten
-*/10 * * * * root /usr/local/bin/inetcheck
+*/10 * * * * root /usr/bin/inetcheck
 
 # regelmaessiges Pruefen der Festplatten und RAID-Verbuende
 # alle 2 Stunden
-0 */2 * * * root /usr/local/bin/diskchecker
+0 */2 * * * root /usr/bin/diskchecker
 
 # regelmaessiges Pruefen des amavis-Daemons
-5 */6 * * * root /usr/local/sbin/amacheck
+5 */6 * * * root /usr/bin/amacheck
 
 # aschenputtel ausführen
 # alle 10 Minuten
-*/10 * * * * root /usr/local/sbin/aschenputtel
+*/10 * * * * root /usr/bin/aschenputtel
 
 # Virenscans auf allen Fileserver-Freigaben
 # Jede Nacht um 0:00 Uhr
-0 0 * * * root /usr/local/sbin/avrun
+0 0 * * * root /usr/bin/avrun
 
 # Sichern aller LDAP, MySQL & PostgreSQL Datenbestaende
 # Jeden Samstag um 6:00 Uhr
-0 6 * * 6 root /usr/local/sbin/alldump
+0 6 * * 6 root /usr/bin/alldump
 
 # Erstellen eines Snapshots des Dokuwiki-Datenverzeichnisses
 # Jeden Samstag 1:30 Uhr
-30 1 * * 6 root /usr/local/sbin/dwdatasnapshot
+30 1 * * 6 root /usr/bin/dwdatasnapshot
 
 # Aktualisieren des internen LDAP-Adressbuchs
 # Alle 6 Stunden an den Tagen Montag - Freitag jeweils um X:30 Uhr
-30 */6 * * 1-5 root /usr/local/sbin/addaddress
-40 */6 * * 1-5 root /usr/local/sbin/buildpostaladdress.pl
+30 */6 * * 1-5 root /usr/bin/addaddress
+40 */6 * * 1-5 root /usr/bin/buildpostaladdress.pl
 
 # Erweitern aller LDAP Gruppeneintraege um die Group-e Attribute
 # bzw. Zarafa Attribute
 # Alle 10 Minuten 
-*/10 * * * * root /usr/local/sbin/manipgroups
+*/10 * * * * root /usr/bin/manipgroups
 
 # Saeubern der Transfer-Freigabe
 # Einmal taeglich um 5:00 Uhr
-0 5 * * * root /usr/local/sbin/clean_transfer
+0 5 * * * root /usr/bin/clean_transfer
 
 # Saeubern der Recycle-Ordner
 # Einmal taeglich um 4:00 Uhr
-0 4 * * * root /usr/local/sbin/clean_recycle
+0 4 * * * root /usr/bin/clean_recycle

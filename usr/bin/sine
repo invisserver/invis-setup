@@ -2136,7 +2136,7 @@ postgresqlserver() {
     chown -R postgres:postgres /var/lib/pgsql/ 2>&1 |tee -a $setupdir/sine.log
     # Postgresql neu starten
 
-    yesno "Soll PostgreSQL automatisch gestartet werden? (Ist nur notwendig, wenn OpenERP oder LX-Office installiert wird.)" "Runlevel Eintrag für PostgreSQL wird konfiguriert."
+    yesno "Soll PostgreSQL automatisch gestartet werden? (Ist nur notwendig, wenn OpenERP oder Kivitendo installiert wird.)" "Runlevel Eintrag für PostgreSQL wird konfiguriert."
     pgsqlrl=${?}
     if [[ $pgsqlrl == "1" ]]; then
 #	/etc/init.d/postgresql stop 2>&1 |tee -a $setupdir/sine.log |pgbox 
