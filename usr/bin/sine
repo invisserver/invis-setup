@@ -1902,9 +1902,15 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
 #    fi
 
     # Samba-Server starten und in Runlevel eintragen
-    chkservice "nmb"
-    chkservice "smb"
-
+    # Sambaversion pruefen
+    whichsamba=`getconfdata "SambaPakete" "2"`
+    if [[ $whichsamba == "sernet" ]]; then
+	chkservice "sernet-samba-nmbd"
+	chkservice "sernet-samba-smbd"
+    else
+	chkservice "nmb"
+	chkservice "smb"
+    fi
 
     # NFSv4 Server vorbereiten -- aber nicht starten
     mkdir -p /srv/nfs4_base/home
@@ -2293,114 +2299,116 @@ if [[ $whichimap == "cyrus" ]]; then
     if [[ $cont == "0" ]]; then
 	pgsubtitle="Zusätzliche Software wird installiert"
 	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
-	zypper -n install -n `cat $setupdir/zypper-package-lists/group-e` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n group-e 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
-        dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen Group-e automatisch herunterzuladen?" 0 0
+
+	dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen Group-e's z-push automatisch herunterzuladen?" 0 0
 	download=${?}
 	if [[ $download == "0" ]]; then
 	    # Link für Download mit wget:
-	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_v1.741.tar.bz2/download 2>&1 | tee -a $setupdir/sine.log | pgbox
-	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_z-push_v2.7.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
+	#    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_v1.741.tar.bz2/download 2>&1 | tee -a $setupdir/sine.log | pgbox
+	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.781/group-e_z-push_v2.7.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
 	fi
 
+	# to be removed
         # Entpacken des groupe Archivs
-        getpath=`find $setupdir -name "group-e_v*.tar.bz2"`
+        #getpath=`find $setupdir -name "group-e_v*.tar.bz2"`
         #echo $getpath
-	if [[ ! -f $getpath ]]; then
-            dialog --backtitle "$dialogtitle" --title "Group-e Installaton" --inputbox "Das Group-e Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum Group-e Archiv an:" 0 0 \ 2> $etupdir/sine_temp
-            getpath=`cat $etupdir/sine_temp`
-        fi
-	if [[ -f $getpath ]]; then
-	    pgsubtitle="Group-e wird entpackt und installiert."
-	    tar -xvf $getpath -C . 2>&1 |pgbox
-	    mv ./group-e /srv/www/htdocs/
-	    chown -R wwwrun:www /srv/www/htdocs/group-e
-	    chmod -R 775 /srv/www/htdocs/group-e/dyn
+	#if [[ ! -f $getpath ]]; then
+        #    dialog --backtitle "$dialogtitle" --title "Group-e Installaton" --inputbox "Das Group-e Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum Group-e Archiv an:" 0 0 \ 2> $etupdir/sine_temp
+        #    getpath=`cat $etupdir/sine_temp`
+        #fi
+	#if [[ -f $getpath ]]; then
+	pgsubtitle="Group-e wird installiert."
+	#    tar -xvf $getpath -C . 2>&1 |pgbox
+	#    mv ./group-e /srv/www/htdocs/
+	#    chown -R wwwrun:www /srv/www/htdocs/group-e
+	#    chmod -R 775 /srv/www/htdocs/group-e/dyn
 	    #chgrp -R www /srv/www/htdocs/group-e/dyn
-	    cp /srv/www/htdocs/group-e/etc/apache.conf /etc/apache2/conf.d/groupe.conf
-	    path="/etc/apache2/conf.d"
-	    file="groupe.conf"
-	    strings="/opt/group-e%/srv/www/htdocs/group-e"
-	    changevalues $path $file "$strings"
-	    path="/srv/www/htdocs/group-e/www/cfg"
-	    file="global.inc.php"
-	    changevalues $path $file "$strings"
-	    path="/srv/www/htdocs/group-e/etc/phplib"
-	    file="prepend.php"
-	    changevalues $path $file "$strings"
-	    msgbox "Die Datenbank für Group-e wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
-	    mysqladmin -u root -p create groupe
-	    msgbox "Für die Group-e-Datenbank wird UTF8 als Zeichensatz gewählt - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
-	    mysql -u root -p --default-character-set=utf8 groupe < /srv/www/htdocs/group-e/dump/group-e_1.6_utf8.sql
-	    msgbox "Die Tabellenstruktur für die Group-e-Datenbank wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
-	    mysql -u root -p < $cfilesdir/groupe/user.sql
-	    path="/srv/www/htdocs/group-e/etc/phplib/lib"
-	    file="local.inc"
-	    strings="YOUR_GROUPE_PASSWORD%myxlgruss"
-	    changevalues $path $file "$strings"
-	    
-	    # Apache Default-Server-Konfiguration anpassen (FollowSymlinks wird hinzu gefügt)
-	    cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
+	#    cp /srv/www/htdocs/group-e/etc/apache.conf /etc/apache2/conf.d/groupe.conf
+	path="/etc/apache2/conf.d"
+	file="groupe.conf"
+	strings="/opt/group-e%/srv/www/htdocs/group-e"
+	changevalues $path $file "$strings"
+	path="/srv/www/htdocs/group-e/www/cfg"
+	file="global.inc.php"
+	changevalues $path $file "$strings"
+	path="/srv/www/htdocs/group-e/etc/phplib"
+	file="prepend.php"
+	changevalues $path $file "$strings"
+	msgbox "Die Datenbank für Group-e wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	mysqladmin -u root -p create groupe
+	msgbox "Für die Group-e-Datenbank wird UTF8 als Zeichensatz gewählt - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	mysql -u root -p --default-character-set=utf8 groupe < /srv/www/htdocs/group-e/dump/group-e_1.6_utf8.sql
+	msgbox "Die Tabellenstruktur für die Group-e-Datenbank wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	mysql -u root -p < $cfilesdir/groupe/user.sql
+	path="/srv/www/htdocs/group-e/etc/phplib/lib"
+	file="local.inc"
+	strings="YOUR_GROUPE_PASSWORD%myxlgruss"
+	changevalues $path $file "$strings"
 	
-	    # mount.cifs bzw. umount.cifs für Group-e verfügbar machen
-	    # Ist mit den PHP5 Paketen aus dem invis Repository eigentlich nit mehr notwendig.
-	    #chmod u+s /sbin/mount.cifs
-	    #chmod u+s /sbin/umount.cifs
-	    # Symbolische Links bleiben, praktisch fuer alle die smbmount nutzen.
-	    ln -s /sbin/mount.cifs /bin/smbmount
-	    ln -s /sbin/umount.cifs /bin/smbumount
+	# Apache Default-Server-Konfiguration anpassen (FollowSymlinks wird hinzu gefügt)
+	cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
+	
+	# mount.cifs bzw. umount.cifs für Group-e verfügbar machen
+	# Ist mit den PHP5 Paketen aus dem invis Repository eigentlich nit mehr notwendig.
+	#chmod u+s /sbin/mount.cifs
+	#chmod u+s /sbin/umount.cifs
+	# Symbolische Links bleiben, praktisch fuer alle die smbmount nutzen.
+	ln -s /sbin/mount.cifs /bin/smbmount
+	ln -s /sbin/umount.cifs /bin/smbumount
 
-	    # Mail-Dummy für Projektmanagement anlegen
-	    smbldap-useradd -m -s /bin/false projekte
-	    msgbox "Es wurde ein Postfach-User für den Group-e Projektmanager angeleget, bitte geben Sie ein Passwort ein." "$windowtitle"
-	    smbldappw projekte
-	    echo "Initmail" |mailx -s Initmail projekte@localhost
+	# Mail-Dummy für Projektmanagement anlegen
+	smbldap-useradd -m -s /bin/false projekte
+	msgbox "Es wurde ein Postfach-User für den Group-e Projektmanager angeleget, bitte geben Sie ein Passwort ein." "$windowtitle"
+	smbldappw projekte
+	echo "Initmail" |mailx -s Initmail projekte@localhost
 
-	    # z-push Installation -- Experimentell
-            getpath=`find ~ -name "group-e_z-push*.tar.gz"`
-	    echo $getpath
-	    if [[ ! -f $getpath ]]; then
-		dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $etupdir/sine_temp
-		getpath=`cat $etupdir/sine_temp`
-	    fi
-	    if [[ -f $getpath ]]; then
-		# Apache Konfigurationserweiterung kopieren.
-		#cp $cfilesdir/webserver/z-push.conf /etc/apache2/conf.d/
-		cp $cfilesdir/webserver/z-push_vh.conf /etc/apache2/vhosts.d/
-		# z-push entpacken und Verzeichnis verschieben
-		pgsubtitle="z-push wird entpackt und installiert."
-		tar -xvf $getpath -C . 2>&1 |pgbox
-		mv ./z-push /srv/www/htdocs/
-		chown -R wwwrun:www /srv/www/htdocs/z-push
+	# z-push Installation -- Experimentell
+    	getpath=`find ~ -name "group-e_z-push*.tar.gz"`
+	echo $getpath
+	if [[ ! -f $getpath ]]; then
+	    dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $etupdir/sine_temp
+	    getpath=`cat $etupdir/sine_temp`
+	fi
+	if [[ -f $getpath ]]; then
+	    # Apache Konfigurationserweiterung kopieren.
+	    #cp $cfilesdir/webserver/z-push.conf /etc/apache2/conf.d/
+	    cp $cfilesdir/webserver/z-push_vh.conf /etc/apache2/vhosts.d/
+	    # z-push entpacken und Verzeichnis verschieben
+	    pgsubtitle="z-push wird entpackt und installiert."
+	    tar -xvf $getpath -C . 2>&1 |pgbox
+	    mv ./z-push /srv/www/htdocs/
+	    chown -R wwwrun:www /srv/www/htdocs/z-push
 		
-		path="/srv/www/htdocs/z-push"
-		file="config.php"
-		strings="/soap.php%/group-e/soap.php"
-		changevalues $path $file "$strings"
+	    path="/srv/www/htdocs/z-push"
+	    file="config.php"
+	    strings="/soap.php%/group-e/soap.php"
+	    changevalues $path $file "$strings"
 
-		strings="Amsterdam%Berlin"
-		changevalues $path $file "$strings"
+	    strings="Amsterdam%Berlin"
+	    changevalues $path $file "$strings"
 
-		strings="/var/www/z-push%/srv/www/htdocs/z-push"
-		changevalues $path $file "$strings"
+	    strings="/var/www/z-push%/srv/www/htdocs/z-push"
+	    changevalues $path $file "$strings"
 		
-		# Muss noch getestet werden, kann sein, dass das unnötig ist.
-	        ddnsname=`getconfdata "DDNS" "2"`
-		httpsport=`getconfdata "HTTPSPORT" "2"`
-		strings="'GROUP_URL_DOMAIN',''%GROUP_URL_DOMAIN','$ddnsname'"
-		changevalues $path $file "https://$strings:$httpsport"
-		
-		path="/etc/apache2/vhosts.d"
-		file="z-push_vh.conf"
-		strings="your.ddns-domain.net%$ddnsname"
-		changevalues $path $file "$strings"
-	    fi
+	    # Muss noch getestet werden, kann sein, dass das unnötig ist.
+	    ddnsname=`getconfdata "DDNS" "2"`
+	    httpsport=`getconfdata "HTTPSPORT" "2"`
+	    strings="'GROUP_URL_DOMAIN',''%GROUP_URL_DOMAIN','$ddnsname'"
+	    changevalues $path $file "https://$strings:$httpsport"
+	
+	    path="/etc/apache2/vhosts.d"
+	    file="z-push_vh.conf"
+	    strings="your.ddns-domain.net%$ddnsname"
+	    changevalues $path $file "$strings"
+	fi
 	
 	    chkservice "apache2"
-	else
-	    msgbox "Das Group-e Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
-	    exit 
-	fi
+	#else
+	#    msgbox "Das Group-e Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
+	#    exit 
+	#fi
 	
 	writeprepstat "erp"
 	waitbox "groupware" "erp"
