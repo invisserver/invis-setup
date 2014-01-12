@@ -885,8 +885,9 @@ sysprep() {
     ntoppw=`getconfdata "NtopPw" "2"`
     ntop --set-admin-password=$ntoppw -u wwwrun 2>&1| tee -a $setupdir/sine.log | pgbox
 
+    # to be removed
     # Systemgruppe für den Zugriff auf private-Keys einrichten
-    groupadd -g 998 -r pkeys 2>&1| tee -a $setupdir/sine.log
+    #groupadd -g 998 -r pkeys 2>&1| tee -a $setupdir/sine.log
 
     #openSSL einrichten und CA bauen
     cp $cfilesdir/ssl/openssl.cnf /etc/ssl 2>&1| tee -a $setupdir/sine.log
