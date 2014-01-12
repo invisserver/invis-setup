@@ -1,6 +1,6 @@
 #!/bin/bash
 # invis 9.2 Server Setup Script
-# Version R2
+# Version R3
 # (c) August 2008 by Stefan Schäfer / FSP Computer & Netzwerke
 # (c) 2009, 2010, 2011, 2012, 2013 by Stefan Schäfer / invis-server.org / stefan@invis-server.org
 # License: GPLv3
@@ -273,8 +273,8 @@ Alle Eingaben werden auf Plausibilität geprüft, fehlerhaft ausgefüllte Felder
 	"Organisation:" 6 2 "$organisation" 6 16 55 0\
 	"email:" 8 2 "$admail" 8 16 55 0\
 	"Name:" 10 2 "$admin" 10 16 55 0\
-	2>$0_temp
-	opensslvalues=(`cat "$0_temp"`)
+	2>$setupdir/$0_temp
+	opensslvalues=(`cat "$setupdir/$0_temp"`)
 	# Werte prüfen und zuordnen
 	if (( ${#opensslvalues[0]} == 2 ));then
 	    country="${opensslvalues[0]}"
@@ -324,8 +324,8 @@ Achtung: Fehlerhafte Eingaben sind nach der vollständigen Installation nur sehr
 	"Domain:" 2 35 "$vdomname" 2 43 27 0\
 	"IP (intern):" 4 2 "$vipaddr" 4 13 20 0\
 	"Netzwerkmaske:" 4 35 "$vlongnmask" 4 50 20 0\
-	2>$0_temp
-	netvalues=(`cat $0_temp`)
+	2>$setupdir/$0_temp
+	netvalues=(`cat $setupdir/$0_temp`)
 	
 	# Alle Daten ermitteln.
 	hn="${netvalues[0]}"
@@ -390,8 +390,8 @@ Geben Sie midestens eine IP-Adresse ein.\n\n" 28 70 7 \
 	"DNS 1:" 2 2 "${fdns[0]}" 2 10 30 0\
 	"DNS 2:" 4 2 "${fdns[1]}" 4 10 30 0\
 	"DNS 3:" 6 2 "${fdns[2]}" 6 10 30 0\
-	2>$0_tmp
-	fdns=(`cat $0_tmp`)
+	2>$setupdir/$0_temp
+	fdns=(`cat $setupdir/$0_temp`)
 	
 	if (( ${#fdns[@]} == 0 )); then
 	    continue
@@ -427,8 +427,8 @@ Die vergebenen Passwörter müssen mindestens 6 Zeichen lang sein." 22 80 6 \
 	"Kontrolle:" 4 44 "${ldapsecrets[3]}" 4 56 10 0\
 	"LDAP-Sektionsadministrator:" 6 2 "${ldapsecrets[4]}" 6 30 10 0\
 	"Kontrolle:" 6 44 "${ldapsecrets[5]}" 6 56 10 0\
-	2>$0_temp
-	ldapsecrets=(`cat $0_temp`)
+	2>$setupdir/$0_temp
+	ldapsecrets=(`cat $setupdir/$0_temp`)
 	i=0
 	while (( $i < 6 ));do
 		if [[ $i =~ [0,2,4] ]];then
@@ -457,8 +457,8 @@ Für die Administration des MySQL-Servers muss ein Passwort für den MySQL-Root 
 Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
 	"MySQL-Root-Passwort:" 2 2 "" 2 23 10 0\
 	"Kontrolle:" 2 36 "" 2 47 10 0\
-	2>$0_temp
-	mysqlsecrets=(`cat $0_temp`)
+	2>$setupdir/$0_temp
+	mysqlsecrets=(`cat $setupdir/$0_temp`)
 
 	    if [[ ${mysqlsecrets[0]} == ${mysqlsecrets[1]} ]] && (( ${#mysqlsecrets[0]} >= 6 ));then
 		ok=1
@@ -474,8 +474,8 @@ Für die Administration des ntop-Netzwerkanlysators muss ein Passwort für den n
 Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
 	"ntop-Admin Passwort:" 2 2 "" 2 23 10 0\
 	"Kontrolle:" 2 36 "" 2 47 10 0\
-	2>$0_temp
-	ntopsecrets=(`cat $0_temp`)
+	2>$setupdir/$0_temp
+	ntopsecrets=(`cat $setupdir/$0_temp`)
 
 	    if [[ ${ntopsecrets[0]} == ${ntopsecrets[1]} ]] && (( ${#ntopsecrets[0]} >= 6 ));then
 		ok=1
@@ -496,8 +496,8 @@ von Group-e." 16 80 5 \
 	cyrus "Das Monster in Kombination mit Group-e" on\
 	dovecot "Der Schlanke in Kombination mit SOGo" off\
 	zarafa "Mailserver/Groupware Kombination für Outlook-Junkies" off\
-	2>$0_temp
-	whichimap=`cat $0_temp`
+	2>$setupdir/$0_temp
+	whichimap=`cat $setupdir/$0_temp`
     
     if [[ $whichimap == "cyrus" ]]; then
 	ok=0
@@ -507,8 +507,8 @@ Für die Administration des IMAP-Servers Cyrus muss ein Passwort für den cyrus-
 Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
 	    "cyrus Passwort:" 2 2 "" 2 23 10 0\
 	    "Kontrolle:" 2 36 "" 2 47 10 0\
-	    2>$0_temp
-	    cyrussecrets=(`cat $0_temp`)
+	    2>$setupdir/$0_temp
+	    cyrussecrets=(`cat $setupdir/$0_temp`)
 
 		if [[ ${cyrussecrets[0]} == ${cyrussecrets[1]} ]] && (( ${#cyrussecrets[0]} >= 6 ));then
 		    ok=1
@@ -524,8 +524,8 @@ Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
 Wählen Sie die von Ihnen bevorzugten Samba Pakete aus." 14 85 5 \
 	openSUSE "Distributionsversion, kürzere Maintenance." on\
 	Sernet "Samba4 LTS-Pakete für openSUSE 13.1 von Sernet." off\
-	2>$0_temp
-	whichsamba=`cat $0_temp`
+	2>$setupdir/$0_temp
+	whichsamba=`cat $setupdir/$0_temp`
 	whichsamba=`tolower $whichsamba`
 	
 #---# ERP-Software
@@ -536,8 +536,8 @@ Wählen Sie die von Ihnen bevorzugte ERP-Software (Warenwirtschaftssystem) aus."
 	waWision "Moderne ERP Lösung für Handel und Dienstleistung inkl. Webshop-Schnittstelle." on\
 	OpenERP "Modern und Modular (noch nicht implementiert)" off\
 	Keine "Sie verwenden ein eigenes System" off\
-	2>$0_temp
-	whicherp=`cat $0_temp`
+	2>$setupdir/$0_temp
+	whicherp=`cat $setupdir/$0_temp`
 	whicherp=`tolower $whicherp`
 	
 #---# Virenscanner Radiobutton
@@ -549,8 +549,8 @@ Nutzung von Antivir installiert. Bei gewerblicher Nutzung des Servers muss eine 
 werden.\nClamav hingegen ist zu 100% Open-Source-Software, d.h. dessen Nutzung ist auch im gewerblichen Umfeld kostenfrei." 22 80 8 \
 	clamav "Open-Source Virenscanner" on\
 	antivir "Kommerzieller Virenscanner von Avira" off\
-	2>$0_temp
-	av=`cat $0_temp`
+	2>$setupdir/$0_temp
+	av=`cat $setupdir/$0_temp`
 
 #---# HTTPS    
     yesno "Soll Ihr invis Server via Internet (HTTPS) erreichbar sein?\n\nVoraussetzung dafür ist ein etwa bei DynDNS.org registrierter Hostname, Zugriff auf einen eigenen DNS Server im Internet oder eine feste IP-Adresse." "HTTPs Zugang"
@@ -560,9 +560,9 @@ werden.\nClamav hingegen ist zu 100% Open-Source-Software, d.h. dessen Nutzung i
 	ok=0
 	while [[ $ok != "1" ]]; do
 	dialog --backtitle "$dialogtitle" --title "HTTPs Zugang" --inputbox "Geben Sie bitten den vollständigen Namen (FQDN) oder die IP-Adresse ein unter dem/der ihr invis Server erreichbar sein soll." 0 0 \
-	2>$0_temp
+	2>$setupdir/$0_temp
 	exitcode=${?}
-	ddnshn=`cat $0_temp`
+	ddnshn=`cat $setupdir/$0_temp`
 	
 	# Doch noch abbrechen
 	if [[ $exitcode == "1" || $exitcode == "255" ]]; then
@@ -590,7 +590,7 @@ Geben Sie bitte den Hostnamen bzw. die IP-Adresse Ihres SMTP-Relays, sowie den z
 	"Port [25/587]:" 4 2 "$smtpport" 4 20 45 0\
 	"Benutzername:" 6 2 "$smtpun" 6 20 45 0\
 	"Passwort:" 8 2 "$smtppw" 8 20 45 0\
-	2>$0_temp
+	2>$setupdir/$0_temp
 	exitcode=${?}
 	# Doch noch abbrechen
 	if [[ $exitcode == "1" || $exitcode == "255" ]]; then
@@ -598,7 +598,7 @@ Geben Sie bitte den Hostnamen bzw. die IP-Adresse Ihres SMTP-Relays, sowie den z
 	    break
 	fi
 	
-	smtpvalues=(`cat $0_temp`)
+	smtpvalues=(`cat $setupdir/$0_temp`)
 	
 	if [[ ${smtpvalues[0]} =~ ^[a-zA-Z0-9_\-]{1,254}\.[a-zA-Z0-9_\-]{1,254}+\.?[a-zA-Z0-9_\-]{1,254}+\.[a-zA-Z]{1,5}$ || ${smtpvalues[0]} =~ ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]] ;then
 	    mailserver="${smtpvalues[0]}"
@@ -651,8 +651,8 @@ Sollen alte Dateien und Verzeichnisse automatisch aus der Transfer-Freigabe gel�
 	"21 Tage" "3 Wochen" on\
 	"42 Tage" "6 Wochen" off\
 	"90 Tage" "3 Monate" off\
-	2>$0_temp
-	trdays=`cat $0_temp|cut -d " " -f1`
+	2>$setupdir/$0_temp
+	trdays=`cat $setupdir/$0_temp|cut -d " " -f1`
     fi
 
     yesno "Sollen Cronjobs für regelmäßige Virenscanns der Fileserver-Verzeichnisse eingerichtet werden?" "Regelmäßige Virenscans der Serverfreigaben"
@@ -908,6 +908,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     # Konfiguration fuer Notfall-Internetzugang via Handy und T-Mobile (Teathering)
     cp $cfilesdir/invis/wvd_tmobile.conf /etc/invis 2>&1| tee -a $setupdir/sine.log
 
+    # to be removed
     #chown -R root:root /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
     #chmod -R ug+x /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
 
@@ -929,6 +930,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     # Workaround fuer fastcgi php.ini Bug
     ln -s /etc/php5/fastcgi /etc/php5/fpm
 
+    # to be removed
 #    pgsubtitle="PHP PEAR Channel Konfiguration wird aktualisiert"
 #    /usr/sbin/fixpearchannel 2>&1 | tee -a $setupdir/sine.log | pgbox
 
@@ -936,7 +938,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     #cp $cfilesdir/invis/invis.cron /etc/cron.d/ 2>&1| tee -a $setupdir/sine.log
 
     # invis permissions-file wird installiert.
-    cp $cfilesdir/System/permissions.d/invis-server /etc/permissions.d/ 2>&1| tee -a $setupdir/sine.log
+    #cp $cfilesdir/System/permissions.d/invis-server /etc/permissions.d/ 2>&1| tee -a $setupdir/sine.log
 
     # invis Konfigurationsdatei anpassen
     file="invis.conf"
@@ -1810,8 +1812,8 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
 #	    "Benutzername:" 2 2 "$mailrelay" 2 20 45 0\
 #	    "Vorname:" 4 2 "$smtpun" 4 20 45 0\
 #	    "Nachname:" 6 2 "$smtppw" 6 20 45 0\
-#	    2>$0_temp
-#	    uservalues=(`cat $0_temp`)
+#	    2>$setupdir/$0_temp
+#	    uservalues=(`cat $setupdir/$0_temp`)
 #	    username=${uservalues[0]}
 #	done
 #	yesno "Soll der neue Benutzer ein vollwertiger Benutzer sein? (Ansonsten wird nur ein Mail-Dummy-Konto eingerichtet)" "Benutzerkonten anlegen"
@@ -1850,8 +1852,8 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     #if [[ $guest == "0" ]]; then
 	#read -p "Geben Sie den gewünschten Benutzernamen ein: " username
 #	dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --inputbox "Geben Sie bitten den gewünschten Benutzernamen ein." 0 0 \
-#	2>$0_temp
-#	username=`cat $0_temp`
+#	2>$setupdir/$0_temp
+#	username=`cat $setupdir/$0_temp`
 #	smbldap-useradd -m -a -s /bin/false -g 514 -E gast.cmd -c "Gastkonto" $username
 #	echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
 #	smbldappw $username
@@ -2263,8 +2265,8 @@ if [[ $whichimap == "cyrus" ]]; then
         getpath=`find $setupdir -name "group-e_v*.tar.bz2"`
         #echo $getpath
 	if [[ ! -f $getpath ]]; then
-            dialog --backtitle "$dialogtitle" --title "Group-e Installaton" --inputbox "Das Group-e Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum Group-e Archiv an:" 0 0 \ 2> $0_temp
-            getpath=`cat $0_temp`
+            dialog --backtitle "$dialogtitle" --title "Group-e Installaton" --inputbox "Das Group-e Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum Group-e Archiv an:" 0 0 \ 2> $setupdir/$0_temp
+            getpath=`cat $setupdir/$0_temp`
         fi
 	if [[ -f $getpath ]]; then
 	    pgsubtitle="Group-e wird entpackt und installiert."
@@ -2316,8 +2318,8 @@ if [[ $whichimap == "cyrus" ]]; then
             getpath=`find ~ -name "group-e_z-push*.tar.gz"`
 	    echo $getpath
 	    if [[ ! -f $getpath ]]; then
-		dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $0_temp
-		getpath=`cat $0_temp`
+		dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $setupdir/$0_temp
+		getpath=`cat $setupdir/$0_temp`
 	    fi
 	    if [[ -f $getpath ]]; then
 		# Apache Konfigurationserweiterung kopieren.
@@ -2554,8 +2556,8 @@ case $whicherp in
 		# Entpacken des lx-office-erp Archivs
     		#getpath=`find $setupdir -name "lx-office-erp*.tar*"`
 		#if [[ ! -f $getpath ]]; then
-        	#    dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Das LX-ERP Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum LX-ERP Archiv an:" 0 0 \ 2> $0_temp
-        	#    getpath=`cat $0_temp`
+        	#    dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Das LX-ERP Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum LX-ERP Archiv an:" 0 0 \ 2> $setupdir/$0_temp
+        	#    getpath=`cat $setupdir/$0_temp`
     		#fi
 		#if [[ -f $getpath ]]; then
 		#    pgsubtitle="LX-ERP wird entpackt und installiert."
@@ -2584,8 +2586,8 @@ Vergessen Sie bitte nicht das hierbei von Ihnen zu vergebende Passwort. ;-)" "$w
 Bitte geben Sie dass soeben vergebene Passwort für den LX-Office Datenbankbenutzer zur weiteren Verwendung erneut ein.\n\n" 17 64 2 \
 		    "Kivitendo-DB-Passwort:" 2 2 "" 2 23 10 0\
 		    "Kontrolle:" 2 36 "" 2 47 10 0\
-		    2>$0_temp
-		    lxpassword=(`cat $0_temp`)
+		    2>$setupdir/$0_temp
+		    lxpassword=(`cat $setupdir/$0_temp`)
 		    if [[ ${lxpassword[0]} == ${lxpassword[1]} ]];then
 			ok=1
 		    fi
@@ -2606,8 +2608,8 @@ Da Kivitendo nur eine 1 zu 1 Zuordnung von Benutzer zu Datenbank zulässt, ist d
 dann sinnvoll, wenn lediglich mit einer Kivitendo Datenbank gearbeitet wird."  16 80 8 \
 		SQL "Benutzerverwaltung über eigene Authentifizierungsdatenbank" on\
 		LDAP "Anbindung an die vorhandene LDAP Benutzerverwaltung" off\
-		2>$0_temp
-		lxauth=`cat $0_temp`
+		2>$setupdir/$0_temp
+		lxauth=`cat $setupdir/$0_temp`
 		path="/srv/www/htdocs/kivitendo-erp/config"
 		file="kivitendo.conf"
 		if [[ $lxauth == "LDAP" ]]; then
@@ -2714,9 +2716,9 @@ faxgate() {
 	ok=0
 	while [[ $ok != "1" ]]; do
 	dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Geben Sie bitte Ihre Telefonvorwahl ein." 0 0 \
-	2>$0_temp
+	2>$setupdir/$0_temp
 	exitcode=${?}
-	vorwahl=`cat $0_temp`
+	vorwahl=`cat $setupdir/$0_temp`
 	
 	if [[ $vorwahl =~ ^[0-9]{3,7}$ ]] ;then
 	    ok=1
@@ -2754,8 +2756,8 @@ können Sie Faxgate für den Single- oder Multi-User-Betrieb einrichten.\n\n
 Für den Multi-User-Betrieb sollten Sie über einen ISDN Anlagenanschluss verfügen."  16 90 8 \
 	Single-User "Es steht nur eine Fax-Nummer zur Verfügung (ISDN Mehrgeräteanschluss)." on\
 	Multi-User "Es stehen mehrere Faxnummern zur Verfügung (ISDN Anlagenanschluss). " off\
-	2>$0_temp
-	singleuser=`cat $0_temp`
+	2>$setupdir/$0_temp
+	singleuser=`cat $setupdir/$0_temp`
 
     if [[ $singleuser == "Single-User" ]]; then
 	cat $cfilesdir/fileserver/samba/smb.faxgate.su >> /etc/samba/smb.shares.conf
@@ -3148,5 +3150,5 @@ textbox "$setupdir/infofiles/aftersetup.txt" "Installation abgeschlossen" "Beend
 
 # Auräumen -- Evtl. verwaiste dialog Prozesse killen
 killall dialog > /dev/null 2>&1
-rm -f ./$0_temp
+rm -f ./$setupdir/$0_temp
 
