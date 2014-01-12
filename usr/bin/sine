@@ -1905,6 +1905,10 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     # Sambaversion pruefen
     whichsamba=`getconfdata "SambaPakete" "2"`
     if [[ $whichsamba == "sernet" ]]; then
+	path="etc/default"
+	file="sernet-samba"
+	strings="none%classic"
+	changevalues $path $file "$strings"
 	chkservice "sernet-samba-nmbd"
 	chkservice "sernet-samba-smbd"
     else
