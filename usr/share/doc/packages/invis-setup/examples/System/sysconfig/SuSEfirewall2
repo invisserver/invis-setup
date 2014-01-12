@@ -709,7 +709,7 @@ FW_FORWARD_MASQ=""
 #
 # Note: contrary to previous SuSEfirewall2 versions it is no longer necessary
 # to additionally open the local port
-FW_REDIRECT=""
+FW_REDIRECT="192.168.220.0/24,192.168.220.0/24,tcp,sshport,22"
 
 ## Type:	yesno
 ## Default:	yes

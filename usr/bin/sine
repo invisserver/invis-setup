@@ -2837,14 +2837,15 @@ Geben Sie ein zugehöriges Passwort ein." "$windowtitle"
 	pgsubtitle="Faxdrucker wird eingerichtet"
 	lpadmin -p Faxgate -v faxgate://capisuite -m Faxgate.ppd.gz -E 2>&1 |pgbox
 	
+	## to be removed
 	# SSH-Portweiterleitung einrichten - provisorische Lösung für faxgate-Client
-	ip=`getconfdata "IP" "2"`
-	sshport=`getconfdata "SSHPORT" "2"`
-	echo "$ip 22 $ip $sshport" > /etc/rinetd.conf
+	#ip=`getconfdata "IP" "2"`
+	#sshport=`getconfdata "SSHPORT" "2"`
+	#echo "$ip 22 $ip $sshport" > /etc/rinetd.conf
 	sleep 1
 	#msgbox "Achtung: Das folgende Fenster müssen Sie vermutlich mit \"STRG+C\" abbrechen. Warum das Programm an
 #dieser Stelle hängen bleibt ist uns bisher ein Rätsel. Wir suchen nach der Lösung." "$windowtitle"
-	chkservice "rinetd"
+	#chkservice "rinetd"
 
 	writeprepstat "webcdwriter"
 	waitbox "lxerp" "webcdwriter"
