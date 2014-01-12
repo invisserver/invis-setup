@@ -1,7 +1,5 @@
 sernet-samba
-sernet-samba-ad
 sernet-samba-client
 sernet-samba-common
 sernet-samba-libs
 sernet-samba-libsmbclient0
-sernet-samba-winbind 

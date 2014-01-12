@@ -534,7 +534,7 @@ Wählen Sie die von Ihnen bevorzugten Samba Pakete aus." 14 85 5 \
 	while (( $ok != "2" ));do
 	    dialog --backtitle "$dialogtitle" --title "Enterprise Samba Zugangsdaten" --form "$dialogshorthelp\n\n
 Geben Sie bitte Ihre Zugangsdaten für das Enterprise-Samba Repository ein." 18 74 5 \
-	    "Benutzername:" 2 2 "$esusername " 2 20 45 0\
+	    "Benutzername:" 2 2 "$esusername" 2 20 45 0\
 	    "Accesskey:" 4 2 "$esaccesskey" 4 20 45 0\
 	    2>$etupdir/sine_temp
 	    exitcode=${?}
@@ -807,6 +807,7 @@ sysprep() {
 	cp $cfilesdir/zypper/sernet-samba4.repo $path
 	file=sernet-samba4.repo
 	strings="USERNAME:ACCESSKEY%$esusername:$esaccesskey"
+	echo $strings
 	changevalues $path $file $strings
 	rpmkeyimporter
         pgsubtitle="Repository-Cache wird aktualisiert"
