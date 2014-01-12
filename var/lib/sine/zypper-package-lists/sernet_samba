@@ -1,7 +1,7 @@
-samba3
-samba3-client
-samba3-winbind
-samba3-doc
-samba3-utils
-libsmbclient0
-libwbclient0
+sernet-samba
+sernet-samba-ad
+sernet-samba-client
+sernet-samba-common
+sernet-samba-libs
+sernet-samba-libsmbclient0
+sernet-samba-winbind 
