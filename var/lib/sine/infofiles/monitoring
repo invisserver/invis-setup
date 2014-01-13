@@ -1,8 +1,9 @@
-Nagios Plugins
+Monitoring Agente für Fernüberwachung
 
 Dieser Schritt des invis Server-Setups ermöglicht die Vorbereitung
-des Servers für seine Überwachung durch einen Icinga bzw. Nagios-
-Server.
+des Servers für seine Überwachung durch einen Monitoring-Server.
+
+Nagios bzw. Icinga
 
 Es werden die notwendigen Nagios-Plugins installiert und ein Benutzer
 "nagios" angelegt.
@@ -10,3 +11,8 @@ Es werden die notwendigen Nagios-Plugins installiert und ein Benutzer
 Um einem Icinga/Nagios Server die Möglichkeit zur Überwachung zu geben
 muss es dem Benutzer "nagios" möglich sein sich per SSH anzumelden und
 per Schlüssel zu Authentifizieren.
+
+Zabbix
+
+Für Überwachung werden Zabbix-Agent und Proxy-Server in Verbindung mit
+MySQL-Datenbank installiert. 
