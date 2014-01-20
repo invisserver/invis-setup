@@ -2267,26 +2267,62 @@ firewall() {
     chkservice "SuSEfirewall2_init"
     chkservice "SuSEfirewall2"
 
-    writeprepstat "nagios"
-    waitbox "firewall" "nagios"
+    writeprepstat "monitoring"
+    waitbox "firewall" "monitoring"
 }
 
-nagios() {
+monitoring() {
     cd $setupdir
     clear
     windowtitle="Vorbereitung für Server Monitoring"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/nagios.txt" 18 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Planen Sie den Server via Icinga oder Nagios zu überwachen?" 0 0
-    cont=${?}
-    if [[ $cont == "0" ]]; then
+#DA#    dialog --backtitle "$dialogtitle" --title "Vorbereitung für Server Monitoring" --exit-label "Weiter" --textbox "$setupdir/infofiles/nagios.txt" 18 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Planen Sie den Server via Icinga oder Nagios zu überwachen?" 0 0
+#DA#    cont=${?}
+#DA#    if [[ $cont == "0" ]]; then
+    dialog --backtitle "$dialogtitle" --title "Vorbereitung für Server Monitoring" --radiolist "$dialogshorthelp\n\n
+Monitoring Agente für Fernüberwachung\n\n
+Dieser Schritt des invis Server-Setups ermöglicht die Vorbereitung
+des Servers für seine Überwachung durch einen Monitoring-Server.\n\n
+Nagios bzw. Icinga\n\n
+Es werden die notwendigen Nagios-Plugins installiert und ein Benutzer
+\"nagios\" angelegt.\n\n
+Um einem Icinga/Nagios Server die Möglichkeit zur Überwachung zu geben
+muss es dem Benutzer \"nagios\" möglich sein sich per SSH anzumelden und
+per Schlüssel zu Authentifizieren.\n\n
+Zabbix\n\n
+Für Überwachung werden Zabbix-Agent und Proxy-Server in Verbindung mit
+MySQL-Datenbank installiert." 30 80 21 \
+	nagios "Nagios-Plugins" on\
+	zabbix "Zabbix-Agent" off\
+	keine  "Keine Überwachung" off\
+	2>$setupdir/sine_temp
+	whichmonitoring=`cat $setupdir/sine_temp`
+    case $whichmonitoring in
+    "nagios" )
         # Vorbereitung zur Ueberwachung des Servers via Icinga oder Nagios
 	zypper -n install -n `cat $setupdir/zypper-package-lists/nagios_plugins` 2>&1 | tee -a $setupdir/sine.log | pgbox
 	groupadd -g 9000 nagios 2>&1 | tee -a $setupdir/sine.log | pgbox
 	useradd -u 9000 -g nagios -d /home/nagios -m -c "Nagios Admin" nagios 2>&1 | tee -a $setupdir/sine.log | pgbox
 	mkdir /home/nagios/.ssh 2>&1 | tee -a $setupdir/sine.log
 	chown -R nagios:nagios /home/nagios/ 2>&1 | tee -a $setupdir/sine.log
-    fi
+	;;
+    "zabbix" )
+        # Vorbereitung zur Ueberwachung des Servers via Zabbix-Agent mit Zabbix-Proxy
+	zypper -n install -n zabbix-agent zabbix-proxy zabbix-proxy-mysql fping 2>&1 | tee -a $setupdir/sine.log | pgbox
+        zabbixdbpw=`mkdbsilent zabbix zabbix a`
+        mysql -u zabbix -p$zabbixdbpw zabbix < $cfilesdir/zabbix/schema.sql
+        cp $cfilesdir/zabbix/zabbix-agentd.conf /etc/zabbix 	2>&1| tee -a $setupdir/sine.log
+        cp $cfilesdir/zabbix/zabbix-proxy.conf /etc/zabbix 	2>&1| tee -a $setupdir/sine.log
+        confdir="/etc/zabbix"
+        file="zabbix-proxy.conf"
+        strings="zabbixdbpw%$zabbixdbpw"
+        changevalues $confdir $file "$strings"
+        chkservice "zabbix-proxy"
+        chkservice "zabbix-agentd"
+	;;
+    esac
+#DA#    fi
     writeprepstat "groupware"
-    waitbox "nagios" "groupware"
+    waitbox "monitoring" "groupware"
 }
 
 groupware() {
@@ -3141,7 +3177,7 @@ if [[ $1 == "help" ]]; then
     echo "\"sine log\" gibt das Logfile aus."
     echo "\"sine showconf\" gibt die gespeicherten Konfigurationsdaten aus."
     echo -e "\"sine modulname\" ruft das angegebene Modul auf. Dies ist nur\nfür optionale Module möglich, nachdem sine einmal vollständig\ndurchgelaufen ist."
-    echo -e "Optionale Module: nagios, groupware, erp, faxgate, webcdwriter,\nopenvpn, dokuwiki, etherpad.\n"
+    echo -e "Optionale Module: monitoring, groupware, erp, faxgate, webcdwriter,\nopenvpn, dokuwiki, etherpad.\n"
     exit
 fi
 
@@ -3184,7 +3220,7 @@ if [[ -z `which dialog 2>/dev/null` ]]; then
     zyppercheck ${PIPESTATUS[0]}
 fi
 
-if [[ $prepstat == "ready" ]] && [[ $1 == "nagios" || $1 == "groupware" || $1 == "erp" || $1 == "faxgate" || $1 == "webcdwriter" || $1 == "openvpn" || $1 == "dokuwiki" || $1 == "etherpad" ]]; then
+if [[ $prepstat == "ready" ]] && [[ $1 == "monitoring" || $1 == "groupware" || $1 == "erp" || $1 == "faxgate" || $1 == "webcdwriter" || $1 == "openvpn" || $1 == "dokuwiki" || $1 == "etherpad" ]]; then
 	echo $1
 	sleep 1
 	$1

@@ -49,6 +49,7 @@ invis 9.x-dev
 - Script zum aktivieren/deaktivieren von Portaleintraegen hinzugefuegt
 - Script ZFS4invis für optionale Installation und Einrichtung von ZFSonLinux für einen invis Server
 - SOGo integriert
+- Zabbix Agent mit Proxy für Netzüberwachung integriert
 
 invis 8.x-dev
 - ajax.php: Regression aus V1.6 "Bei Gruppen mit nur einem User ist die Liste der verfÃ¼gbaren User leer" gefixt
