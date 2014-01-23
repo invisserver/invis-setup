@@ -1,4 +1,4 @@
-Monitoring Agente für Fernüberwachung
+Monitoring Agents für Fernüberwachung
 
 Dieser Schritt des invis Server-Setups ermöglicht die Vorbereitung
 des Servers für seine Überwachung durch einen Monitoring-Server.
@@ -14,5 +14,5 @@ per Schlüssel zu Authentifizieren.
 
 Zabbix
 
-Für Überwachung werden Zabbix-Agent und Proxy-Server in Verbindung mit
-MySQL-Datenbank installiert. 
+Für ein Monitoring durch Zabbix werden Zabbix-Agent und Proxy-Server 
+in Verbindung mit einer MySQL-Datenbank installiert.

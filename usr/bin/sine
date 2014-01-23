@@ -580,6 +580,19 @@ werden.\nClamav hingegen ist zu 100% Open-Source-Software, d.h. dessen Nutzung i
 	2>$setupdir/sine_temp
 	av=`cat $setupdir/sine_temp`
 
+#---# Monitoring
+
+    dialog --backtitle "$dialogtitle" --title "Vorbereitung für Server Monitoring" --radiolist "$dialogshorthelp\n\n
+Planen Sie Ihren Server durch eine Monitoring Lösung zu überwachen?
+Für die Lösungen Icinga, Nagios oder Zabbix können im Verlauf des Setups Vorbereitungen getroffen werden.
+\n\n
+Welche Lösung möchten Sie einsetzen?\n\n" 18 80 8 \
+	nagios "Nagios-Plugins (Icinga & Nagios)" on\
+	zabbix "Zabbix-Agent" off\
+	keine  "Keine Überwachung" off\
+	2>$setupdir/sine_temp
+	whichmonitoring=`cat $setupdir/sine_temp`
+
 #---# HTTPS    
     yesno "Soll Ihr invis Server via Internet (HTTPS) erreichbar sein?\n\nVoraussetzung dafür ist ein etwa bei DynDNS.org registrierter Hostname, Zugriff auf einen eigenen DNS Server im Internet oder eine feste IP-Adresse." "HTTPs Zugang"
     exthttps=${?}
@@ -738,6 +751,9 @@ Aus Ihrem lokalen Netz heraus kann für SSH weiter Port 22 verwendet werden." "S
     echo "EnterpriseSambaAccesskey:$esaccesskey" >> $setupdir/invis_confdata
 
     echo "ERPSoftware:$whicherp" >> $setupdir/invis_confdata
+
+    echo "MonitoringSoftware:$whichmonitoring" >> $setupdir/invis_confdata
+
     echo "SSHPORT:$sshport" >> $setupdir/invis_confdata
     echo "HTTPSPORT:$httpsport" >> $setupdir/invis_confdata
     echo "AV:$av" >> $setupdir/invis_confdata
@@ -2275,24 +2291,12 @@ monitoring() {
     cd $setupdir
     clear
     windowtitle="Vorbereitung für Server Monitoring"
-#DA#    dialog --backtitle "$dialogtitle" --title "Vorbereitung für Server Monitoring" --exit-label "Weiter" --textbox "$setupdir/infofiles/nagios.txt" 18 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Planen Sie den Server via Icinga oder Nagios zu überwachen?" 0 0
-#DA#    cont=${?}
-#DA#    if [[ $cont == "0" ]]; then
-    dialog --backtitle "$dialogtitle" --title "Vorbereitung für Server Monitoring" --radiolist "$dialogshorthelp\n\n
-Monitoring Agents für Fernüberwachung\n\n
-Dieser Schritt des invis Server-Setups ermöglicht die Vorbereitung
-des Servers für seine Überwachung durch einen Monitoring-Server.\n\n
-Nagios bzw. Icinga oder Zabbix\n\n
-Je nach Auswahl werden die notwendigen Nagios-Plugins installiert und ein Benutzer
-\"nagios\" angelegt oder Zabbix-Agent, Proxy-Server und zugehörige Datenbank installiert.\n\n
-Um einem Icinga/Nagios Server die Möglichkeit zur Überwachung zu geben
-muss es dem Benutzer \"nagios\" möglich sein sich per SSH anzumelden und
-per Schlüssel zu Authentifizieren.\n\n" 30 80 21 \
-	nagios "Nagios-Plugins" on\
-	zabbix "Zabbix-Agent" off\
-	keine  "Keine Überwachung" off\
-	2>$setupdir/sine_temp
-	whichmonitoring=`cat $setupdir/sine_temp`
+    dialog --backtitle "$dialogtitle" --title "Vorbereitung für Server Monitoring" --exit-label "Weiter" --textbox "$setupdir/infofiles/monitoring.txt" 24 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Planen Sie den Server via zu überwachen?" 0 0
+    cont=${?}
+    if [[ $cont == "0" ]]; then
+    
+    whichmonitoring=`getconfdata "MonitoringSoftware" "2"`
+
     case $whichmonitoring in
     "nagios" )
         # Vorbereitung zur Ueberwachung des Servers via Icinga oder Nagios
@@ -2317,7 +2321,7 @@ per Schlüssel zu Authentifizieren.\n\n" 30 80 21 \
         chkservice "zabbix-agentd"
 	;;
     esac
-#DA#    fi
+    fi
     writeprepstat "groupware"
     waitbox "monitoring" "groupware"
 }
