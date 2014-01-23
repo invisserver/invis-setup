@@ -2279,18 +2279,15 @@ monitoring() {
 #DA#    cont=${?}
 #DA#    if [[ $cont == "0" ]]; then
     dialog --backtitle "$dialogtitle" --title "Vorbereitung für Server Monitoring" --radiolist "$dialogshorthelp\n\n
-Monitoring Agente für Fernüberwachung\n\n
+Monitoring Agents für Fernüberwachung\n\n
 Dieser Schritt des invis Server-Setups ermöglicht die Vorbereitung
 des Servers für seine Überwachung durch einen Monitoring-Server.\n\n
-Nagios bzw. Icinga\n\n
-Es werden die notwendigen Nagios-Plugins installiert und ein Benutzer
-\"nagios\" angelegt.\n\n
+Nagios bzw. Icinga oder Zabbix\n\n
+Je nach Auswahl werden die notwendigen Nagios-Plugins installiert und ein Benutzer
+\"nagios\" angelegt oder Zabbix-Agent, Proxy-Server und zugehörige Datenbank installiert.\n\n
 Um einem Icinga/Nagios Server die Möglichkeit zur Überwachung zu geben
 muss es dem Benutzer \"nagios\" möglich sein sich per SSH anzumelden und
-per Schlüssel zu Authentifizieren.\n\n
-Zabbix\n\n
-Für Überwachung werden Zabbix-Agent und Proxy-Server in Verbindung mit
-MySQL-Datenbank installiert." 30 80 21 \
+per Schlüssel zu Authentifizieren.\n\n" 30 80 21 \
 	nagios "Nagios-Plugins" on\
 	zabbix "Zabbix-Agent" off\
 	keine  "Keine Überwachung" off\
@@ -2347,7 +2344,7 @@ if [[ $whichimap == "cyrus" ]]; then
 	if [[ $download == "0" ]]; then
 	    # Link für Download mit wget:
 	#    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_v1.741.tar.bz2/download 2>&1 | tee -a $setupdir/sine.log | pgbox
-	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.781/group-e_z-push_v2.7.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
+	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_z-push_v2.7.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
 	fi
 
 	# to be removed
