@@ -1614,7 +1614,7 @@ cups() {
     changevalues $path $file $strings
 
     # Workaround für CUPS-Bug
-    mkdir $libdir/cups/driver
+    mkdir $libdir/cups/driver  2>&1| tee -a $setupdir/sine.log
     
     chkservice "cups"
 
@@ -1933,9 +1933,9 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     fi
 
     # NFSv4 Server vorbereiten -- aber nicht starten
-    mkdir -p /srv/nfs4_base/home
-    mkdir /srv/nfs4_base/shares    
-    cp $cfilesdir/fileserver/nfs/exports_nfs4 /etc/exports
+    mkdir -p /srv/nfs4_base/home   2>&1| tee -a $setupdir/sine.log
+    mkdir /srv/nfs4_base/shares    2>&1| tee -a $setupdir/sine.log
+    cp $cfilesdir/fileserver/nfs/exports_nfs4 /etc/exports   2>&1| tee -a $setupdir/sine.log
     cat $cfilesdir/fileserver/nfs/fstab_extention >> /etc/fstab
     mount -a
     domain=`getconfdata "Domain" "2"`
@@ -2461,7 +2461,7 @@ elif [[ $whichimap == "dovecot" ]]; then
     cd $setupdir
     clear
     windowtitle="SOGo Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/sogo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/sogo.txt" 38 90
 
     zypper -n install -n `cat $setupdir/zypper-package-lists/sogo` 2>&1 | tee -a $setupdir/sine.log | pgbox
     zyppercheck ${PIPESTATUS[0]}
