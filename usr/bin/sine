@@ -2309,6 +2309,7 @@ monitoring() {
     "zabbix" )
         # Vorbereitung zur Ueberwachung des Servers via Zabbix-Agent mit Zabbix-Proxy
 	zypper -n install -n zabbix-agent zabbix-proxy zabbix-proxy-mysql fping 2>&1 | tee -a $setupdir/sine.log | pgbox
+        chmod ug+s /usr/sbin/fping* 2>&1 | tee -a $setupdir/sine.log
         zabbixdbpw=`mkdbsilent zabbix zabbix a`
         mysql -u zabbix -p$zabbixdbpw zabbix < $cfilesdir/zabbix/schema.sql
         cp $cfilesdir/zabbix/zabbix-agentd.conf /etc/zabbix 	2>&1| tee -a $setupdir/sine.log
