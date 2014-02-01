@@ -2352,7 +2352,7 @@ if [[ $whichimap == "cyrus" ]]; then
 	if [[ $download == "0" ]]; then
 	    # Link für Download mit wget:
 	#    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_v1.741.tar.bz2/download 2>&1 | tee -a $setupdir/sine.log | pgbox
-	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_z-push_v2.7.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
+	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.781/group-e_z-push_v3.3.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
 	fi
 
 	# to be removed
