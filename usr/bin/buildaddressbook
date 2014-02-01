@@ -2,5 +2,5 @@
 # Cron-Script zur Pflege der LDAP-Adressbuecher
 # /etc/cron.daily
 
-/usr/local/sbin/addaddress
-/usr/local/sbin/buildpostaladdress.pl
+/usr/bin/addaddress
+/usr/bin/buildpostaladdress.pl
