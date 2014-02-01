@@ -213,6 +213,7 @@ check() {
 	changevalues $path $file "$strings"
 	strings="NETCONFIG_NTP_POLICY=\"auto\"%NETCONFIG_NTP_POLICY=\"\""
 	changevalues $path $file "$strings"
+	# Das Verzeichnis /var/run/ntp existiert nicht. ??
 	cp $cfilesdir/System/sysconfig/network/servers-netconfig /var/run/ntp
 	chkservice "ntp"
         hwclock --systohc
@@ -1613,8 +1614,9 @@ cups() {
     strings="192.168.220.0%$net"
     changevalues $path $file $strings
 
+    # to be removed
     # Workaround für CUPS-Bug
-    mkdir $libdir/cups/driver  2>&1| tee -a $setupdir/sine.log
+    #mkdir $libdir/cups/driver  2>&1| tee -a $setupdir/sine.log
     
     chkservice "cups"
 
@@ -1933,8 +1935,9 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     fi
 
     # NFSv4 Server vorbereiten -- aber nicht starten
-    mkdir -p /srv/nfs4_base/home   2>&1| tee -a $setupdir/sine.log
-    mkdir /srv/nfs4_base/shares    2>&1| tee -a $setupdir/sine.log
+    # to be removed
+    #mkdir -p /srv/nfs4_base/home   2>&1| tee -a $setupdir/sine.log
+    #mkdir /srv/nfs4_base/shares    2>&1| tee -a $setupdir/sine.log
     cp $cfilesdir/fileserver/nfs/exports_nfs4 /etc/exports   2>&1| tee -a $setupdir/sine.log
     cat $cfilesdir/fileserver/nfs/fstab_extention >> /etc/fstab
     mount -a
