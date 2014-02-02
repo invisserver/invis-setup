@@ -8,4 +8,8 @@ Vielzahl an x86-Betriebssystemen unterstützt.
 Sinnvoll ist die Installation einer Virtualbox Umgebung nur, wenn Ihr Server über ausreichende
 Ressourcen und dessen Prozessor über AMD-V oder Intel-VT Befehlssatzerweiterungen verfügt.
 
+Der Oracle VM VirtualBox Extension Pack wird aus lizenzrechtlichen Gründen nicht automatisch
+installiert. Sie müssen dessen Installation bei Bedarf von Hand installieren.
 
+Teil der Installation ist auch das Webfrontend "phpvirtualbox". Es ermöglicht die Verwaltung
+virtueller Maschinen im Browser.

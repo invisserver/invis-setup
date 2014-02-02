@@ -3175,12 +3175,15 @@ virtualbox() {
     clear
     windowtitle="Virtualbox Virtualisierungsumgebung einrichten"
 
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/virtualbox.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Etherpadd-Lite installieren?" 0 0
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/virtualbox.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Virtualbox installieren?" 0 0
     cont=${?}
 
     # Weitermachen?
     if [[ $cont == "0" ]]; then
 	pgsubtitle="Software wird installiert"
+	
+	# Umgebungsvariablen fuer Virtualbox erstellen
+	cp $cfilesdir/virtualbox/virtualbox /etc/default
 	# Virtualbox Repo installieren
 	cp $cfilesdir/zypper/virtualbox.repo /etc/zypp/repos.d/
 	rpmkeyimporter
@@ -3191,13 +3194,12 @@ virtualbox() {
 	useradd -c "Dummy Benutzer fuer phpVirtualBox" vbox 2>&1 | tee -a $setupdir/sine.log | pgbox
 	pwvbox=`pwgen -sn 8 1`
 	echo "vbox:$pwvbox" | chpasswd | tee -a $setupdir/sine.log | pgbox
-	
-	# Umgebungsvariablen fuer Virtualbox erstellen
-	cp $cfilesdir/virtualbox/virtualbox /etc/default
-	
-	##tbc
-	
-	
+	# phpvirtualbox Konfiguration anpassen
+	path="/etc/phpvirtualbox"
+	cp $cfilesdir/virtualbox/config.php $path
+	strings="vboxpass%$pwvbox"
+	changevalues $path $file "$strings"
+	swpestat phpvirtualbox TRUE 2>&1 | tee -a $setupdir/sine.log | pgbox
     else
 	msgbox "Virtualbox Installation übersprungen" "$windowtitle"
     fi
