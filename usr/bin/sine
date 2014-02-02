@@ -3201,6 +3201,7 @@ virtualbox() {
 	strings="vboxpass%$pwvbox"
 	changevalues $path $file "$strings"
 	swpestat phpvirtualbox TRUE 2>&1 | tee -a $setupdir/sine.log | pgbox
+	chkservice "vboxweb-service"
     else
 	msgbox "Virtualbox Installation übersprungen" "$windowtitle"
     fi
