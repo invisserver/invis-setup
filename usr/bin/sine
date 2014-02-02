@@ -3222,7 +3222,7 @@ virtualbox() {
 	mkdir -p $vbworkingdir/isos
 	chown -R .vboxusers $vbworkingdir
 	chmod -R g+ws $vbworkingdir
-	VBoxManage setproperty machinefolder default $vbworkingdir
+	VBoxManage setproperty machinefolder $vbworkingdir
 
     else
 	msgbox "Virtualbox Installation übersprungen" "$windowtitle"
