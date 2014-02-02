@@ -14,7 +14,7 @@ for x in $zypperdir/*; do
     if [[ ! -d $x ]]; then
 	#echo $x
         repotype=`cat "$x"|grep type|cut -d "=" -f 2`
-        if [[ $repotype = "rpm-md" ]]; then
+        if [[ $repotype == "rpm-md" || $repotype == "yum" ]]; then
             gpgurl=`cat "$x"|grep gpgkey|cut -d "=" -f 2`
             #echo $gpgurl
             if [[ -n $gpgurl ]]; then
