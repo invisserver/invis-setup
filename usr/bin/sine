@@ -2920,7 +2920,7 @@ webcdwriter() {
     # Weitermachen?
     if [[ $cont == "0" ]]; then
 	pgsubtitle="Software wird installiert"
-	zypper -n install -n webcdwriter sox 2>&1 |pgbox
+	zypper -n install -n webcdwriter sox 2>&1 | tee -a $setupdir/sine.log |pgbox
 	zyppercheck ${PIPESTATUS[0]}
 	# wodim verfügbar machen
 	rm -f /var/CDWserver/bin/cdrecord
@@ -3166,6 +3166,41 @@ etherpad() {
     else
 	msgbox "Etherpad-Lite Installation übersprungen" "$windowtitle"
     fi
+    writeprepstat "virtualbox"
+    waitbox "etherpad" "virtualbox"
+}
+
+virtualbox() {
+    cd $setupdir
+    clear
+    windowtitle="Virtualbox Virtualisierungsumgebung einrichten"
+
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/virtualbox.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Etherpadd-Lite installieren?" 0 0
+    cont=${?}
+
+    # Weitermachen?
+    if [[ $cont == "0" ]]; then
+	pgsubtitle="Software wird installiert"
+	# Virtualbox Repo installieren
+	cp $cfilesdir/zypper/virtualbox.repo /etc/zypp/repos.d/
+	rpmkeyimporter
+	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n `cat $setupdir/zypper-package-lists/virtualbox` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	# lokaler Benutzer vbox wird angelegt
+	useradd -c "Dummy Benutzer fuer phpVirtualBox" vbox 2>&1 | tee -a $setupdir/sine.log | pgbox
+	pwvbox=`pwgen -sn 8 1`
+	echo "vbox:$pwvbox" | chpasswd | tee -a $setupdir/sine.log | pgbox
+	
+	# Umgebungsvariablen fuer Virtualbox erstellen
+	cp $cfilesdir/virtualbox/virtualbox /etc/default
+	
+	##tbc
+	
+	
+    else
+	msgbox "Virtualbox Installation übersprungen" "$windowtitle"
+    fi
     writeprepstat "ready"
 }
 
@@ -3225,7 +3260,7 @@ if [[ -z `which dialog 2>/dev/null` ]]; then
     zyppercheck ${PIPESTATUS[0]}
 fi
 
-if [[ $prepstat == "ready" ]] && [[ $1 == "monitoring" || $1 == "groupware" || $1 == "erp" || $1 == "faxgate" || $1 == "webcdwriter" || $1 == "openvpn" || $1 == "dokuwiki" || $1 == "etherpad" ]]; then
+if [[ $prepstat == "ready" ]] && [[ $1 == "monitoring" || $1 == "groupware" || $1 == "erp" || $1 == "faxgate" || $1 == "webcdwriter" || $1 == "openvpn" || $1 == "dokuwiki" || $1 == "etherpad" || $1 =="virtualbox" ]]; then
 	echo $1
 	sleep 1
 	$1

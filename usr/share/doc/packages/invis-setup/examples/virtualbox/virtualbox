@@ -1,0 +1,6 @@
+#Virtualbox Variablen fuer den VBox-Webservice
+VBOXWEB_USER=root
+VBOXWEB_HOST=127.0.0.1
+VBOXWEB_PORT=18083
+VBOXWEB_LOGFILE=/var/log/vboxweb
+

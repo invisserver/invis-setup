@@ -1,0 +1,11 @@
+Virtualbox
+
+Oracle VM VirtualBox ist eine Virtualisierungssoftware des US-amerikanischen Unternehmens Oracle.
+Sie kann auf den Betriebssystemen FreeBSD[3], Linux, OS/2, Mac OS X, Solaris und Windows als
+Wirtssystem auf 32-Bit- oder 64-Bit-x86-Systemen eingesetzt werden. Als Gastsysteme werden eine
+Vielzahl an x86-Betriebssystemen unterstützt. 
+
+Sinnvoll ist die Installation einer Virtualbox Umgebung nur, wenn Ihr Server über ausreichende
+Ressourcen und dessen Prozessor über AMD-V oder Intel-VT Befehlssatzerweiterungen verfügt.
+
+
