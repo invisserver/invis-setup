@@ -3196,6 +3196,7 @@ virtualbox() {
 	echo "vbox:$pwvbox" | chpasswd | tee -a $setupdir/sine.log | pgbox
 	# phpvirtualbox Konfiguration anpassen
 	path="/etc/phpvirtualbox"
+	file="config.php"
 	cp $cfilesdir/virtualbox/config.php $path
 	strings="vboxpass%$pwvbox"
 	changevalues $path $file "$strings"
