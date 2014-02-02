@@ -1,0 +1,143 @@
+#! /bin/sh
+# Copyright (c) 1995-2004 SUSE Linux AG, Nuernberg, Germany
+# All rights reserved
+# Obiger Copyright-Vermerk betrifft lediglich das Grund-
+# gerüst des init-Scripts.
+# (c) 2010 Stefan Schaefer -- FSP Computer & Netzwerke
+# (c) 2011 Stefan Schaefer -- invis-server.org
+# Author: Stefan Schaefer <st-schaefer@fsproductions.de>
+# Version 0.5
+# /etc/init.d/vboxinit
+#   and its symbolic link
+# /usr/sbin/rcvboxinit
+#
+#    This program is free software; you can redistribute it and/or modify 
+#    it under the terms of the GNU General Public License as published by 
+#    the Free Software Foundation; either version 2 of the License, or 
+#    (at your option) any later version. 
+# 
+#    This program is distributed in the hope that it will be useful, 
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of 
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+#    GNU General Public License for more details. 
+# 
+#    You should have received a copy of the GNU General Public License 
+#    along with this program; if not, write to the Free Software 
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+### BEGIN INIT INFO
+# Provides:          VBox VMs
+# Required-Start:    $network $remote_fs $syslog vboxdrv
+# Required-Stop:     $network 
+# Should-Start:      
+# Should-Stop:       
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: Domain Name System (DNS) server, named
+# Description:       Berkeley Internet Name Domain (BIND) implementation of the
+#	Domain Name System (DNS) server named.
+### END INIT INFO
+
+. /etc/rc.status
+rc_reset
+
+PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+config="/etc/vbinit/vboxinit.conf"
+
+vbversion=$(VBoxManage -v |cut -d "." -f1)
+
+startvms() {
+    # laufende VMs eritteln
+    rvms=($(VBoxManage list runningvms|grep "^\""|cut -d "\"" -f2))
+    while read line; do
+	if [[ $(echo $line| grep -v "^#") ]]; then
+	    startnr=$(echo $line| cut -d ":" -f2)
+	    vm=$(echo $line| cut -d ":" -f1)
+	    if [[ $startnr != 0 ]]; then
+		(( index=$startnr - 1 ))
+		vms[$startnr]="$vm"
+	    fi
+	fi
+    done < $config
+
+    if (( ${#rvms[*]} == 0 ));then
+	for vm in ${vms[*]}; do
+		echo -e "\nGestartet wird VM: $vm\n"
+		if (( vbversion < 4 )); then
+		    VBoxManage startvm $vm -t vrdp
+		else
+		    VBoxManage startvm $vm -t headless
+		fi
+		delay=$(cat $config| grep "$vm:"|cut -d ":" -f 3)
+		echo -e "\nWartezeit bis zum Start der nächsten VM: $delay Sekunden"
+		sleep $delay
+	    done
+	else
+	    echo -e "Es laufen bereits ${#rvms[*]} virtuelle Maschinen\nstarten sie fehlende bitte von Hand mit:\nVBoxManage startvm VM-Name -t vrdp"
+	fi
+}
+
+shutdownvms() {
+    # laufende VMs ermitteln
+    rvms=($(VBoxManage list runningvms|grep "^\""|cut -d "\"" -f2))
+    for rvm in ${rvms[*]}; do
+	echo -e "\nGestoppt wird VM: $rvm\n"
+	VBoxManage controlvm $rvm acpipowerbutton
+    done
+}
+
+checkshutdown() {
+    i=0
+    echo -e "15s Warten bis alle virtuellen Maschinen heruntergefahren sind."
+    while (( $i < 3 )); do
+	sleep 15
+	laufennoch=$(pgrep "VBoxHeadless")
+	if [[ -n $laufennoch ]]; then
+	    echo "Bitte weitere 15s warten."
+	else
+	    break
+	fi
+	(( i=$i + 1 ))
+    done
+    laufennoch=$(pgrep "VBoxHeadless")
+    if [[ -n $laufennoch ]]; then
+	echo -e "Es konnten nicht alle VMs gestoppt werden.\nEs wird empfohlen alle VMs mit:\n\"/etc/init.d/vboxinit force-stop\"\nzu beenden."
+    fi
+}
+
+case "$1" in
+    start)
+	echo "Starting virtual Machines "
+	startvms
+	;;
+    stop)
+	echo "Shutting down virtual Machines "
+	shutdownvms
+	checkshutdown
+	;;
+    force-stop)
+	echo "Forced shutdown of virtual Machines "
+	#laufende vms ermitteln
+	rvms=($(VBoxManage list runningvms|grep "^\""|cut -d "\"" -f2))
+	for rvm in ${rvms[*]}; do
+	    echo -e "\nGestoppt wird VM: $rvm\n"
+	    VBoxManage controlvm $rvm poweroff
+	done
+	;;
+    restart)
+	echo "Shutting down virtual Machines "
+	shutdownvms
+	checkshutdown
+	echo "Restarting virtual Machines "
+	startvms
+	;;
+    status)
+	echo -n "Checking for running VMs "
+	VBoxManage list runningvms
+	;;
+    *)
+	echo "Usage: $0 {start|stop|status|force-stop}"
+	exit 1
+	;;
+esac
+rc_exit

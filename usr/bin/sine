@@ -3202,6 +3202,19 @@ virtualbox() {
 	changevalues $path $file "$strings"
 	swpestat phpvirtualbox TRUE 2>&1 | tee -a $setupdir/sine.log | pgbox
 	chkservice "vboxweb-service"
+	
+	# vbinit installieren
+	# Konfigurationsverzeichnis einrichten
+	mkdir /etc/vbinit
+	cp $cfilesdir/virtualbox/vboxinit.conf /etc/vbinit/
+	chown -R root.root /etc/vbinit
+	chmod 0640 /etc/vbinit/vboxinit.conf
+
+	# initscript kopieren
+	cp $cfilesdir/virtualbox/vboxinit /etc/init.d/
+	chown -R root.root /etc/init.d/vboxinit
+	chmod 0750 /etc/init.d/vboxinit
+	chkservice "vboxinit"
     else
 	msgbox "Virtualbox Installation übersprungen" "$windowtitle"
     fi

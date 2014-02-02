@@ -13,3 +13,10 @@ installiert. Sie müssen dessen Installation bei Bedarf von Hand installieren.
 
 Teil der Installation ist auch das Webfrontend "phpvirtualbox". Es ermöglicht die Verwaltung
 virtueller Maschinen im Browser.
+
+Weiterhin wird ein einfaches init-System zum automatischen Start virtueller Maschinen in vor-
+gegebener Reihenfolge installiert. Virtuelle Maschinen müssen dazu lediglich in:
+
+/etc/vbinit/vboxinit.conf
+
+eingetragen werden.
