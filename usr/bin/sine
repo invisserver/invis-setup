@@ -3215,6 +3215,15 @@ virtualbox() {
 	chown -R root.root /etc/init.d/vboxinit
 	chmod 0750 /etc/init.d/vboxinit
 	chkservice "vboxinit"
+	
+	# Arbeitsverzeichnisse für Virtualbox anlegen
+	vbworkingdir="/srv/virtualbox"
+	mkdir -p $vbworkingdir/apps
+	mkdir -p $vbworkingdir/isos
+	chown -R .vboxusers $vbworkingdir
+	chmod -R g+ws $vbworkingdir
+	VBoxManage setproperty machinefolder default $vbworkingdir
+
     else
 	msgbox "Virtualbox Installation übersprungen" "$windowtitle"
     fi
