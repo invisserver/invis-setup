@@ -1685,6 +1685,8 @@ samba() {
     # Logon-Scripts werden kopiert und ins DOS-Format ueberfuehrt
     cp $cfilesdir/fileserver/samba/logon-scripts/*.cmd /var/lib/samba/netlogon
     unix2dos /var/lib/samba/netlogon/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
+    # Samba4 wertet X-Bit aus
+    chmod +x /var/lib/samba/netlogon/*  2>&1| tee -a $setupdir/sine.log
     
     hn=`getconfdata "Hostname" "2"`
     path="/var/lib/samba/netlogon"
