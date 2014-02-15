@@ -496,7 +496,7 @@ Wählen Sie den von Ihnen bevorzugten IMAP-Server aus. Wenn Sie Group-e verwende
 von Group-e." 16 80 5 \
 	cyrus "Das Monster in Kombination mit Group-e" on\
 	dovecot "Der Schlanke in Kombination mit SOGo" off\
-	zarafa "Mailserver/Groupware Kombination für Outlook-Junkies" off\
+	zarafa "Mailserver/Groupware Kombination für Outlook-Freunde" off\
 	2>$setupdir/sine_temp
 	whichimap=`cat $setupdir/sine_temp`
     
@@ -700,6 +700,58 @@ Sollen alte Dateien und Verzeichnisse automatisch aus der Transfer-Freigabe gel�
     yesno "Sollen Cronjobs für regelmäßige Virenscanns der Fileserver-Verzeichnisse eingerichtet werden?" "Regelmäßige Virenscans der Serverfreigaben"
     avcron=${?}
 
+    yesno "Soll Ihr Server ein beliebiges Verzeichnis im Hintergrund mit einem ownCloud Konto synchronisieren?" "ownCloud Synchronisation"
+    owncloudsync=${?}
+
+    ok=0
+    if [[ $owncloudsync == "0" ]]; then
+    ocsyncdir="/srv/shares/media/owncloud"
+    while (( $ok != "4" ));do
+	dialog --backtitle "$dialogtitle" --title "ownCloud Zugangsdaten" --form "$dialogshorthelp\n\n
+Geben Sie bitte den Hostnamen bzw. die IP-Adresse Ihres ownCloud Servers, sowie die zuhehörigen Zugangsdaten ein." 19 74 9 \
+	"ownCloud Server:" 2 2 "$ocserver" 2 20 45 0\
+	"Sync-Verzeichnis" 4 2 "$ocsyncdir" 4 20 45 0\
+	"Benutzername:" 6 2 "$ocusername" 6 20 45 0\
+	"Passwort:" 8 2 "$ocpassword" 8 20 45 0\
+	2>$setupdir/sine_temp
+	exitcode=${?}
+	# Doch noch abbrechen
+	if [[ $exitcode == "1" || $exitcode == "255" ]]; then
+	    break
+	fi
+	
+	ocvalues=(`cat $setupdir/sine_temp`)
+
+	if (( ${#ocvalues[0]} > 0 ));then
+	    ocserver=${ocvalues[0]}
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+
+	if (( ${#ocvalues[1]} > 0 ));then
+	    ocsyncdir=${ocvalues[1]}
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+
+	if (( ${#ocvalues[2]} > 0 ));then
+	    ocusername=${ocvalues[2]}
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+
+	if (( ${#ocvalues[3]} > 0 ));then
+	    ocpassword=${ocvalues[3]}
+	    (( ok=$ok + 1 ))
+	else
+	    ok=0
+	fi
+
+    done
+    fi
 #---# Ende der Fragestunde
 
     sshport=`freeports`
@@ -778,6 +830,16 @@ Aus Ihrem lokalen Netz heraus kann für SSH weiter Port 22 verwendet werden." "S
 	echo "cleanTR:n" >> $setupdir/invis_confdata
     fi
 
+    if [[ $owncloudsync == "0" ]]; then
+	echo "ownCloudSync:j" >> $setupdir/invis_confdata
+	echo "ownCloudServer:$ocserver" >> $setupdir/invis_confdata
+	echo "ownCloudSyncDir:$ocsyncdir" >> $setupdir/invis_confdata
+	echo "ownCloudUser:$ocusername" >> $setupdir/invis_confdata
+	echo "ownCloudPassword:$ocpassword" >> $setupdir/invis_confdata
+    else
+	echo "ownCloudSync:n" >> $setupdir/invis_confdata
+    fi
+    
     writeprepstat "sysprep" 
     waitbox "quest" "sysprep" 
 
@@ -877,6 +939,33 @@ sysprep() {
 	cp $cfilesdir/Virenscanner/avscan.conf /etc/avira/ 2>&1| tee -a $setupdir/sine.log
 	# avguard in RL-Konzept aufnehmen und starten
 	chkservice "avguard"
+    fi
+
+    ## ownCloud Synchronisation
+    ocsync=`getconfdata "ownCloudSync" "2"`
+    if [[ $ocsync == "j" ]]; then
+        zypper refresh 2>&1| tee -a $setupdir/sine.log | pgbox
+	zypper -n install -n csync libcsync-plugin-owncloud  2>&1| tee -a $setupdir/sine.log | pgbox
+	ocsyncdir=`getconfdata "ownCloudSyncDir" "2"`
+	if [[ ! -d $ocsyncdir ]]; then
+	    mkdir -p $ocsyncdir
+	fi
+	ocuserver=`getconfdata "ownCloudServer" "2"`
+	ocusername=`getconfdata "ownCloudUserName" "2"`
+	ocpassword=`getconfdata "ownCloudPassword" "2"`
+	path="/etc/invis"
+	file="invis.conf"
+	strings="ocSync:n%ocSync:j"
+	changevalues $path $file "$strings"
+	strings="oc-user%$ocusername"
+	changevalues $path $file "$strings"
+	strings="oc-syncdir%$ocsyndir"
+	changevalues $path $file "$strings"
+	strings="oc-server%$ocserver"
+	changevalues $path $file "$strings"
+	file="invis-pws.conf"
+	strings="oc-pass%$ocpassword"
+	changevalues $path $file "$strings"
     fi
 
     # Vorbereitete sysconfig Dateien kopieren
