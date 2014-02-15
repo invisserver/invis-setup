@@ -2349,13 +2349,14 @@ if [[ $whichimap == "cyrus" ]]; then
 	zypper -n install -n group-e 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 
-	dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen Group-e's z-push automatisch herunterzuladen?" 0 0
-	download=${?}
-	if [[ $download == "0" ]]; then
+	# to be removed
+	#dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen Group-e's z-push automatisch herunterzuladen?" 0 0
+	#download=${?}
+	#if [[ $download == "0" ]]; then
 	    # Link für Download mit wget:
 	#    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_v1.741.tar.bz2/download 2>&1 | tee -a $setupdir/sine.log | pgbox
-	    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.781/group-e_z-push_v3.3.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
-	fi
+	#    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.781/group-e_z-push_v3.3.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
+	#fi
 
 	# to be removed
         # Entpacken des groupe Archivs
@@ -2396,7 +2397,7 @@ if [[ $whichimap == "cyrus" ]]; then
 	
 	# Apache Default-Server-Konfiguration anpassen (FollowSymlinks wird hinzu gefügt)
 	cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
-	
+	# to be removed
 	# mount.cifs bzw. umount.cifs für Group-e verfügbar machen
 	# Ist mit den PHP5 Paketen aus dem invis Repository eigentlich nit mehr notwendig.
 	#chmod u+s /sbin/mount.cifs
@@ -2411,47 +2412,48 @@ if [[ $whichimap == "cyrus" ]]; then
 	smbldappw projekte
 	echo "Initmail" |mailx -s Initmail projekte@localhost
 
+	# to be removed
 	# z-push Installation -- Experimentell
-    	getpath=`find ~ -name "group-e_z-push*.tar.gz"`
-	echo $getpath
-	if [[ ! -f $getpath ]]; then
-	    dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $setupdir/sine_temp
-	    getpath=`cat $setupdir/sine_temp`
-	fi
-	if [[ -f $getpath ]]; then
+    	#getpath=`find ~ -name "group-e_z-push*.tar.gz"`
+	#echo $getpath
+	#if [[ ! -f $getpath ]]; then
+	#    dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $setupdir/sine_temp
+	#    getpath=`cat $setupdir/sine_temp`
+	#fi
+	#if [[ -f $getpath ]]; then
 	    # Apache Konfigurationserweiterung kopieren.
 	    #cp $cfilesdir/webserver/z-push.conf /etc/apache2/conf.d/
-	    cp $cfilesdir/webserver/z-push_vh.conf /etc/apache2/vhosts.d/
+	cp $cfilesdir/webserver/z-push_vh-groupe.conf /etc/apache2/vhosts.d/
 	    # z-push entpacken und Verzeichnis verschieben
-	    pgsubtitle="z-push wird entpackt und installiert."
-	    tar -xvf $getpath -C . 2>&1 |pgbox
-	    mv ./z-push /srv/www/htdocs/
-	    chown -R wwwrun:www /srv/www/htdocs/z-push
+	    #pgsubtitle="z-push wird entpackt und installiert."
+	    #tar -xvf $getpath -C . 2>&1 |pgbox
+	    #mv ./z-push /srv/www/htdocs/
+	    #chown -R wwwrun:www /srv/www/htdocs/z-push
 		
-	    path="/srv/www/htdocs/z-push"
-	    file="config.php"
-	    strings="/soap.php%/group-e/soap.php"
-	    changevalues $path $file "$strings"
+	    #path="/srv/www/htdocs/z-push"
+	    #file="config.php"
+	    #strings="/soap.php%/group-e/soap.php"
+	    #changevalues $path $file "$strings"
 
-	    strings="Amsterdam%Berlin"
-	    changevalues $path $file "$strings"
+	    #strings="Amsterdam%Berlin"
+	    #changevalues $path $file "$strings"
 
-	    strings="/var/www/z-push%/srv/www/htdocs/z-push"
-	    changevalues $path $file "$strings"
+	    #strings="/var/www/z-push%/srv/www/htdocs/z-push"
+	    #changevalues $path $file "$strings"
 		
 	    # Muss noch getestet werden, kann sein, dass das unnötig ist.
-	    ddnsname=`getconfdata "DDNS" "2"`
-	    httpsport=`getconfdata "HTTPSPORT" "2"`
-	    strings="'GROUP_URL_DOMAIN',''%GROUP_URL_DOMAIN','$ddnsname'"
-	    changevalues $path $file "https://$strings:$httpsport"
+	    #ddnsname=`getconfdata "DDNS" "2"`
+	    #httpsport=`getconfdata "HTTPSPORT" "2"`
+	    #strings="'GROUP_URL_DOMAIN',''%GROUP_URL_DOMAIN','$ddnsname'"
+	    #changevalues $path $file "https://$strings:$httpsport"
 	
-	    path="/etc/apache2/vhosts.d"
-	    file="z-push_vh.conf"
-	    strings="your.ddns-domain.net%$ddnsname"
-	    changevalues $path $file "$strings"
+	    #path="/etc/apache2/vhosts.d"
+	    #file="z-push_vh.conf"
+	    #strings="your.ddns-domain.net%$ddnsname"
+	    #changevalues $path $file "$strings"
 	fi
 	
-	    chkservice "apache2"
+	chkservice "apache2"
 	#else
 	#    msgbox "Das Group-e Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
 	#    exit 
