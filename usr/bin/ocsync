@@ -1,0 +1,49 @@
+#!/bin/bash
+# Shellscript zum Synchronisieren eines beliebigen Verzeichnisses
+# des invis-Servers mit einem ownCloud Konto
+# (C) 20014 Stefan Schäfer -- invis-server.org
+# Mail: stefan@invis-server.org
+# Questions: http://forum.invis-server.org
+# License: GPLv3
+
+# Konfigurationsdaten
+conffile="/etc/invis/invis.conf"
+passfile="/etc/invis/invis-pws.conf"
+
+# Funktionen
+# Werte aus Konfigurationsdatendatei extrahieren
+# $1 = Konfigurationsdatei, $2 = Parameter, $3 Wert (Feld)
+getconfdata() {
+    cat $1 |grep "$2" | cut -d ":" -f $3
+}
+
+# Konfigurationsparameter tauschen
+changevalues() {
+    # Arg1 = Pfad, Arg2 = Datei, Arg3 = sed String
+    cat $1/$2|sed "s%$3%g" > $1/$2.new
+    mv $1/$2.new $1/$2
+}
+
+# Workaround
+# Prüfen, ob die ownclouds csync lib vorhanden ist
+libfile="/usr/lib64/csync-0/csync_ownclouds.so"
+if [[ ! -f $libfile && ! -h $libfile ]]; then
+    ln -s /usr/lib64/csync-0/csync_owncloud.so /usr/lib64/csync-0/csync_ownclouds.so
+fi
+
+## Konfigurationsdaten einlesen
+ocsync=`getconfdata $conffile "ocSync" "2"`
+
+echo "yes" > /tmp/ocsync
+
+if [[ $ocsync == "j" ]]; then
+    ocserver=`getconfdata $conffile "ocServer" "2"`
+    ocprot=`getconfdata $conffile "ocProtocol" "2"`
+    ocdir=`getconfdata $conffile "ocLocalFolder" "2"`
+    ocuser=`getconfdata $conffile "ocUser" "2"`
+    ocpass=`getconfdata $passfile "ocPass" "2"`
+
+    # Synchronisation starten
+    csync $ocdir $ocprot://$ocuser:$ocpass@$ocserver/remote.php/webdav < /tmp/ocsync
+
+fi

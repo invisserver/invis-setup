@@ -7,6 +7,10 @@ MAILTO=/dev/null
 # alle 10 Minuten
 */10 * * * * root /usr/bin/inetcheck
 
+# ownCloud Synchronisation
+# alle 5 Minuten
+*/5 * * * * root /usr/bin/ocsync > /dev/null 2>&1
+
 # regelmaessiges Pruefen der Festplatten und RAID-Verbuende
 # alle 2 Stunden
 0 */2 * * * root /usr/bin/diskchecker
