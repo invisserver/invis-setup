@@ -902,10 +902,6 @@ sysprep() {
     ntoppw=`getconfdata "NtopPw" "2"`
     ntop --set-admin-password=$ntoppw -u wwwrun 2>&1| tee -a $setupdir/sine.log | pgbox
 
-    # to be removed
-    # Systemgruppe für den Zugriff auf private-Keys einrichten
-    #groupadd -g 998 -r pkeys 2>&1| tee -a $setupdir/sine.log
-
     #openSSL einrichten und CA bauen
     cp $cfilesdir/ssl/openssl.cnf /etc/ssl 2>&1| tee -a $setupdir/sine.log
     cp $cfilesdir/ssl/CA.pl /usr/share/ssl/misc/ 2>&1| tee -a $setupdir/sine.log
@@ -943,36 +939,8 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     # Verzeichnis fuer dnssec Schluessel erzeugen
     mkdir -p /etc/ssl/ddns 2>&1| tee -a $setupdir/sine.log
 
-    # to be removed
-    # Systemüberwachungstools werden installiert
-    #cp /usr/bin/inetcheck /usr/bin/ 	2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/diskchecker /usr/bin/ 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/freeports /usr/bin/ 	2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/alldump /usr/sbin/	2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/dwdatasnapshot /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/scanleases /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/afterup /usr/sbin/ 	2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/amacheck /usr/sbin/ 	2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/avrun /usr/sbin/ 	2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/clean_transfer /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/clean_recycle /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/serverkeys /usr/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/fixpearchannel /usr/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/fixbindchroot /usr/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/mkdbsilent /usr/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/umtsup /usr/sbin 	2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/fetchavkey /usr/sbin 2>&1| tee -a $setupdir/sine.log
-    #cp /usr/bin/safebootpart /usr/sbin 2>&1| tee -a $setupdir/sine.log
-
     # Konfiguration fuer Notfall-Internetzugang via Handy und T-Mobile (Teathering)
     cp $cfilesdir/invis/wvd_tmobile.conf /etc/invis 2>&1| tee -a $setupdir/sine.log
-
-    # to be removed
-    #chown -R root:root /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
-    #chmod -R ug+x /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
-
-    #chown -R root:root /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
-    #chmod -R a+x /usr/sbin/ 2>&1| tee -a $setupdir/sine.log
 
     # PHP ini-Dateien anpassen
     cp $cfilesdir/webserver/apache2/php.ini /etc/php5/apache2/ 2>&1| tee -a $setupdir/sine.log
@@ -988,16 +956,6 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
 
     # Workaround fuer fastcgi php.ini Bug
     ln -s /etc/php5/fastcgi /etc/php5/fpm
-
-    # to be removed
-#    pgsubtitle="PHP PEAR Channel Konfiguration wird aktualisiert"
-#    /usr/sbin/fixpearchannel 2>&1 | tee -a $setupdir/sine.log | pgbox
-
-    # invis cron-file wird installiert
-    #cp $cfilesdir/invis/invis.cron /etc/cron.d/ 2>&1| tee -a $setupdir/sine.log
-
-    # invis permissions-file wird installiert.
-    #cp $cfilesdir/System/permissions.d/invis-server /etc/permissions.d/ 2>&1| tee -a $setupdir/sine.log
 
     # invis Konfigurationsdatei anpassen
     file="invis.conf"
@@ -1276,14 +1234,6 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
     # Installation entfaellt, da es per rpm installiert wird.
     cp $cfilesdir/LDAP/phpldapadmin/config.php /srv/www/htdocs/phpldapadmin/config/
 
-    # to be removed
-    #cp /usr/bin/addaddress /usr/sbin/
-    #cp /usr/bin/addcn.pl /usr/sbin/
-    #cp /usr/bin/buildpostaladdress.pl /usr/sbin/
-    
-    #chown -R root:root /usr/sbin
-    #chmod -R ug+x /usr/sbin
-    
     writeprepstat "dns"
     waitbox "ldap" "dns"
 }
@@ -1340,19 +1290,9 @@ dns() {
     strings="invis-net.loc%$domain"
     changevalues $path $file "$strings"    
 
-    # Chroot Umgebung fuer bind 9.8.x fixen -- hoffentlich nur temporaer notwendig
-    ## to be removed
-    #/usr/bin/fixbindchroot 2>&1| tee -a $setupdir/sine.log
-
     # DNS Dienst starten und ins Runlevel-Konzept einbinden.
     chkservice "named"
     
-    # Schlüssel für DHCP initiertes DNS-Update erzeugen
-    #echo -e "\033[1;33mEs wird ein Schlüssel für DNS-Update via DHCP erzeugt. Das dauert....\033[0m"
-    #/usr/bin/genDDNSkey --force
-    #cp /etc/named.keys /var/lib/dhcp/etc
-
-    #echo -e "\033[1;33mPassen Sie evtl. noch den Eintrag der Forward-Nameserver in /etc/named.conf an Ihre Umgebung an.\033[0m"
     writeprepstat "dhcp"
     waitbox "dns" "dhcp"
 }
@@ -1511,12 +1451,6 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    # Symbolischen Link auf das z-push2 Verzeichnis anlegen
 	    ln -s /srv/www/htdocs/z-push2 /srv/www/htdocs/z-push
 	    
-	    # to be removed
-	    # Datensicherungstools installieren
-	    #cp /usr/bin/zbackup /usr/sbin
-	    #cp /usr/bin/zdbdump /usr/sbin
-	    #chown root:root /usr/sbin/z*
-	
 	    rm -f `ls /etc/postfix/ |grep "main.[dovecot|cyrus]"` 2>&1| tee -a $setupdir/sine.log
 	    mv /etc/postfix/main.zarafa /etc/postfix/main.cf 2>&1| tee -a $setupdir/sine.log
 	    ;;
@@ -1614,10 +1548,6 @@ cups() {
     strings="192.168.220.0%$net"
     changevalues $path $file $strings
 
-    # to be removed
-    # Workaround für CUPS-Bug
-    #mkdir $libdir/cups/driver  2>&1| tee -a $setupdir/sine.log
-    
     chkservice "cups"
 
     writeprepstat "samba"
@@ -1822,32 +1752,6 @@ samba() {
     # Testen, welche Groupware zum Einsatz kommt
     whichimap=`getconfdata "IMAPserver" "2"`
     
-    # to be removed
-    #path="/usr/bin"
-    #file="manipgroups"
-    #cp /usr/bin/$file $path/ 2>&1| tee -a $setupdir/sine.log
-    #chown root:root $path/$file 2>&1| tee -a $setupdir/sine.log
-    #chmod 0700 $path/$file 	2>&1| tee -a $setupdir/sine.log
-
-    #if [[ $whichimap != "zarafa" ]]; then
-    #    path="/usr/bin"
-#	file="addgeg"
-#	cp /usr/bin/$file $path/
-#	chown root:root $path/$file
-#	chmod 0700 $path/$file
-#	$path/$file 2>&1|tee -a $setupdir/sine.log
-#    else
-#        path="/usr/bin"
-#	file="addzag"
-#	cp /usr/bin/$file $path/
-#	chown root:root $path/$file
-#	chmod 0700 $path/$file
-#	$path/$file 2>&1|tee -a $setupdir/sine.log
-#	file="extzu"
-#	cp /usr/bin/$file $path/ 	2>&1| tee -a $setupdir/sine.log
-#	chown root:root $path/$file 	2>&1| tee -a $setupdir/sine.log
-#	chmod 0700 $path/$file 		2>&1| tee -a $setupdir/sine.log
-#    fi
 
     msgbox "Auf Ihrem Server wurde ein Samba-PDC eingerichtet.\n\n
 Es wurden grundlegende Gruppen und Systemaccounts angelegt.\nDer Server verfügt über die Freigaben:\n\n
@@ -1860,66 +1764,6 @@ Es wurden grundlegende Gruppen und Systemaccounts angelegt.\nDer Server verfügt
 Es wurde die Gruppe Verwaltung angelegt, sowie ein Benutzer domadmin, Mitglied der Gruppe Domain Admins.\n
 Ihr Server wurde darüber hinaus an die LDAP-Benutzerdatenbank angebunden.\n\n
 Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation abgeschlossen."
-
-#1800
-# to be removed
-#Möchten Sie jetzt Benutzer anlegen?" "Benutzerkonten anlegen"
-#    nextuser=${?}
-    
-#    while [[ $nextuser == "0" ]]; do
-#	username=""
-#	while (( ${#username} <= 3 )); do
-#	    dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --form "$dialogshorthelp\n\n
-#Geben Sie die folgenden Daten für den neuen Benutzer ein:" 18 74 7 \
-#	    "Benutzername:" 2 2 "$mailrelay" 2 20 45 0\
-#	    "Vorname:" 4 2 "$smtpun" 4 20 45 0\
-#	    "Nachname:" 6 2 "$smtppw" 6 20 45 0\
-#	    2>$setupdir/sine_temp
-#	    uservalues=(`cat $setupdir/sine_temp`)
-#	    username=${uservalues[0]}
-#	done
-#	yesno "Soll der neue Benutzer ein vollwertiger Benutzer sein? (Ansonsten wird nur ein Mail-Dummy-Konto eingerichtet)" "Benutzerkonten anlegen"
-#	windows=${?}
-#	if [[ $windows == "0" ]]; then  
-#	    yesno "Soll der neue Benutzer Mitglied der privilegierten Gruppe \"Verwaltung\" sein?" "Benutzerkonten anlegen"
-#	    verwaltung=${?}
-#	fi
-	
-	# Alle neuen Benutzer bekommen eine Willkommens-Mail zugesandt, dies dient der automatischen Erzeugung eines Maildirs.
-#	if [[ $windows == "1" ]]; then
-#	    smbldap-useradd -m -s /bin/false -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
-#	elif [[ $verwaltung == "0" ]]; then
-#	    smbldap-useradd -m -a -G "Verwaltung" -E verwaltung.cmd -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
-#	else
-#	    smbldap-useradd -m -a -c "${uservalues[1]} ${uservalues[2]},umask=0002" -N ${uservalues[1]} -S ${uservalues[2]} ${uservalues[0]}
-#	fi
-
-#        echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
-#        # Passwort setzen
-#        smbldappw $username
-#        echo "Willkommen in der Domäne $smbdom"|mailx -s Willkommen $username@localhost
-#	if [[ $windows == "j" ]]; then
-#	    mkdir /srv/shares/portal/downloads/$username
-#	    chmod g+rwsx,o-rwx /srv/shares/portal/downloads/$username
-#	fi
-#	yesno "Möchten Sie einen weiteren Benutzer anlegen?" "Benutzerkonten anlegen" nextuser
-#	nextuser=${?}
-#    done
-
-    # to be removed
-    # Gastkonto anlegen
-    #yesno "Möchten Sie jetzt einen minderprivilegierten Gast-Benutzer anlegen?" "Benutzerkonten anlegen"
-    #guest=${?}
-    
-    #if [[ $guest == "0" ]]; then
-	#read -p "Geben Sie den gewünschten Benutzernamen ein: " username
-#	dialog --backtitle "$dialogtitle" --title "Benutzerkonten anlegen" --inputbox "Geben Sie bitten den gewünschten Benutzernamen ein." 0 0 \
-#	2>$setupdir/sine_temp
-#	username=`cat $setupdir/sine_temp`
-#	smbldap-useradd -m -a -s /bin/false -g 514 -E gast.cmd -c "Gastkonto" $username
-#	echo -e "\033[0;33mBitte geben Sie ein Passwort für den neuen Benutzer ein.\033[0m"
-#	smbldappw $username
-#    fi
 
     # Samba-Server starten und in Runlevel eintragen
     # Sambaversion pruefen
@@ -1937,9 +1781,6 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     fi
 
     # NFSv4 Server vorbereiten -- aber nicht starten
-    # to be removed
-    #mkdir -p /srv/nfs4_base/home   2>&1| tee -a $setupdir/sine.log
-    #mkdir /srv/nfs4_base/shares    2>&1| tee -a $setupdir/sine.log
     cp $cfilesdir/fileserver/nfs/exports_nfs4 /etc/exports   2>&1| tee -a $setupdir/sine.log
     cat $cfilesdir/fileserver/nfs/fstab_extention >> /etc/fstab
     mount -a
@@ -1961,17 +1802,6 @@ webserver() {
     windowtitle="Web Server"
     waitinfobox "Ihr Webserver sowie das invis-Portal werden eingerichtet.
 Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/config.php vorgenommen werden." "Webserver-Konfiguration"
-    # to be removed
-    #pgsubtitle="Zeichensatz des openSUSE-Manuals wird in UTF8 umgewandelt"
-    #/usr/bin/changecharset "/usr/share/doc/manual/opensuse-manuals_de" 2>&1 | tee -a $setupdir/sine.log | pgbox
-
-    # to be removed
-    # Installation Portal
-    # MIME_Type wird jetzt aus spins:invis installiert
-    #pgsubtitle="PHP-PEAR MIME_Type wird installiert"
-    #pear install MIME_Type 2>&1 |pgbox
-    #cp -R $cfilesdir/webserver/portal /srv/www/htdocs/
-    #chown -R wwwrun:www /srv/www/htdocs 
     fqdn=`getconfdata "FQDN" "2"`
     masterpw=`getconfdata "MasterPW" "2"`
     path="/srv/www/htdocs/portal"
@@ -2013,15 +1843,6 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     # Putty bereitstellen
     cp $cfilesdir/putty/putty.exe /srv/www/htdocs/portal/
     
-    # to be removed
-    # Shell-in-a-Box einrichten
-    #sshport=`getconfdata "SSHPORT" "2"`
-    #path="/etc/init.d/"
-    #file="shellinabox"
-    #strings="SSH%SSH:localhost:$sshport --localhost-only --disable-ssl"
-    #changevalues $path $file "$strings"
-    #chmod +x $path$file
-    
     # Proxy-Module einrichten
     a2enmod headers
     #a2enmod xml2enc
@@ -2034,29 +1855,6 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     # Stammzertifikat der Server-CA bereitstellen
     cp /etc/ssl/CA/cacert.pem /srv/www/htdocs/portal/inc/
     
-    # to be removed
-    # Shellscripts installieren
-    #cp /usr/bin/creategroupshare /usr/sbin/
-    #cp /usr/bin/createhome /usr/sbin/
-    #cp /usr/bin/deletehome /usr/sbin/
-    
-    # to be removed
-    # sudoers Datei anpassen
-    #cp $cfilesdir/webserver/invis.sudoers >> /etc/sudoers.d/
-    
-    # to be removed
-    # Upload-Verzeichnis anlegen und Rechte anpassen
-    #mkdir -m 2770 /srv/uploads
-    #chown wwwrun:www /srv/uploads
-    
-    #aschenputtel installieren
-    #cp /usr/bin/aschenputtel /usr/sbin/
-    #chmod 755 /usr/sbin/aschenputtel
-    #chown root:root /usr/sbin/aschenputtel
-    
-    # Kopieren und anpassend der Konfigurationsdateien
-    # to be removed
-    #cp $cfilesdir/webserver/invis.conf /etc/apache2/conf.d/
     cp $cfilesdir/webserver/invis-vh.conf /etc/apache2/vhosts.d/
     path="/etc/apache2/vhosts.d"
     file="invis-vh.conf"
@@ -2079,11 +1877,6 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     httpsport=`getconfdata "HTTPSPORT" "2"`
     strings="httpsport%$httpsport"
     changevalues $path $file "$strings"
-
-    # Vergangenheit
-    # htpasswd Files anlegen
-    #cp -R $cfilesdir/webserver/passwds /srv/www/passwds
-    #chown -R wwwrun.www /srv/www/passwds
 
     ## Externer Zugriff via HTTPS?
     ddnshn=`getconfdata "DDNS" "2"`
@@ -2111,24 +1904,6 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
         changevalues $path $file "$strings"
 
     fi
-    # CorNAz einrichten
-
-    # to be removed
-    # Mailproviderdatei an lokales LDAP-Verzeichnis anpassen
-    # Dateien werden kopiert
-    # Quellverzeichnis
-    #sourcedir="$cfilesdir/webserver/cornaz"
-    #cp $sourcedir/fetchmail/fetchmail /etc/init.d/
-    #cp $sourcedir/sysconfig/fetchmail /var/lib/cornaz/sysconfig/
-    #cp $sourcedir/var/* /var/cornaz/bin/
-    # /etc/sudoers wird angepasst.
-#    cp /etc/sudoers /etc/sudoers.bak
-#echo "Cmnd_Alias FETCHPHP = /var/lib/cornaz/bin/fetchcopy
-#wwwrun ALL=NOPASSWD:FETCHPHP" >> /etc/sudoers
-#echo "Cmnd_Alias HOLIDAY = /var/lib/cornaz/bin/holiday
-#wwwrun ALL=NOPASSWD:HOLIDAY" >> /etc/sudoers
-#echo "Cmnd_Alias BACKHOME = /var/lib/cornaz/bin/backhome
-#wwwrun ALL=NOPASSWD:BACKHOME" >> /etc/sudoers
 
     # Konfigurationsdaten ermitteln.
     domain=`getconfdata "Domain" "2"`
@@ -2349,31 +2124,7 @@ if [[ $whichimap == "cyrus" ]]; then
 	zypper -n install -n group-e 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 
-	# to be removed
-	#dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen Group-e's z-push automatisch herunterzuladen?" 0 0
-	#download=${?}
-	#if [[ $download == "0" ]]; then
-	    # Link für Download mit wget:
-	#    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.741/group-e_v1.741.tar.bz2/download 2>&1 | tee -a $setupdir/sine.log | pgbox
-	#    wget --trust-server-names http://sourceforge.net/projects/group-e/files/group-e/1.781/group-e_z-push_v3.3.tar.gz/download 2>&1 | tee -a $setupdir/sine.log | pgbox
-	#fi
-
-	# to be removed
-        # Entpacken des groupe Archivs
-        #getpath=`find $setupdir -name "group-e_v*.tar.bz2"`
-        #echo $getpath
-	#if [[ ! -f $getpath ]]; then
-        #    dialog --backtitle "$dialogtitle" --title "Group-e Installaton" --inputbox "Das Group-e Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum Group-e Archiv an:" 0 0 \ 2> $setupdir/sine_temp
-        #    getpath=`cat $setupdir/sine_temp`
-        #fi
-	#if [[ -f $getpath ]]; then
 	pgsubtitle="Group-e wird installiert."
-	#    tar -xvf $getpath -C . 2>&1 |pgbox
-	#    mv ./group-e /srv/www/htdocs/
-	#    chown -R wwwrun:www /srv/www/htdocs/group-e
-	#    chmod -R 775 /srv/www/htdocs/group-e/dyn
-	    #chgrp -R www /srv/www/htdocs/group-e/dyn
-	#    cp /srv/www/htdocs/group-e/etc/apache.conf /etc/apache2/conf.d/groupe.conf
 	path="/etc/apache2/conf.d"
 	file="groupe.conf"
 	strings="/opt/group-e%/srv/www/htdocs/group-e"
@@ -2397,12 +2148,6 @@ if [[ $whichimap == "cyrus" ]]; then
 	
 	# Apache Default-Server-Konfiguration anpassen (FollowSymlinks wird hinzu gefügt)
 	cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
-	# to be removed
-	# mount.cifs bzw. umount.cifs für Group-e verfügbar machen
-	# Ist mit den PHP5 Paketen aus dem invis Repository eigentlich nit mehr notwendig.
-	#chmod u+s /sbin/mount.cifs
-	#chmod u+s /sbin/umount.cifs
-	# Symbolische Links bleiben, praktisch fuer alle die smbmount nutzen.
 	ln -s /sbin/mount.cifs /bin/smbmount
 	ln -s /sbin/umount.cifs /bin/smbumount
 
@@ -2412,52 +2157,9 @@ if [[ $whichimap == "cyrus" ]]; then
 	smbldappw projekte
 	echo "Initmail" |mailx -s Initmail projekte@localhost
 
-	# to be removed
-	# z-push Installation -- Experimentell
-    	#getpath=`find ~ -name "group-e_z-push*.tar.gz"`
-	#echo $getpath
-	#if [[ ! -f $getpath ]]; then
-	#    dialog --backtitle "$dialogtitle" --title "z-push Installation" --inputbox "Das z-push Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum z-push Archiv an:" 0 0 \ 2> $setupdir/sine_temp
-	#    getpath=`cat $setupdir/sine_temp`
-	#fi
-	#if [[ -f $getpath ]]; then
-	    # Apache Konfigurationserweiterung kopieren.
-	    #cp $cfilesdir/webserver/z-push.conf /etc/apache2/conf.d/
 	cp $cfilesdir/webserver/z-push_vh-groupe.conf /etc/apache2/vhosts.d/
-	    # z-push entpacken und Verzeichnis verschieben
-	    #pgsubtitle="z-push wird entpackt und installiert."
-	    #tar -xvf $getpath -C . 2>&1 |pgbox
-	    #mv ./z-push /srv/www/htdocs/
-	    #chown -R wwwrun:www /srv/www/htdocs/z-push
-		
-	    #path="/srv/www/htdocs/z-push"
-	    #file="config.php"
-	    #strings="/soap.php%/group-e/soap.php"
-	    #changevalues $path $file "$strings"
-
-	    #strings="Amsterdam%Berlin"
-	    #changevalues $path $file "$strings"
-
-	    #strings="/var/www/z-push%/srv/www/htdocs/z-push"
-	    #changevalues $path $file "$strings"
-		
-	    # Muss noch getestet werden, kann sein, dass das unnötig ist.
-	    #ddnsname=`getconfdata "DDNS" "2"`
-	    #httpsport=`getconfdata "HTTPSPORT" "2"`
-	    #strings="'GROUP_URL_DOMAIN',''%GROUP_URL_DOMAIN','$ddnsname'"
-	    #changevalues $path $file "https://$strings:$httpsport"
-	
-	    #path="/etc/apache2/vhosts.d"
-	    #file="z-push_vh.conf"
-	    #strings="your.ddns-domain.net%$ddnsname"
-	    #changevalues $path $file "$strings"
-	fi
 	
 	chkservice "apache2"
-	#else
-	#    msgbox "Das Group-e Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
-	#    exit 
-	#fi
 	
 	writeprepstat "erp"
 	waitbox "groupware" "erp"
@@ -2504,9 +2206,6 @@ else
     mkdir -p /var/lib/zarafa-webaccess/tmp
     mkdir -p /var/lib/zarafa-webaccess/plugins
     chmod a+rwx /var/lib/zarafa-webaccess/tmp
-    # to be removed
-    #libzarafaclient=`ls $libdir | grep "libzarafaclient-"`
-    #ln -s $libdir/$libzarafaclient $libdir/libzarafaclient.so
 
     # htaccess-Dateien entfernen, wenn Apache Worker MPM aktiv ist
     isworker=`ps ax |grep httpd2-worker |grep -v grep|wc -l`
@@ -2516,17 +2215,8 @@ else
 	chkservice "apache2"
     fi
 
-    # to be removed
-    ## Helfer-Scripts kopieren
-    #cp /usr/bin/*zarafa* /usr/sbin/
-    #cp /usr/bin/runzarafa /usr/sbin/
-
-    #chown root:root /usr/sbin/*zarafa*
-    #chmod ug+x /usr/sbin/*zarafa*
-    
     ## Leere Zarafa-Datenbank anlegen
     zarafadbuserpw=`mkdbsilent zarafa zarafa a`
-    #echo "MysqlPW: $zarafadbuserpw"
 
     # Locales-Vorlage kopieren
     cp $cfilesdir/zarafa/zarafa /etc/sysconfig/
@@ -2642,29 +2332,6 @@ case $whicherp in
 			a2enmod fcgid
 		    /etc/init.d/apache2 reload 2>&1 |pgbox
 		fi
-		# to be removed
-		# Automatischer Download
-    		#dialog --backtitle "$dialogtitle" --title "$windowtitle" --yesno "Soll sine versuchen LX-Office automatisch herunterzuladen?" 0 0
-		#download=${?}
-		#if [[ $download == "0" ]]; then
-		    # Link für Download mit wget:
-		    #http://downloads.sourceforge.net/project/lx-office/Lx-Office%20ERP/2.7.0/lx-office-erp-2.7.0.tar.gz
-		#    wget http://downloads.sourceforge.net/project/lx-office/Lx-Office%20ERP/$lxerpversion/lx-office-erp-$lxerpversion.tar.gz 2>&1 |pgbox
-		#fi
-
-		# Entpacken des lx-office-erp Archivs
-    		#getpath=`find $setupdir -name "lx-office-erp*.tar*"`
-		#if [[ ! -f $getpath ]]; then
-        	#    dialog --backtitle "$dialogtitle" --title "$windowtitle" --inputbox "Das LX-ERP Archiv wurde nicht gefunden. Geben Sie bitte Pfad und Dateinamen zum LX-ERP Archiv an:" 0 0 \ 2> $setupdir/sine_temp
-        	#    getpath=`cat $setupdir/sine_temp`
-    		#fi
-		#if [[ -f $getpath ]]; then
-		#    pgsubtitle="LX-ERP wird entpackt und installiert."
-		#    tar -xvf $getpath -C . 2>&1 | tee -a $setupdir/sine.log | pgbox
-		#    mv $setupdir/lxoffice-erp-$lxerpversion /srv/www/htdocs/lxerp
-		#    chown -R wwwrun:www /srv/www/htdocs/lxerp
-		#    cp $cfilesdir/lxerp/lx_office.conf /srv/www/htdocs/lxerp/config/lx_office.conf
-		#    cp $cfilesdir/lxerp/lx-office-task-server /etc/init.d/
 
 		# Kivitendo Konfiguration vorbereiten
 		cp $cfilesdir/kivitendo-erp/kivitendo.conf /srv/www/htdocs/kivitendo-erp/config/kivitendo.conf
@@ -2694,12 +2361,6 @@ Bitte geben Sie dass soeben vergebene Passwort für den LX-Office Datenbankbenut
 		lxpw="${lxpassword[0]}"
 
 		pgsubtitle="Datenbanken werden angelegt"
-		# to be removed
-		#cp /$cfilesdir/lxerp/function.sql /tmp
-		#chmod o+r /tmp/function.sql
-		#cd /tmp
-		#sudo -u postgres psql template1 -f /tmp/function.sql 2>&1 | tee -a $setupdir/sine.log | pgbox
-		#rm -f /tmp/function.sql
 		cd $setupdir
 		dialog --backtitle "$dialogtitle" --title "$windowtitle" --radiolist "$dialogshorthelp\n\n
 Legen Sie jetzt bitte fest auf welche Art Kivitendo Benutzer authentifiziert werden.\n
@@ -2895,15 +2556,7 @@ Geben Sie ein zugehöriges Passwort ein." "$windowtitle"
 	pgsubtitle="Faxdrucker wird eingerichtet"
 	lpadmin -p Faxgate -v faxgate://capisuite -m Faxgate.ppd.gz -E 2>&1 |pgbox
 	
-	## to be removed
-	# SSH-Portweiterleitung einrichten - provisorische Lösung für faxgate-Client
-	#ip=`getconfdata "IP" "2"`
-	#sshport=`getconfdata "SSHPORT" "2"`
-	#echo "$ip 22 $ip $sshport" > /etc/rinetd.conf
 	sleep 1
-	#msgbox "Achtung: Das folgende Fenster müssen Sie vermutlich mit \"STRG+C\" abbrechen. Warum das Programm an
-#dieser Stelle hängen bleibt ist uns bisher ein Rätsel. Wir suchen nach der Lösung." "$windowtitle"
-	#chkservice "rinetd"
 
 	writeprepstat "webcdwriter"
 	waitbox "lxerp" "webcdwriter"
@@ -2975,13 +2628,9 @@ openvpn() {
 
 	# openVPN Key-Center einrichten
 	domain=`getconfdata "Domain" "2"`
-	#echo $domain
 	path="$cfilesdir/openvpn/easy-rsa/2.0"
 	file="Makefile"
 	cp $path/$file $path/$file.ori
-	# to be removed
-	#strings="DESTDIR=%DESTDIR=/etc/openvpn"
-        #changevalues $path $file "$strings"
 	strings="openvpndomain%$domain"
         changevalues $path $file "$strings"
 	cd $path
