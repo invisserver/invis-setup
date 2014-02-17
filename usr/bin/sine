@@ -953,6 +953,10 @@ sysprep() {
 	ocserver=`getconfdata "ownCloudServer" "2"`
 	ocusername=`getconfdata "ownCloudUser" "2"`
 	ocpassword=`getconfdata "ownCloudPassword" "2"`
+	echo $ocserver
+	echo $ocusername
+	echo $ocpassword
+	sleep 3
 	path="/etc/invis"
 	file="invis.conf"
 	strings="ocSync:n%ocSync:j"
@@ -964,7 +968,7 @@ sysprep() {
 	strings="oc-server%$ocserver"
 	changevalues $path $file "$strings"
 	file="invis-pws.conf"
-	strings="oc-pass%$ocpassword"
+	strings="oc-secret%$ocpassword"
 	changevalues $path $file "$strings"
     fi
 
