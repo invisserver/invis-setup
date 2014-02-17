@@ -950,8 +950,8 @@ sysprep() {
 	if [[ ! -d $ocsyncdir ]]; then
 	    mkdir -p $ocsyncdir
 	fi
-	ocuserver=`getconfdata "ownCloudServer" "2"`
-	ocusername=`getconfdata "ownCloudUserName" "2"`
+	ocserver=`getconfdata "ownCloudServer" "2"`
+	ocusername=`getconfdata "ownCloudUser" "2"`
 	ocpassword=`getconfdata "ownCloudPassword" "2"`
 	path="/etc/invis"
 	file="invis.conf"
