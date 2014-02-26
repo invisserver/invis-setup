@@ -1,5 +1,5 @@
 # Umgebungsvariablen setzen
-PATH="/bin:/usr/bin:/usr/bin:/root/bin:/usr/bin:/usr/bin:/bin:/usr/lib/mit/bin:/usr/lib/mit/bin"
+PATH="/sbin:/usr/sbin:/usr/local/sbin:/root/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/X11R6/bin"
 # Email Versand fuer die invis cron-jobs deaktiviert. Es sind einfach zu viele Mails
 MAILTO=/dev/null
 

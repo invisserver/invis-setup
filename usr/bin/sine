@@ -2239,8 +2239,9 @@ if [[ $whichimap == "cyrus" ]]; then
 	strings="YOUR_GROUPE_PASSWORD%myxlgruss"
 	changevalues $path $file "$strings"
 	
+	## to be removed
 	# Apache Default-Server-Konfiguration anpassen (FollowSymlinks wird hinzu gefügt)
-	cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
+	#cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
 	ln -s /sbin/mount.cifs /bin/smbmount
 	ln -s /sbin/umount.cifs /bin/smbumount
 
