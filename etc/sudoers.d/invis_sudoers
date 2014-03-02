@@ -1,12 +1,14 @@
-Cmnd_Alias CREATEHOME  = /usr/sbin/createhome
-wwwrun ALL=NOPASSWD:CREATEHOME
-Cmnd_Alias DELETEHOME = /usr/sbin/deletehome
-wwwrun ALL=NOPASSWD:DELETEHOME
-Cmnd_Alias CREATEGROUPSHARE = /usr/sbin/creategroupshare
-wwwrun ALL=NOPASSWD:CREATEGROUPSHARE
-Cmnd_Alias FETCHPHP = /var/lib/cornaz/bin/fetchcopy
-wwwrun ALL=NOPASSWD:FETCHPHP
-Cmnd_Alias HOLIDAY = /var/lib/cornaz/bin/holiday
-wwwrun ALL=NOPASSWD:HOLIDAY
-Cmnd_Alias BACKHOME = /var/lib/cornaz/bin/backhome
-wwwrun ALL=NOPASSWD:BACKHOME
+Cmnd_Alias      CREATEHOME = /usr/bin/createhome
+Cmnd_Alias      DELETEHOME = /usr/bin/deletehome
+Cmnd_Alias      CREATEGROUPSHARE = /usr/bin/creategroupshare
+Cmnd_Alias      FETCHPHP = /var/lib/cornaz/bin/fetchcopy
+Cmnd_Alias      HOLIDAY = /var/lib/cornaz/bin/holiday
+Cmnd_Alias      BACKHOME = /var/lib/cornaz/bin/backhome
+
+wwwrun  ALL = (root) NOPASSWD:CREATEHOME
+wwwrun  ALL = (root) NOPASSWD:DELETEHOME
+wwwrun  ALL = (root) NOPASSWD:CREATEGROUPSHARE
+wwwrun  ALL = (root) NOPASSWD:FETCHPHP
+wwwrun  ALL = (root) NOPASSWD:HOLIDAY
+wwwrun  ALL = (root) NOPASSWD:BACKHOME
+
