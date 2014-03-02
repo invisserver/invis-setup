@@ -31,6 +31,17 @@ if [[ -f /sbin/mount.cifs ]]; then
     #chmod u+s /sbin/umount.cifs
 fi
 
+#Anpassen der Besitzrechte der Freigaben
+chown -R root:"Domain Users" /srv/shares/archiv
+chown -R root:"Domain Users" /srv/shares/gruppen
+chown -R root:"Domain Users" /srv/shares/projekte
+chown -R root:"Domain Users" /srv/shares/media
+chown -R root:"Domain Admins" /srv/shares/service
+chown -R root:"Domain Guests" /srv/shares/transfer
+chown -R root:"Verwaltung" /srv/shares/verwaltung
+chown root:"Domain Users" /srv/shares/portal/uploads
+chown domadmin:"Domain Users" /srv/shares/portal/downloads
+
 # Link zur Zarafa-Client-Library erneuern
 #if [[ -d /etc/zarafa ]]; then
 #    fixzarafaclientlib

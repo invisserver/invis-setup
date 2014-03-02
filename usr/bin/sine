@@ -1822,10 +1822,12 @@ samba() {
     chown -R root:"Verwaltung" /srv/shares/verwaltung 2>&1| tee -a $setupdir/sine.log
 
     # Zielverzeichnis fuer aschenputtel anlegen
-    mkdir -p -m 2770 /srv/shares/portal/uploads 2>&1| tee -a $setupdir/sine.log
+    ## to be removed
+    #mkdir -p -m 2770 /srv/shares/portal/uploads 2>&1| tee -a $setupdir/sine.log
     chown root:"Domain Users" /srv/shares/portal/uploads 2>&1| tee -a $setupdir/sine.log
     # Download-Verzeichnis anlegen
-    mkdir -p -m 2775 /srv/shares/portal/downloads 2>&1| tee -a $setupdir/sine.log
+    ## to be removed
+    #mkdir -p -m 2775 /srv/shares/portal/downloads 2>&1| tee -a $setupdir/sine.log
     chown domadmin:"Domain Users" /srv/shares/portal/downloads 2>&1| tee -a $setupdir/sine.log
 
     #Printer-Scripts kopieren
