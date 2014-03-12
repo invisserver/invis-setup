@@ -881,7 +881,7 @@ sysprep() {
 	#zypper -n install -n --from sernet-samba `cat $setupdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
 	esusername=`getconfdata "EnterpriseSambaUsername" "2"`
 	esaccesskey=`getconfdata "EnterpriseSambaAccesskey" "2"`
-	echo "Samba Pakete von Sernet stehen fuer openSUSE 13.1 noch nicht zur Verfügung. Installiere Pakete für Version 12.3" | pgbox
+	#echo "Samba Pakete von Sernet stehen fuer openSUSE 13.1 noch nicht zur Verfügung. Installiere Pakete für Version 12.3" | pgbox
 	path="/etc/zypp/repos.d"
 	cp $cfilesdir/zypper/sernet-samba4.repo $path
 	file=sernet-samba4.repo
