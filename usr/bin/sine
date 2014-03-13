@@ -877,21 +877,24 @@ sysprep() {
     pgsubtitle="Die gewählten Samba-Pakete werden installiert"
     sambapackages=`getconfdata "SambaPakete" "2"`
     if [[ $sambapackages == "sernet" ]]; then
-	#rpm -e --nodeps libwbclient0 samba-client
-	#zypper -n install -n --from sernet-samba `cat $setupdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
 	esusername=`getconfdata "EnterpriseSambaUsername" "2"`
 	esaccesskey=`getconfdata "EnterpriseSambaAccesskey" "2"`
-	#echo "Samba Pakete von Sernet stehen fuer openSUSE 13.1 noch nicht zur Verfügung. Installiere Pakete für Version 12.3" | pgbox
 	path="/etc/zypp/repos.d"
 	cp $cfilesdir/zypper/sernet-samba4.repo $path
 	file=sernet-samba4.repo
 	strings="USERNAME:ACCESSKEY%$esusername:$esaccesskey"
-	echo $strings
+	#echo $strings
 	changevalues $path $file $strings
 	rpmkeyimporter
         pgsubtitle="Repository-Cache wird aktualisiert"
         zypper refresh 2>&1| tee -a $setupdir/sine.log | pgbox
 	zypper -n install -n `cat $setupdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
+	
+	# Sernet Samba Startoption anpassen
+	path="/etc/default"
+	file="sernet-samba"
+	strings="none%classic"
+	changevalues $path $file $strings
     else
 	zypper -n install -n `cat $setupdir/zypper-package-lists/opensuse_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
     fi
@@ -1605,17 +1608,30 @@ esac
     adminpw=`getconfdata "AdminPW" "2"`
     strings="admin-secret%$adminpw"
     changevalues $path $file "$strings"
-    
-    # Postfix neustarten und in Runlevel aufnehmen
-    # Mailman einrichten ????
-    /usr/lib/mailman/bin/mailman-generate-sysconfig 2>&1| tee -a $setupdir/sine.log|pgbox
-    chkservice "postfix"
 
-    # Mailman einrichten
-    msgbox "Das Programm Mailman wird vorbereitet.\n\nEs wird für Verwaltungszwecke eine erste Mailingliste eingerichtet. Dafür
-müssen Sie unter anderem ein Passwort vergeben." "Mailman Installation"
-    /usr/lib/mailman/bin/mmsitepass
-    /usr/lib/mailman/bin/newlist mailman
+
+
+    # Mailman einrichten ????
+    clear
+    windowtitle="Mailman Installation"
+    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/mailman.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Mailman installieren?" 0 0
+    cont=${?}
+
+    if [[ $cont == "0" ]]; then
+	#Mailman installieren
+	zypper -n in -n mailman 2>&1| tee -a $setupdir/sine.log|pgbox
+	/usr/lib/mailman/bin/mailman-generate-sysconfig 2>&1| tee -a $setupdir/sine.log|pgbox
+
+	# Mailman einrichten
+	msgbox "Das Programm Mailman wird vorbereitet.\n\nEs wird für Verwaltungszwecke eine erste Mailingliste eingerichtet,\nsowie ein Masterepasswort zur Administration aller Listen. ." "Mailman Installation"
+	#Globales Master-Passwort setzen
+	/usr/lib/mailman/bin/mmsitepass
+	#Verwaltungsmailingliste einrichten
+	/usr/lib/mailman/bin/newlist mailman
+    fi
+
+    # Postfix neustarten und in Runlevel aufnehmen
+    chkservice "postfix"
 
     writeprepstat "cups"
     waitbox "mailserver" "cups"
