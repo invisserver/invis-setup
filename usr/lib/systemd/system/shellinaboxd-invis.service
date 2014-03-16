@@ -1,0 +1,9 @@
+[Unit]
+    Description=Starts Shellinabox Daemon for invis Servers
+    After=network.target
+[Service]
+    Type=simple
+    ExecStart=/usr/bin/shellinaboxd --service=/:LOGIN --disable-ssl --localhost-only
+    Restart=always
+[Install]
+    WantedBy=multiuser.target

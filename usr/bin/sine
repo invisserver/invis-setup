@@ -2063,7 +2063,7 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     
     # Webserver, shellinabox, fetchmail und Mailman neustarten und in Runlevel integrieren
     chkservice "fetchmail"
-    chkservice "shellinabox"
+    chkservice "shellinabox-invis"
     chkservice "apache2"
     #chkservice "mailman"
 
