@@ -1,4 +1,4 @@
-# Authentication for system users. Included from auth.conf.
+# Authentication for system users. Included from 10-auth.conf.
 #
 # <doc/wiki/PasswordDatabase.txt>
 # <doc/wiki/UserDatabase.txt>
@@ -46,19 +46,19 @@ passdb {
 
 # System users (NSS, /etc/passwd, or similiar). In many systems nowadays this
 # uses Name Service Switch, which is configured in /etc/nsswitch.conf.
-#userdb {
+userdb {
   # <doc/wiki/AuthDatabase.Passwd.txt>
-#  driver = passwd
+  driver = passwd
   # [blocking=no]
   #args = 
 
   # Override fields from passwd
   #override_fields = home=/home/virtual/%u
-#}
+}
 
 # Static settings generated from template <doc/wiki/UserDatabase.Static.txt>
-userdb {
-  driver = static
+#userdb {
+  #driver = static
   # Can return anything a userdb could normally return. For example:
   #
   #  args = uid=500 gid=500 home=/var/mail/%u
@@ -70,5 +70,5 @@ userdb {
   # the user verification another way, you can add allow_all_users=yes to
   # the args in which case the passdb lookup is skipped.
   #
-  args = uid=vmail gid=vmail home=/var/spool/mail/%n allow_all_users=yes 
-}
+  #args =
+#}
