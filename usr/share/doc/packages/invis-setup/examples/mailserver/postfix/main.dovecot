@@ -706,8 +706,10 @@ relay_domains = hash:/etc/postfix/relay
 transport_maps = hash:/etc/postfix/relay
 
 ## Virtueller Transportweg
-virtual_transport = dovecot
-dovecot_destination_recipient_limit = 1
+#virtual_transport = dovecot
+## jetzt lmtp via socket
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+#dovecot_destination_recipient_limit = 1
 
 ## FSP Addressrewriting
 sender_canonical_maps=ldap:/etc/postfix/s-canonical.cf
