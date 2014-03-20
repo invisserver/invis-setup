@@ -492,15 +492,15 @@ Das vergebene Passwort muss mindestens 6 Zeichen lang sein." 17 64 2 \
     # - Cyrus und Group-e sind ein gutes Team
     # - Zarafa schließt Cyrus und Group-e aus
     dialog --backtitle "$dialogtitle" --title "MAIL & Groupware Server" --radiolist "$dialogshorthelp\n\n
-Wählen Sie den von Ihnen bevorzugten IMAP-Server aus. Wenn Sie Group-e verwenden sollten Sie \"cyrus\" auswählen. Zarafa verhindert die Installation
-von Group-e." 16 80 5 \
-	cyrus "Das Monster in Kombination mit Group-e" on\
-	dovecot "Der Schlanke in Kombination mit SOGo" off\
+Wählen Sie die von Ihnen bevorzugte Kombination aus IMAP-Server und Groupware aus." 16 80 7 \
+	groupe "Group-e in Kombination mit Cyrus IMAP" on\
+	sogo "SOGo in Kombination mit Dovecot" off\
 	zarafa "Mailserver/Groupware Kombination für Outlook-Freunde" off\
+	roundcube "Schlanker Webmailer Roundcube in Kombination mit Dovecot" off\
 	2>$setupdir/sine_temp
 	whichimap=`cat $setupdir/sine_temp`
     
-    if [[ $whichimap == "cyrus" ]]; then
+    if [[ $whichimap == "groupe" ]]; then
 	ok=0
 	while (( $ok != "1" ));do
 	    dialog --backtitle "$dialogtitle" --title "cyrus Admin Passwort" --insecure --passwordform "$dialogshorthelp\n\n
@@ -796,7 +796,7 @@ Aus Ihrem lokalen Netz heraus kann für SSH weiter Port 22 verwendet werden." "S
     echo "MySQLpw:$mysqlpw" >> $setupdir/invis_confdata
     echo "NtopPw:$ntoppw" >> $setupdir/invis_confdata
     echo "IMAPserver:$whichimap"  >> $setupdir/invis_confdata
-    if [[ $whichimap == "cyrus" ]];then
+    if [[ $whichimap == "groupe" ]];then
 	echo "CyrusPw:$cyruspw" >> $setupdir/invis_confdata
     fi
     echo "SambaPakete:$whichsamba" >> $setupdir/invis_confdata
@@ -1471,14 +1471,14 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
     # Kopieren der Postfix-Konfigurationsdateien
     cp $cfilesdir/mailserver/postfix/* /etc/postfix 2>&1| tee -a $setupdir/sine.log
     
-    ## Dovecot, Zarafa oder Cyrus
+    ## SOGo, Group-e, Zarafa oder Roundcube
     whichimap=`getconfdata "IMAPserver" "2"`
     case "$whichimap" in
     
-	"dovecot" )
+	"sogo"|"roundcube" )
 	    # Dovecot einrichten 
     	    pgsubtitle="Dovecot IMAP wird installiert und eingerichtet"
-	    zypper -n install -n dovecot21 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zypper -n install -n dovecot22 2>&1| tee -a $setupdir/sine.log | pgbox
 	    zyppercheck ${PIPESTATUS[0]}
 	    cp -r $cfilesdir/mailserver/dovecot/* /etc/dovecot/ 2>&1| tee -a $setupdir/sine.log
 	    path="/etc/dovecot/conf.d"
@@ -1511,7 +1511,7 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    echo "$domain	dovecot:" >> /etc/postfix/relay
 	    postmap /etc/postfix/relay
 	    ;;
-	"cyrus" )
+	"groupe" )
 	    # Cyrus einrichten
 	    pgsubtitle="Cyrus IMAP wird installiert und eingerichtet"
 	    zypper -n install -n cyrus-imapd 2>&1| tee -a $setupdir/sine.log | pgbox
@@ -1858,13 +1858,6 @@ samba() {
     #Verzeichnisrechte anpassen - Druckertreiber Freigabe print$
     chown -R root:"Domain Admins" /var/lib/samba/drivers 2>&1| tee -a $setupdir/sine.log
     chmod -R g+ws /var/lib/samba/drivers 2>&1| tee -a $setupdir/sine.log
-
-    ## Vermutlich muss sich das Folgende an die Moeglichkeit Benutzer anzulegen anschließen,
-    ## oder hier ganz verschwinden....
-    # Alle Gruppen mit den Attributen und Objektklassen der gewaehlten Groupware ausstatten
-    # Testen, welche Groupware zum Einsatz kommt
-    whichimap=`getconfdata "IMAPserver" "2"`
-    
 
     msgbox "Auf Ihrem Server wurde ein Samba-PDC eingerichtet.\n\n
 Es wurden grundlegende Gruppen und Systemaccounts angelegt.\nDer Server verfügt über die Freigaben:\n\n
@@ -2224,199 +2217,215 @@ groupware() {
 
 whichimap=`getconfdata "IMAPserver" "2"`
 
-if [[ $whichimap == "cyrus" ]]; then
-    cd $setupdir
-    clear
-    windowtitle="Group-e Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/group-e.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Group-e installieren?" 0 0
-    cont=${?}
+#if [[ $whichimap == "groupe" ]]; then
+case "$whichimap" in
 
-    if [[ $cont == "0" ]]; then
-	pgsubtitle="Zusätzliche Software wird installiert"
-	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
-	zypper -n install -n group-e 2>&1 | tee -a $setupdir/sine.log | pgbox
+    "groupe" )
+	cd $setupdir
+	clear
+	windowtitle="Group-e Installation"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/group-e.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie Group-e installieren?" 0 0
+	cont=${?}
+
+	if [[ $cont == "0" ]]; then
+	    pgsubtitle="Zusätzliche Software wird installiert"
+	    zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
+	    zypper -n install -n group-e 2>&1 | tee -a $setupdir/sine.log | pgbox
+	    zyppercheck ${PIPESTATUS[0]}
+
+	    pgsubtitle="Group-e wird installiert."
+	    path="/etc/apache2/conf.d"
+	    file="groupe.conf"
+	    strings="/opt/group-e%/srv/www/htdocs/group-e"
+	    changevalues $path $file "$strings"
+	    path="/srv/www/htdocs/group-e/www/cfg"
+	    file="global.inc.php"
+	    changevalues $path $file "$strings"
+	    path="/srv/www/htdocs/group-e/etc/phplib"
+	    file="prepend.php"
+	    changevalues $path $file "$strings"
+	    msgbox "Die Datenbank für Group-e wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	    mysqladmin -u root -p create groupe
+	    msgbox "Für die Group-e-Datenbank wird UTF8 als Zeichensatz gewählt - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	    mysql -u root -p --default-character-set=utf8 groupe < /srv/www/htdocs/group-e/dump/group-e_1.6_utf8.sql
+	    msgbox "Die Tabellenstruktur für die Group-e-Datenbank wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
+	    mysql -u root -p < $cfilesdir/groupe/user.sql
+	    path="/srv/www/htdocs/group-e/etc/phplib/lib"
+	    file="local.inc"
+	    strings="YOUR_GROUPE_PASSWORD%myxlgruss"
+	    changevalues $path $file "$strings"
+	    # Links fuer cifsmount Kommandos erstellen
+	    ln -s /sbin/mount.cifs /bin/smbmount
+	    ln -s /sbin/umount.cifs /bin/smbumount
+
+	    # Mail-Dummy für Projektmanagement anlegen
+	    smbldap-useradd -m -s /bin/false projekte
+	    msgbox "Es wurde ein Postfach-User für den Group-e Projektmanager angeleget, bitte geben Sie ein Passwort ein." "$windowtitle"
+	    smbldappw projekte
+	    echo "Initmail" |mailx -s Initmail projekte@localhost
+
+	    cp $cfilesdir/webserver/z-push_vh-groupe.conf /etc/apache2/vhosts.d/
+	
+	    chkservice "apache2"
+	
+	    writeprepstat "erp"
+	    waitbox "groupware" "erp"
+	else
+	    msgbox "Group-e Installation übersprungenen." "$windowtitle"
+	    writeprepstat "erp" 
+	fi
+	;; 
+#elif [[ $whichimap == "sogo" ]]; then
+    "sogo" )
+	cd $setupdir
+	clear
+	windowtitle="SOGo Installation"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/sogo.txt" 38 90
+
+	zypper -n install -n `cat $setupdir/zypper-package-lists/sogo` 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	cp $cfilesdir/sogo/SOGo /etc/sysconfig/SOGo
+	mkdir /etc/sogo
+	cp $cfilesdir/sogo/sogo.conf /etc/sogo/
+	confdir="/etc/sogo"
+	file="sogo.conf"
+	basedn=`getconfdata "baseDN" "2"`
+	strings="dc=i5-net,dc=loc%$basedn"
+	changevalues $confdir $file "$strings"
+	adminpw=`getconfdata "AdminPW" "2"`
+	strings="admin-secret%$adminpw"
+	changevalues $confdir $file "$strings"
+	sogodbuserpw=`mkdbsilent sogo sogo a`
+	strings="dbuserpw%$sogodbuserpw"
+	changevalues $confdir $file "$strings"
+	chown :sogo /etc/sogo/sogo.conf
+	chkservice "sogod"
+
+	writeprepstat "erp"
+	waitbox "groupware" "erp"
+	;;
+    "zarafa" )
+	## Zarafa
+	cd $setupdir
+	clear
+	windowtitle="Zarafa Konfiguration"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/zarafa.txt" 38 90
+
+	## Fix Zarafa Package-Bugs
+	# Spaeter wieder entfernen
+	mkdir -p /var/lib/zarafa-webaccess/tmp
+	mkdir -p /var/lib/zarafa-webaccess/plugins
+	chmod a+rwx /var/lib/zarafa-webaccess/tmp
+
+	# htaccess-Dateien entfernen, wenn Apache Worker MPM aktiv ist
+	isworker=`ps ax |grep httpd2-worker |grep -v grep|wc -l`
+	if (( $isworker > 0 )); then
+	    rm -f /usr/share/zarafa-webaccess/.htaccess
+	    rm -f /usr/share/zarafa-webapp/.htaccess
+	    chkservice "apache2"
+	fi
+
+	## Leere Zarafa-Datenbank anlegen
+	zarafadbuserpw=`mkdbsilent zarafa zarafa a`
+
+        # Locales-Vorlage kopieren
+	cp $cfilesdir/zarafa/zarafa /etc/sysconfig/
+
+	# Konfigurationsvorlagen kopieren
+	cp $cfilesdir/zarafa/*.cfg /etc/zarafa/
+    
+	# Konfigurationsdaten einlesen
+	domain=`getconfdata "Domain" "2"`
+	basedn=`getconfdata "baseDN" "2"`
+	ldapmasterpw=`getconfdata "MasterPW" "2"`
+
+	# Datenbank Zugang in Zarafa Konfiguration einfuegen usw.
+	path="/etc/zarafa"
+	file="server.cfg"
+	strings="dbuserpass%$zarafadbuserpw"
+	changevalues $path $file "$strings"
+
+	strings="postmaster@localhost%domadmin@$domain"
+	changevalues $path $file "$strings"
+
+	## Plugin-Path bei Bedarf anpassen
+	if [[ $libdir == "/usr/lib64" ]]; then
+	    strings="/usr/lib/zarafa%$libdir/zarafa"
+	    changevalues $path $file "$strings"
+	fi
+
+	# LDAP Konfiguration anpassen
+	file="ldap.cfg"
+	strings="master-secret%$ldapmasterpw"
+	changevalues $path $file "$strings"
+
+	strings="dc=zarafa,dc=com%$basedn"
+	changevalues $path $file "$strings"
+    
+	strings="dc=invis-net,dc=loc%$basedn"
+	changevalues $path $file "$strings"
+    
+	path="/etc/postfix"
+	file="zarafa-users.cf"
+	strings="dbuserpass%$zarafadbuserpw"
+	changevalues $path $file "$strings"
+
+	## Locales anpassen
+	path="/etc/zarafa/userscripts"
+	strings="en_US%de_DE.UTF-8"
+	file="companies_common.sh"
+	changevalues $path $file "$strings"
+
+	file="groups_common.sh"
+	changevalues $path $file "$strings"
+
+	file="users_common.sh"
+	changevalues $path $file "$strings"
+
+	path="/etc/zarafa/webaccess-ajax"
+	file="config.php"
+    
+	strings="London%Berlin"
+	changevalues $path $file "$strings"
+
+	strings="en_EN%de_DE.UTF-8"
+	changevalues $path $file "$strings"
+    
+	# Zarafa-Schluessel erzeugen
+	mkzarafakey
+    
+	# Dienste ins Runlevel-Konzept eintragen
+	for zinit in /etc/init.d/zarafa-* ; do
+	    zinit=`basename $zinit`
+	    chkservice $zinit
+	done
+    
+	#z-push als vHost anlegen & apache reload
+	cp $cfilesdir/webserver/z-push_vh.conf /etc/apache2/vhosts.d/
+	rm -f /etc/apache2/conf.d/z-push.conf
+	/etc/init.d/apache2 reload
+    
+	# Oeffentlichen Speicher anlegen
+	zarafa-admin -s    
+	extzu junk 1
+    
+	writeprepstat "erp"
+	waitbox "groupware" "erp"
+	;;
+    "roundcube" )
+	cd $setupdir
+	clear
+	windowtitle="Roundcube Installation"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/roundcube.txt" 38 90
+	zypper -n install -n roundcubemail 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 
-	pgsubtitle="Group-e wird installiert."
-	path="/etc/apache2/conf.d"
-	file="groupe.conf"
-	strings="/opt/group-e%/srv/www/htdocs/group-e"
-	changevalues $path $file "$strings"
-	path="/srv/www/htdocs/group-e/www/cfg"
-	file="global.inc.php"
-	changevalues $path $file "$strings"
-	path="/srv/www/htdocs/group-e/etc/phplib"
-	file="prepend.php"
-	changevalues $path $file "$strings"
-	msgbox "Die Datenbank für Group-e wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
-	mysqladmin -u root -p create groupe
-	msgbox "Für die Group-e-Datenbank wird UTF8 als Zeichensatz gewählt - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
-	mysql -u root -p --default-character-set=utf8 groupe < /srv/www/htdocs/group-e/dump/group-e_1.6_utf8.sql
-	msgbox "Die Tabellenstruktur für die Group-e-Datenbank wird installiert - Sie benötigen das MySQL root-Passwort." "Group-e Installation"
-	mysql -u root -p < $cfilesdir/groupe/user.sql
-	path="/srv/www/htdocs/group-e/etc/phplib/lib"
-	file="local.inc"
-	strings="YOUR_GROUPE_PASSWORD%myxlgruss"
-	changevalues $path $file "$strings"
-	
-	## to be removed
-	# Apache Default-Server-Konfiguration anpassen (FollowSymlinks wird hinzu gefügt)
-	#cp $cfilesdir/groupe/default-server.conf /etc/apache2/default-server.conf
-	ln -s /sbin/mount.cifs /bin/smbmount
-	ln -s /sbin/umount.cifs /bin/smbumount
-
-	# Mail-Dummy für Projektmanagement anlegen
-	smbldap-useradd -m -s /bin/false projekte
-	msgbox "Es wurde ein Postfach-User für den Group-e Projektmanager angeleget, bitte geben Sie ein Passwort ein." "$windowtitle"
-	smbldappw projekte
-	echo "Initmail" |mailx -s Initmail projekte@localhost
-
-	cp $cfilesdir/webserver/z-push_vh-groupe.conf /etc/apache2/vhosts.d/
-	
-	chkservice "apache2"
+	# configuration here
 	
 	writeprepstat "erp"
 	waitbox "groupware" "erp"
-    else
-	msgbox "Group-e Installation übersprungenen." "$windowtitle"
-	writeprepstat "erp" 
-    fi 
-elif [[ $whichimap == "dovecot" ]]; then
-    cd $setupdir
-    clear
-    windowtitle="SOGo Installation"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/sogo.txt" 38 90
-
-    zypper -n install -n `cat $setupdir/zypper-package-lists/sogo` 2>&1 | tee -a $setupdir/sine.log | pgbox
-    zyppercheck ${PIPESTATUS[0]}
-    cp $cfilesdir/sogo/SOGo /etc/sysconfig/SOGo
-    mkdir /etc/sogo
-    cp $cfilesdir/sogo/sogo.conf /etc/sogo/
-    confdir="/etc/sogo"
-    file="sogo.conf"
-    basedn=`getconfdata "baseDN" "2"`
-    strings="dc=i5-net,dc=loc%$basedn"
-    changevalues $confdir $file "$strings"
-    adminpw=`getconfdata "AdminPW" "2"`
-    strings="admin-secret%$adminpw"
-    changevalues $confdir $file "$strings"
-    sogodbuserpw=`mkdbsilent sogo sogo a`
-    strings="dbuserpw%$sogodbuserpw"
-    changevalues $confdir $file "$strings"
-    chown :sogo /etc/sogo/sogo.conf
-    chkservice "sogod"
-
-    writeprepstat "erp"
-    waitbox "groupware" "erp"
-else
-    ## Zarafa
-    cd $setupdir
-    clear
-    windowtitle="Zarafa Konfiguration"
-    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/zarafa.txt" 38 90
-
-    ## Fix Zarafa Package-Bugs
-    # Spaeter wieder entfernen
-    mkdir -p /var/lib/zarafa-webaccess/tmp
-    mkdir -p /var/lib/zarafa-webaccess/plugins
-    chmod a+rwx /var/lib/zarafa-webaccess/tmp
-
-    # htaccess-Dateien entfernen, wenn Apache Worker MPM aktiv ist
-    isworker=`ps ax |grep httpd2-worker |grep -v grep|wc -l`
-    if (( $isworker > 0 )); then
-	rm -f /usr/share/zarafa-webaccess/.htaccess
-	rm -f /usr/share/zarafa-webapp/.htaccess
-	chkservice "apache2"
-    fi
-
-    ## Leere Zarafa-Datenbank anlegen
-    zarafadbuserpw=`mkdbsilent zarafa zarafa a`
-
-    # Locales-Vorlage kopieren
-    cp $cfilesdir/zarafa/zarafa /etc/sysconfig/
-
-    # Konfigurationsvorlagen kopieren
-    cp $cfilesdir/zarafa/*.cfg /etc/zarafa/
-    
-    # Konfigurationsdaten einlesen
-    domain=`getconfdata "Domain" "2"`
-    basedn=`getconfdata "baseDN" "2"`
-    ldapmasterpw=`getconfdata "MasterPW" "2"`
-
-    # Datenbank Zugang in Zarafa Konfiguration einfuegen usw.
-    path="/etc/zarafa"
-    file="server.cfg"
-    strings="dbuserpass%$zarafadbuserpw"
-    changevalues $path $file "$strings"
-
-    strings="postmaster@localhost%domadmin@$domain"
-    changevalues $path $file "$strings"
-
-    ## Plugin-Path bei Bedarf anpassen
-    if [[ $libdir == "/usr/lib64" ]]; then
-	strings="/usr/lib/zarafa%$libdir/zarafa"
-	changevalues $path $file "$strings"
-    fi
-
-    # LDAP Konfiguration anpassen
-    file="ldap.cfg"
-    strings="master-secret%$ldapmasterpw"
-    changevalues $path $file "$strings"
-
-    strings="dc=zarafa,dc=com%$basedn"
-    changevalues $path $file "$strings"
-    
-    strings="dc=invis-net,dc=loc%$basedn"
-    changevalues $path $file "$strings"
-    
-    path="/etc/postfix"
-    file="zarafa-users.cf"
-    strings="dbuserpass%$zarafadbuserpw"
-    changevalues $path $file "$strings"
-
-    ## Locales anpassen
-    path="/etc/zarafa/userscripts"
-    strings="en_US%de_DE.UTF-8"
-    file="companies_common.sh"
-    changevalues $path $file "$strings"
-
-    file="groups_common.sh"
-    changevalues $path $file "$strings"
-
-    file="users_common.sh"
-    changevalues $path $file "$strings"
-
-    path="/etc/zarafa/webaccess-ajax"
-    file="config.php"
-    
-    strings="London%Berlin"
-    changevalues $path $file "$strings"
-
-    strings="en_EN%de_DE.UTF-8"
-    changevalues $path $file "$strings"
-    
-    # Zarafa-Schluessel erzeugen
-    mkzarafakey
-    
-    # Dienste ins Runlevel-Konzept eintragen
-    for zinit in /etc/init.d/zarafa-* ; do
-	zinit=`basename $zinit`
-	chkservice $zinit
-    done
-    
-    #z-push als vHost anlegen & apache reload
-    cp $cfilesdir/webserver/z-push_vh.conf /etc/apache2/vhosts.d/
-    rm -f /etc/apache2/conf.d/z-push.conf
-    /etc/init.d/apache2 reload
-    
-    # Oeffentlichen Speicher anlegen
-    zarafa-admin -s    
-    extzu junk 1
-    
-    writeprepstat "erp"
-    waitbox "groupware" "erp"
-
-fi
+	;;
+esac
 
 }
 
@@ -2425,83 +2434,79 @@ whicherp=`getconfdata "ERPSoftware" "2"`
 case $whicherp in
 
     "kivitendo" )
-	# PostgreSQL in RL eintragen, wenn noch nicht geschehen
-	srvon=`chkconfig postgresql|grep " on"`
-	if [[ -z $srvon ]]; then chkservice "postgresql"; fi
-	    #lxerpversion="2.7.0"
-	    cd $setupdir
-	    clear
-	    windowtitle="Kivitendo Installation"
-	    dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/kivitendo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie LX-ERP installieren?" 0 0
-	    cont=${?}
+    # PostgreSQL in RL eintragen, wenn noch nicht geschehen
+    srvon=`chkconfig postgresql|grep " on"`
+    if [[ -z $srvon ]]; then chkservice "postgresql"; fi
+	#lxerpversion="2.7.0"
+	cd $setupdir
+	clear
+	windowtitle="Kivitendo Installation"
+	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/kivitendo.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie LX-ERP installieren?" 0 0
+	cont=${?}
 
-	    if [[ $cont == "0" ]]; then
-		pgsubtitle="Zusätzliche Software wird installiert"
-		zypper refresh 2>&1 |pgbox
-		zypper -n install -n `cat $setupdir/zypper-package-lists/kivitendo` 2>&1 |pgbox
-		zyppercheck ${PIPESTATUS[0]}
+	if [[ $cont == "0" ]]; then
+	    pgsubtitle="Zusätzliche Software wird installiert"
+	    zypper refresh 2>&1 |pgbox
+	    zypper -n install -n `cat $setupdir/zypper-package-lists/kivitendo` 2>&1 |pgbox
+	    zyppercheck ${PIPESTATUS[0]}
 	
-		# Apache FCGID-Modul aktivieren, wenn nicht bereits geschehen
-		if [[ -z `a2enmod -l | grep fcgid` ]]; then
-			a2enmod fcgid
-		    /etc/init.d/apache2 reload 2>&1 |pgbox
-		fi
+	    # Apache FCGID-Modul aktivieren, wenn nicht bereits geschehen
+	    if [[ -z `a2enmod -l | grep fcgid` ]]; then
+		a2enmod fcgid
+		/etc/init.d/apache2 reload 2>&1 |pgbox
+	    fi
 
-		# Kivitendo Konfiguration vorbereiten
-		cp $cfilesdir/kivitendo-erp/kivitendo.conf /srv/www/htdocs/kivitendo-erp/config/kivitendo.conf
+	    # Kivitendo Konfiguration vorbereiten
+	    cp $cfilesdir/kivitendo-erp/kivitendo.conf /srv/www/htdocs/kivitendo-erp/config/kivitendo.conf
 
-		msgbox "Der Kivitendo Taskserver wird ins Runklevelkonzept integriert.
+	    msgbox "Der Kivitendo Taskserver wird ins Runklevelkonzept integriert.
 Sein Start wird solange fehlschlagen, bis Sie einen gültigen Kivitendo Benutzernamen in
 /srv/www/htdocs/kivitendo-erp/config/kivitendo.conf eingetragen haben." "$windowtitle"
 
-		#cp /srv/www/htdocs/kivitendo-erp/scripts/boot/systemd/kivitendo-task-server.service /usr/lib/systemd/system/
-		chkservice "kivitendo-task-server"
+	    #cp /srv/www/htdocs/kivitendo-erp/scripts/boot/systemd/kivitendo-task-server.service /usr/lib/systemd/system/
+	    chkservice "kivitendo-task-server"
 
-		msgbox "Es wird ein Postgresql-Benutzer - kivitendo - für Kivitendo angelegt. 
+	    msgbox "Es wird ein Postgresql-Benutzer - kivitendo - für Kivitendo angelegt. 
 Vergessen Sie bitte nicht das hierbei von Ihnen zu vergebende Passwort. ;-)" "$windowtitle"
-		sudo -u postgres createuser -d -r -S -P kivitendo
-		ok=0
-		while (( $ok != "1" ));do
-		    dialog --backtitle "$dialogtitle" --title "Kivitendo-DB Passwort" --insecure --passwordform "$dialogshorthelp\n\n
+	    sudo -u postgres createuser -d -r -S -P kivitendo
+	    ok=0
+	    while (( $ok != "1" ));do
+		dialog --backtitle "$dialogtitle" --title "Kivitendo-DB Passwort" --insecure --passwordform "$dialogshorthelp\n\n
 Bitte geben Sie dass soeben vergebene Passwort für den LX-Office Datenbankbenutzer zur weiteren Verwendung erneut ein.\n\n" 17 64 2 \
-		    "Kivitendo-DB-Passwort:" 2 2 "" 2 23 10 0\
-		    "Kontrolle:" 2 36 "" 2 47 10 0\
-		    2>$setupdir/sine_temp
-		    lxpassword=(`cat $setupdir/sine_temp`)
-		    if [[ ${lxpassword[0]} == ${lxpassword[1]} ]];then
-			ok=1
-		    fi
-		done
-		lxpw="${lxpassword[0]}"
+		"Kivitendo-DB-Passwort:" 2 2 "" 2 23 10 0\
+		"Kontrolle:" 2 36 "" 2 47 10 0\
+		2>$setupdir/sine_temp
+		lxpassword=(`cat $setupdir/sine_temp`)
+		if [[ ${lxpassword[0]} == ${lxpassword[1]} ]];then
+		    ok=1
+		fi
+	    done
+	    lxpw="${lxpassword[0]}"
 
-		pgsubtitle="Datenbanken werden angelegt"
-		cd $setupdir
-		dialog --backtitle "$dialogtitle" --title "$windowtitle" --radiolist "$dialogshorthelp\n\n
+	    pgsubtitle="Datenbanken werden angelegt"
+	    cd $setupdir
+	    dialog --backtitle "$dialogtitle" --title "$windowtitle" --radiolist "$dialogshorthelp\n\n
 Legen Sie jetzt bitte fest auf welche Art Kivitendo Benutzer authentifiziert werden.\n
 Da Kivitendo nur eine 1 zu 1 Zuordnung von Benutzer zu Datenbank zulässt, ist die LDAP-Authentifizierung nur
 dann sinnvoll, wenn lediglich mit einer Kivitendo Datenbank gearbeitet wird."  16 80 8 \
-		SQL "Benutzerverwaltung über eigene Authentifizierungsdatenbank" on\
-		LDAP "Anbindung an die vorhandene LDAP Benutzerverwaltung" off\
-		2>$setupdir/sine_temp
-		lxauth=`cat $setupdir/sine_temp`
-		path="/srv/www/htdocs/kivitendo-erp/config"
-		file="kivitendo.conf"
-		if [[ $lxauth == "LDAP" ]]; then
-		    basedn=`getconfdata "baseDN" "2"`
-		    strings="dc=invis-net,dc=loc%$basedn"
-		    changevalues $path $file "$strings"
-		    strings="module = DB%module = LDAP"
-		    changevalues $path $file "$strings"
-		    ldapadminpw=`getconfdata "AdminPW" "2"`
-		    strings="admin_secret%$ldapadminpw"
-		    changevalues $path $file "$strings"
-		fi
-		strings="lxpw%$lxpw"
+	    SQL "Benutzerverwaltung über eigene Authentifizierungsdatenbank" on\
+	    LDAP "Anbindung an die vorhandene LDAP Benutzerverwaltung" off\
+	    2>$setupdir/sine_temp
+	    lxauth=`cat $setupdir/sine_temp`
+	    path="/srv/www/htdocs/kivitendo-erp/config"
+	    file="kivitendo.conf"
+	    if [[ $lxauth == "LDAP" ]]; then
+		basedn=`getconfdata "baseDN" "2"`
+		strings="dc=invis-net,dc=loc%$basedn"
 		changevalues $path $file "$strings"
-	    #else 
-		#msgbox "LX-ERP Installationsarchiv ist nicht vorhanden - Abbruch" "$windowtitle"
-		#exit
-	    #fi
+		strings="module = DB%module = LDAP"
+		changevalues $path $file "$strings"
+		ldapadminpw=`getconfdata "AdminPW" "2"`
+		strings="admin_secret%$ldapadminpw"
+		changevalues $path $file "$strings"
+	    fi
+	    strings="lxpw%$lxpw"
+	    changevalues $path $file "$strings"
 
 	    writeprepstat "faxgate"
 	    waitbox "erp" "faxgate"
