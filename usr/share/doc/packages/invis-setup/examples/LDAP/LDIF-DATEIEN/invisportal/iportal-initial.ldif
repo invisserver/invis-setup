@@ -33,6 +33,19 @@ iPortEntryPosition: Lokal
 iPortEntryButton: Groupware
 iPortEntryPriv:	user
 
+# Webmailer Roundcube
+dn: iPortEntryName=Roundcube,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+objectClass: top
+objectClass: iPortEntry
+iPortEntryName: Roundcube
+iPortEntrySSL: FALSE
+iPortEntryURL: [servername]/roundcube
+iPortEntryDescription: Roundcubemail ist ein moderner und schlanker Webmailer.
+iPortEntryActive: ROUNDCUBETRUE
+iPortEntryPosition: Lokal
+iPortEntryButton: Groupware
+iPortEntryPriv:	user
+
 # Groupware ZarafaAcc
 dn: iPortEntryName=ZarafaAcc,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top

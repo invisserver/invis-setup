@@ -1495,6 +1495,10 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    chmod 0775 /var/lib/dovecot 2>&1| tee -a $setupdir/sine.log
 	    chown -R :vmail /var/spool/mail 2>&1| tee -a $setupdir/sine.log
 
+	    # Dictionary Verzeichnis fuer IMAP ACLs anlegen.
+	    mkdir /var/lib/dovecot/db
+	    chown vmail.vmail /var/lib/dovecot/db
+	    
 	    # Dovecots Modulpfad an Systemarchitektur anpassen
 	    if [[ $libdir == "/usr/lib64" ]]; then 
 		strings="/usr/lib/dovecot/modules%$libdir/dovecot/modules"
@@ -2419,9 +2423,22 @@ case "$whichimap" in
 	dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/roundcube.txt" 38 90
 	zypper -n install -n roundcubemail 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
-
-	# configuration here
 	
+	# Datenbank anlegen
+	rcmdbpass=`mkdbsilent roundcube roundcube a`
+
+	# Konfigurationsdateien kopieren und anpassen
+	path="/etc/roundcubemail/"
+	cp $cfilesdir/roundcubemail/* $path
+	file="db.inc.php"
+	strings="rcmdbpass%$rcmdbpass"
+	changevalues $path $file "$strings"
+
+	domain=`getconfdata "Domain" "2"`
+	file="main.inc.php"
+	strings="invis-net.loc%$domain"
+	changevalues $path $file "$strings"
+
 	writeprepstat "erp"
 	waitbox "groupware" "erp"
 	;;

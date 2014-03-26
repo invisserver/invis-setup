@@ -52,8 +52,11 @@ userdb {
   # [blocking=no]
   #args = 
 
+  ## invis-server.org -- Home-Verzeichnis verschieben und uid/gid auf vmail
+  ## setzen. Ansonsten wird es schwierig mit Shared Mailboxes weil die Zugriffs
+  ## Zugriffrechte auf die Maildirs einen Fremdzugriff nicht erlauben.
   # Override fields from passwd
-  #override_fields = home=/home/virtual/%u
+  override_fields = uid=vmail gid=vmail home=/var/spool/mail/%u
 }
 
 # Static settings generated from template <doc/wiki/UserDatabase.Static.txt>
