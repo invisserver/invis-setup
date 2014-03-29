@@ -25,9 +25,15 @@ changevalues() {
 groupware=`getconfdata "$conffile" "usedGroupware" "2"`
 
 # Script zur Manipulation der Gruppeneintraege aufrufen
-if [[ $groupware == "zarafa" ]]; then
-    addzag
-elif [[ $groupware == "groupe" ]]; then
-    addgeg
-fi
+case $groupware in
+    "zarafa" )
+        addzag
+        ;;
+    "groupe" )
+	addgeg
+	;;
+    "sogo" )
+	# to be filled
+	;;
+esac
 

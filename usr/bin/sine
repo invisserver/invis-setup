@@ -1078,17 +1078,26 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
 	changevalues $confdir $file "$strings"
     fi
 
-    imapserver=`getconfdata "IMAPserver" "2"`
-    if [[ $imapserver == "zarafa" ]]; then
-	strings="usedgroupware%$imapserver"
-	changevalues $confdir $file "$strings"
-    elif [[ $imapserver == "cyrus" ]]; then
-	strings="usedgroupware%groupe"
-	changevalues $confdir $file "$strings"
-    else
-    	strings="usedgroupware%sogo"
-	changevalues $confdir $file "$strings"
-    fi
+    groupware=`getconfdata "IMAPserver" "2"`
+    ## verwendete Groupware in Konfigurationsdatei schreiben
+    case $groupware in
+	"zarafa" ) 
+	    strings="usedgroupware%$imapserver"
+	    changevalues $confdir $file "$strings"
+	    ;;
+	"groupe" )
+	    strings="usedgroupware%groupe"
+	    changevalues $confdir $file "$strings"
+	    ;;
+	"sogo" )
+	    strings="usedgroupware%sogo"
+	    changevalues $confdir $file "$strings"
+	    ;;
+	"roundcube" )
+	    strings="usedgroupware%roundcube"
+	    changevalues $confdir $file "$strings"
+	    ;;
+    esac
 
     # invis Passwort-Datei anpassen
     file="invis-pws.conf"
@@ -1268,28 +1277,48 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
     whicherp=`getconfdata "ERPSoftware" "2"`
     
     file="iportal-initial.ldif"
-    if [[ $whichgroupware == "zarafa" ]]; then
-	strings="GROUPETRUE%FALSE"
-	changevalues $path $file "$strings"
-	strings="SOGOTRUE%FALSE"
-	changevalues $path $file "$strings"
-	strings="ZARAFATRUE%TRUE"
-	changevalues $path $file "$strings"
-    elif [[ $whichgroupware == "cyrus" ]]; then
-	strings="GROUPETRUE%TRUE"
-	changevalues $path $file "$strings"
-	strings="SOGOTRUE%FALSE"
-	changevalues $path $file "$strings"
-	strings="ZARAFATRUE%FALSE"
-	changevalues $path $file "$strings"
-    else
-	strings="SOGOTRUE%TRUE"
-	changevalues $path $file "$strings"
-	strings="GROUPETRUE%FALSE"
-	changevalues $path $file "$strings"
-	strings="ZARAFATRUE%FALSE"
-	changevalues $path $file "$strings"
-    fi
+    case $whichgroupware in
+	"zarafa" )
+	    strings="GROUPETRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="SOGOTRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="ZARAFATRUE%TRUE"
+	    changevalues $path $file "$strings"
+	    strings="ROUNDCUBETRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    ;;
+	"groupe" )
+	    strings="GROUPETRUE%TRUE"
+	    changevalues $path $file "$strings"
+	    strings="SOGOTRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="ZARAFATRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="ROUNDCUBETRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    ;;
+	"sogo" )
+	    strings="SOGOTRUE%TRUE"
+	    changevalues $path $file "$strings"
+	    strings="GROUPETRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="ZARAFATRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="ROUNDCUBETRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    ;;
+	"roundcube" )
+	    strings="ROUNDCUBETRUE%TRUE"
+	    changevalues $path $file "$strings"
+	    strings="ZARAFATRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="GROUPETRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    strings="SOGOTRUE%FALSE"
+	    changevalues $path $file "$strings"
+	    ;;
+    esac
 
     if [[ $whicherp == "openerp" ]]; then
 	strings="LXTRUE%FALSE"
