@@ -303,7 +303,7 @@ FW_SERVICES_EXT_TCP="443 sshport httpsport 1194"
 # Note: this setting has precedence over FW_SERVICES_ACCEPT_*
 #
 ## invis-server.org
-FW_SERVICES_EXT_UDP="123 1194"
+FW_SERVICES_EXT_UDP="1194"
 
 ## Type:	string
 # 
