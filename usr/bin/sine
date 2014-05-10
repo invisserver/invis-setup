@@ -1920,7 +1920,8 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     fi
 
     # NFSv4 Server vorbereiten -- aber nicht starten
-    cp $cfilesdir/fileserver/nfs/exports_nfs4 /etc/exports   2>&1| tee -a $setupdir/sine.log
+    cp $cfilesdir/fileserver/nfs/exports_nfs4 /etc/exports  2>&1| tee -a $setupdir/sine.log
+    cp $cfilesdir/fileserver/nfs/nfs /etc/sysconfig  2>&1| tee -a $setupdir/sine.log
     cat $cfilesdir/fileserver/nfs/fstab_extention >> /etc/fstab
     mount -a
     domain=`getconfdata "Domain" "2"`
@@ -1928,7 +1929,12 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     file="idmapd.conf"
     strings="localdomain%$domain"
     changevalues $path $file "$strings"
-
+    netbase=`getconfdata "Networkbase" "2"`
+    nmaskshort=`getconfdata "NMask-short" "2"`
+    file=exports
+    strings="192.168.220.0/24%$netbase/$nmaskshort"
+    changevalues $path $file "$strings"
+    
     writeprepstat "webserver"
     waitbox "samba" "webserver"
 
