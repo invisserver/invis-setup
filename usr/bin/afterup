@@ -43,19 +43,17 @@ chown -R root:"Verwaltung" /srv/shares/verwaltung
 chown root:"Domain Users" /srv/shares/portal/uploads
 chown domadmin:"Domain Users" /srv/shares/portal/downloads
 
+# Zugriffsrechte auf Private-Key Verzeichnis bereinigen
+chown .pkeys /etc/ssl/private
+chmod g+rx /etc/ssl/private
+
+# Wenn vorhanden Rechte auf nagios check_icmp bereinigen
+if [[ -f /usr/lib/nagios/plugins/check-icmp ]]; then
+    chmod u+s /usr/lib/nagios/plugins/check-icmp
+fi
+
 # Link zur Zarafa-Client-Library erneuern
 #if [[ -d /etc/zarafa ]]; then
 #    fixzarafaclientlib
 #fi
-
-# fetchmail Updates verändern das init-Script des fetchmail Daemons
-#path="/etc/init.d"
-#file="fetchmail"
-#strings="/etc/fetchmailrc%/var/cornaz/inuse/.fetchmailrc"
-#changevalues $path $file $strings
-
-#strings="/etc/sysconfig/fetchmail%/var/cornaz/sysconfig/fetchmail"
-#changevalues $path $file $strings
-
-#chmod a+x $path/$file
 

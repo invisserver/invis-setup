@@ -2058,7 +2058,8 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     changevalues $path $file "$strings"
 
     # Sysconfig Datei bearbeiten
-    path="/var/lib/cornaz/sysconfig"
+    cp $cfilesdir/mailserver/fetchmail/fetchmail /etc/sysconfig/
+    path="/etc/sysconfig/fetchmail"
     file="fetchmail"
     strings="localdomain%$domain"
     changevalues $path $file "$strings"
