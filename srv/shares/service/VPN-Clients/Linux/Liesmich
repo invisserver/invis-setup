@@ -1,0 +1,10 @@
+Das Script invisconnect dient dazu einen Linux-PC per
+OpenVPN an einen invis-Server anzubinden und dabei auch
+dessen Freigaben per NFS zu mounten.
+
+Damit das funktionieren kann, muss der betreffende PC
+zunächst mit per SSSD an die Benutzerverwaltung des 
+Servers angebunden sein. Wie das zu bewerkstelligen
+ist, kann im invis-Wiki nachgelesen werden.
+
+http://wki.invis-server.org

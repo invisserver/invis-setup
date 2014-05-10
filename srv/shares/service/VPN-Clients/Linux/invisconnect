@@ -1,0 +1,51 @@
+#!/bin/bash
+
+ovpnconf="/etc/openvpn/vpn-client.ovpn"
+mntpathbase="/mnt/invis"
+domain="invis-net.loc"
+invisip="192.168.220.10"
+delay=20
+
+usage() {
+    echo -e "Geben Sie an, ob Sie die Verbindung zum Server aufbauen oder trennen möchten."
+    echo -e "Verbinden:\tinvisconnect c"
+    echo -e "Trennen:\tinvisconnect d"
+}
+
+case "$1" in
+    "c")
+	    # OpenVPN Verbindung aufbauen
+	    sudo /usr/sbin/openvpn --config $ovpnconf --daemon -log ovpnsession.log
+	    # invis Server Freigaben einhaengen
+	    echo "$delay Sekunden Wartezeit, bevor das Script fortgesetzt wird."
+	    sleep $delay
+	    # invis DNS Server nutzen
+	    # resolv.conf sichern
+	    sudo mv /etc/resolv.conf /etc/resolv.conf.ori
+	    # temporaere resolv.conf erzeugen
+	    sudo echo -e "search $domain" > /tmp/resolv.conf
+	    sudo echo -e "nameserver $invisip" >> /tmp/resolv.conf
+	    sudo mv /tmp/resolv.conf /etc/resolv.conf
+	    # Testen, ob Zielverzeichnisse vorhanden, wenn nicht anlegen.
+	    if [[ ! -d $mntpathbase ]]; then
+		sudo mkdir -p $mntpathbase/shares
+		sudo mkdir -p $mntpathbase/home
+	    fi
+	    # Freigaben einhaengen
+	    sudo mount -t nfs $invisip:/srv/nfs4_base/shares $mntpathbase/shares
+	    sudo mount -t nfs $invisip:/srv/nfs4_base/home $mntpathbase/home
+	    ;;
+	"d")
+	    # Freigaben aushaengen
+	    sudo umount $mntpathbase/shares
+	    sudo umount $mntpathbase/home
+	    # OpenVPN beenden
+	    openvpnpid=$(pgrep openvpn)
+	    sudo kill $openvpnpid
+	    # Urspruengliche resolv.conf wiederherstellen
+	    sudo mv /etc/resolv.conf.ori /etc/resolv.conf
+	    ;;
+	*)
+	    usage
+	    ;;
+esac

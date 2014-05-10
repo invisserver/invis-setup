@@ -1701,35 +1701,68 @@ samba() {
     cd $setupdir
     clear
     windowtitle="Samba Server"
-
+    ipaddr=`getconfdata "IP" "2"`
+    smbdom=`getconfdata "Workgroup" "2"`
+    basedn=`getconfdata "baseDN" "2"`
+    hn=`getconfdata "Hostname" "2"`
+    smbhostname=`echo $hn | tr [a-z] [A-Z]`
+    masterpw=`getconfdata "MasterPW" "2"`
+    av=`getconfdata "AV" "2"`
+    whichsamba=`getconfdata "SambaPakete" "2"`
+    domain=`getconfdata "Domain" "2"`
+    netbase=`getconfdata "Networkbase" "2"`
+    nmaskshort=`getconfdata "NMask-short" "2"`
+    smbdom=`getconfdata "Workgroup" "2"`
+    ddns=`getconfdata "DDNS" "2"`
     cp $cfilesdir/fileserver/samba/smb.conf /etc/samba 2>&1| tee -a $setupdir/sine.log
     # Scriptvorlage fuer das Verschieben der Windows-Bibliotheken kopieren
     cp $cfilesdir/fileserver/service/Win_Scripts/movelibdirs.cmd /etc/invis/templates/ 2>&1| tee -a $setupdir/sine.log
     unix2dos /etc/invis/templates/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
     unix2dos /srv/shares/service/Win_Scripts/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
     unix2dos /srv/shares/service/Win_Timeserver/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
+    unix2dos /srv/shares/service/VPN-Clients/Windows/vpn-client.ovpn
+
+    # invisconnect-Script anpassen
+    path="/srv/shares/service/VPN-Clients/Linux"
+    file="invisconnect"
+    strings="192.168.220.10%$ipaddr"
+    changevalues $path $file "$strings"
+
+    strings="invis-net.loc%$domain"
+    changevalues $path $file "$strings"
+
+    # OpenVPN Client-Konfigurationsdateien anpassen
+    file="vpn-client.ovpn"
+    strings="invis-net.loc%$domain"
+    changevalues $path $file "$strings"
+
+    strings="server.ihredomain.de%$ddns"
+    changevalues $path $file "$strings"
+
+    path="/srv/shares/service/VPN-Clients/Windows"
+    file="vpn-client.ovpn"
+    strings="invis-net.loc%$domain"
+    changevalues $path $file "$strings"
+
+    strings="server.ihredomain.de%$ddns"
+    changevalues $path $file "$strings"
+
     # Anpassen der Datei smb.conf
 
-    ipaddr=`getconfdata "IP" "2"`
     path="/etc/samba"
     file="smb.conf"
     strings="192.168.220.10%$ipaddr"
     changevalues $path $file "$strings"
     
-    smbdom=`getconfdata "Workgroup" "2"`
     strings="I5-NET%$smbdom"
     changevalues $path $file "$strings"
     
-    basedn=`getconfdata "baseDN" "2"`
     strings="dc=i5-net,dc=loc%$basedn"
     changevalues $path $file "$strings"
     
-    smbhostname=`getconfdata "Hostname" "2"`
-    smbhostname=`echo $smbhostname | tr [a-z] [A-Z]`
     strings="INVIS5%$smbhostname"
     changevalues $path $file "$strings"
 
-    av=`getconfdata "AV" "2"`
     if [[ $av == "beide" ]]; then
 	av="antivir"
     fi
@@ -1752,7 +1785,6 @@ samba() {
     chmod -R g+w /srv/shares/service 2>&1| tee -a $setupdir/sine.log
     
     # Setzen des LDAP Zugangspasswort
-    masterpw=`getconfdata "MasterPW" "2"`
     pgsubtitle="Samba erhält das LDAP-Administrationspasswort"
     smbpasswd -w $masterpw 2>&1| tee -a $setupdir/sine.log | pgbox
 
@@ -1762,7 +1794,6 @@ samba() {
     # Samba4 wertet X-Bit aus
     chmod +x /var/lib/samba/netlogon/*  2>&1| tee -a $setupdir/sine.log
     
-    hn=`getconfdata "Hostname" "2"`
     path="/var/lib/samba/netlogon"
     file="user.cmd"
     strings="invis5%$hn"
@@ -1789,7 +1820,6 @@ samba() {
     changevalues $path $file "$strings"
         
     # Anbinden des Servers an die LDAP-Benutzerdatenbank (LDAP-Client via sssd und PAM, Client verwendet STARTTLS)
-    basedn=`getconfdata "baseDN" "2"`
     cp $cfilesdir/LDAP/conf-client/openldap/ldap.conf /etc/openldap/ldap.conf 2>&1| tee -a $setupdir/sine.log
     path="/etc/openldap"
     file="ldap.conf"
@@ -1906,7 +1936,6 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
 
     # Samba-Server starten und in Runlevel eintragen
     # Sambaversion pruefen
-    whichsamba=`getconfdata "SambaPakete" "2"`
     if [[ $whichsamba == "sernet" ]]; then
 	path="etc/default"
 	file="sernet-samba"
@@ -1924,13 +1953,10 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     cp $cfilesdir/fileserver/nfs/nfs /etc/sysconfig  2>&1| tee -a $setupdir/sine.log
     cat $cfilesdir/fileserver/nfs/fstab_extention >> /etc/fstab
     mount -a
-    domain=`getconfdata "Domain" "2"`
     path="/etc"
     file="idmapd.conf"
     strings="localdomain%$domain"
     changevalues $path $file "$strings"
-    netbase=`getconfdata "Networkbase" "2"`
-    nmaskshort=`getconfdata "NMask-short" "2"`
     file=exports
     strings="192.168.220.0/24%$netbase/$nmaskshort"
     changevalues $path $file "$strings"
