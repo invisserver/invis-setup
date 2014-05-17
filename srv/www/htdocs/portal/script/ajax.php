@@ -7,7 +7,7 @@
  * (C) 2009, 2010, 2011, 2012 Stefan Schaefer, invis-server.org
  * (C) 2013 Ingo Göppert, invis-server.org
  * License GPLv3
- * Questions: daniel@invis-server.org
+ * Questions: stefan@invis-server.org
  */
 
 require_once('../ldap.php');
@@ -393,8 +393,8 @@ function userList($conn) {
 				if (isset($entry['zarafaaccount'])) {
 				    if ($entry['zarafaaccount'] == 1) $isZarafaGroupe = 1;
 				}
-				if (isset($entry['activegroup-e'])) {
-				    if ($entry['activegroup-e'] == 1) $isZarafaGroupe = 1;
+				if (isset($entry['activgroup-e'])) {
+				    if ($entry['activgroup-e'] == 1) $isZarafaGroupe = 1;
 				}
 				if (in_array($entry['uid'], $admins)) $entry['TYPE'] = 0;
 				elseif ($isZarafaGroupe) $entry['TYPE'] = 4;
