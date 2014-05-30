@@ -20,12 +20,12 @@ if ($status == "Urlaub") {
 	$i++;
 	}
 	$ausgabe = "<b>Status: </b> Ihre eMails werden vorübergehend nicht abgeholt.";
-	$fh = fopen("/var/lib/cornaz/build/.fetchmailrc","w+");
+	$fh = fopen("$COR_FETCHMAILRC_BUILD","w+");
 	foreach ($fetchmailrc_b as $zeile) {
 		fwrite ($fh, "$zeile");
 	}
 	fclose($fh);
-	exec ("sudo /var/lib/cornaz/bin/fetchcopy");
+	exec ("sudo $COR_PATH/bin/fetchcopy");
 
 	#Info Zeile
 	$margin = "";
@@ -33,7 +33,6 @@ if ($status == "Urlaub") {
 	<center>$vorgang</center><p><center>$ausgabe</center><p>
 	<hr size=\"1\" noshade width=\"300\" center><p>";
 	site_info($margin, $info);
-	//imap_close($login);
 }
 
 ?>

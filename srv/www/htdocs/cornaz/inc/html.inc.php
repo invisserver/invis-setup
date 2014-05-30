@@ -3,14 +3,14 @@
 # Seitenanfang
 
 function site_head($programm, $sitename, $bgcolor) {
-	echo ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">");
+	echo ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
 	echo ("<html>");
 	echo ("<head>");
 	echo ("<title>$sitename</title>");
 	echo ("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
 	echo ("<meta name=\"author\" content=\"Stefan Schaefer, FSP\">");
 	echo ("</head>");
-	echo ("<body bgcolor=\"$bgcolor\" link=\"darkblue\" alink=\"red\" vlink=\"#fb8000\"
+	echo ("<body style='font-family:sans-serif' bgcolor=\"$bgcolor\" link=\"darkblue\" alink=\"red\" vlink=\"#fb8000\"
 		text=\"black\" marginwidth=\"0\" marginheight=\"0\" leftmargin=\"0\"
 		topmargin=\"0\">");
 	echo ("<table border=\"0\" width=\"100%\" cellpadding=\"3\" cellspacing=\"0\">");
@@ -30,7 +30,7 @@ function site_head($programm, $sitename, $bgcolor) {
 	echo ("</table>");
 }
 # Seitenende
-function site_end($cormainpage, $corfooter, $corwebserver){
+function site_end($cormainpage, $corfooter, $COR_WEBSERVER){
 	echo ("<table border=\"0\" width=\"100%\" cellpadding=\"3\" cellspacing=\"0\">");
 	echo ("<tbody>");
 	echo ("<tr>");
@@ -42,7 +42,7 @@ function site_end($cormainpage, $corfooter, $corwebserver){
 		echo ("<tr>");
 		echo ("<td valign=\"middle\" width=\"130\">$cormainpage</td>");
 		echo ("<td valign=\"middle\" align=\"middle\">$corfooter</td>");
-		echo ("<td valign=\"middle\" width=\"130\" align=\"right\">$corwebserver</td>");
+		echo ("<td valign=\"middle\" width=\"130\" align=\"right\">$COR_WEBSERVER</td>");
 		echo ("</tr>");
 		echo ("</tbody>");
 		echo ("</table>");
@@ -165,7 +165,7 @@ function table_row_n($val_n, $margin){
 		echo ("<tr>");
 		$i = 0;
 		foreach ($val_n as $td) {
-		echo ("<td valign=\"top\" width=\"$td[1]\"><fontface=\"arial\">$td[0]</font></td>");
+			echo ("<td valign=\"top\" width=\"$td[1]\"><fontface=\"arial\">$td[0]</font></td>");
 		}
 		echo ("</tr>");
 		echo ("</tbody>");
@@ -178,21 +178,19 @@ function table_row_n($val_n, $margin){
 
 # Schaltflächenzeile mit n Spalten
 function button_row_n($val_n, $margin, $script){
-	echo ("<table border=\"0\" width=\"100%\" cellpadding=\"3\" cellspacing=\"0\">");
+	echo ("<table border=\"0\"  width=\"100%\" cellpadding=\"3\" cellspacing=\"0\"><tbody>");
 	echo ("<tr>");
 	echo ("<td width=\"100\">&nbsp;</td>");
-	echo ("<td valign=\"top\" height=\"40\" width=\"110\" bgcolor=\"#fafafa\"><b><font color=\"darkgrey\">$margin</font></b>");
-	echo ("</td>");
-	echo ("<td valign=\"middle\" height=\"40\">");
-		echo ("<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\">");
-		echo ("<tbody>");
-		echo ("<tr>");
+	echo ("<td valign=\"top\" height=\"40\" width=\"110\" bgcolor=\"#fafafa\"><b><font color=\"darkgrey\">$margin</font></b></td>");
+	//echo ("<td width=\"340\">&nbsp;</td>");
+	echo ("<td align=\"center\" height=\"40\">");
+		echo ("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\"><tbody>");
+		echo ("<tr align=\"justify\">");
 		foreach ($val_n as $button) {
-		echo ("<td valign=\"middle\" width=\"120\"><form action=\"$script\" method=\"post\"><center><input type=\"hidden\" name=\"file\" value=\"$button[1]\"></input><input type=\"hidden\" name=\"bgcolor\" value=\"$button[2]\"></input><input type=\"submit\" value=\"  $button[0]   \"></input></center></form></td>");
+			echo ("<td width=\"200\" align=\"center\" valign=\"middle\"><form action=\"$script\" method=\"post\"><input type=\"hidden\" name=\"file\" value=\"$button[1]\"></input><input type=\"hidden\" name=\"bgcolor\" value=\"$button[2]\"></input><input type=\"submit\" value=\"$button[0]\"></input></form></td>");
 		};
 		echo ("</tr>");
-		echo ("</tbody>");
-		echo ("</table>");
+		echo ("</tbody></table>");
 	echo ("</td>");
 	echo ("<td width=\"100\">&nbsp;</td>");
 	echo ("</tr>");

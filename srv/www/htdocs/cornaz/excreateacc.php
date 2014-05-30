@@ -9,7 +9,7 @@ $extaddress=$_POST["extaddress"];
 $protokoll=$_POST["protokoll"];
 $kennung=$_POST["kennung"];
 $extpasswd=$_POST["extpasswd"];
-$luser="$corusername@$corlocalmaildomain";
+$luser="$corusername@$DOMAIN";
 
 # SSL oder nicht
 if ($protokoll == "pop3s" or $protokoll == "imaps") {
@@ -20,7 +20,7 @@ if ($protokoll == "pop3s" or $protokoll == "imaps") {
 }
 
 # Verbindung zum LDAP Server aufbauen
-$ditcon=ldap_connect("$corldaphost");
+$ditcon=ldap_connect("$LDAP_SERVER");
 # LDAP Protokoll auf Version 3 setzen
 if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
     echo "Kann das Protokoll nicht auf Version 3 setzen";
@@ -28,7 +28,7 @@ if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
 # Am LDAP per SimpleBind anmelden
 if ($ditcon) {
     // bind mit passendem dn für aktulisierenden Zugriff
-    $dn=("uid=$corusername,$corbasedn");
+    $dn=("uid=$corusername,$BASE_DN_USER");
     $r=ldap_bind($ditcon,$dn,"$corpassword");
 	// Daten vorbereiten
     $account["fspExtMailAddress"]="$extaddress";
@@ -50,7 +50,7 @@ if ($ditcon) {
 	if ($entries["count"] == 0) { 
 		// Daten vorbereiten
 	    	$account2["fspLocalMailAddress"]="$luser";
-    		$account2["fspLocalMailHost"]="$corldaphost";
+    		$account2["fspLocalMailHost"]="$COR_LOCAL_IMAP_SERVER";
     		$account2["fspMainMailAddress"]="$extaddress";
     		$account2["objectclass"]="top";
     		$account2["objectclass"]="fspLocalMailRecipient";
@@ -75,21 +75,22 @@ if ( $status == "Anwesend" ) {
 	}
 	$i++;
 	}
-		$fh = fopen("/var/lib/cornaz/build/.fetchmailrc","w+");
+		$fh = fopen("$COR_FETCHMAILRC_BUILD","w+");
 	foreach ($fetchmailrc_b as $zeile) {
 		fwrite ($fh, "$zeile");
 	}
 	fclose($fh);
-	exec ("sudo /var/lib/cornaz/bin/fetchcopy");
+	exec ("sudo $COR_PATH/bin/fetchcopy");
 	# Verbindung zum LDAP Server aufbauen
-	$ditcon=ldap_connect("$corldaphost");
+	$ditcon=ldap_connect("$LDAP_SERVER");
+
 	# LDAP Protokoll auf Version 3 setzen
 	if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
 		echo "Kann das Protokoll nicht auf Version 3 setzen";
 		# Am LDAP per SimpleBind anmelden
 		if ($ditcon) {
     			// bind mit passendem dn für aktulisierenden Zugriff
-			$dn=("uid=$corusername,$corbasedn");
+			$dn=("uid=$corusername,$BASE_DN_USER");
   			$r=ldap_bind($ditcon,$dn, "$corpassword");
 			$filter="(&(fspExtMailServer=*)(fspLocalMailAddress=$corusername*))";
 			$justthese = array( "fspExtMailAddress", "fspExtMailProto", "fspExtMailUsername", "fspExtMailServer", "fspExtMailUserPw", "fspMailfetchOpts");
@@ -104,7 +105,7 @@ if ( $status == "Anwesend" ) {
 		array_shift($entries);
 		$i=0;
 		foreach ($entries as $zugangsdaten) {
-			$fh = fopen("/var/lib/cornaz/build/.fetchmailrc","a");
+			$fh = fopen("$COR_FETCHMAILRC_BUILD","a");
 			$Server = $entries[$i]["fspextmailserver"][0];
 			$Proto = $entries[$i]["fspextmailproto"][0];
 			$Extuser = $entries[$i]["fspextmailusername"][0];
@@ -115,7 +116,7 @@ if ( $status == "Anwesend" ) {
 			fclose($fh);
 			$i++;
 		}
-		exec ("sudo /var/lib/cornaz/bin/fetchcopy");
+		exec ("sudo $COR_PATH/bin/fetchcopy");
 		$ausgabe = "<b>Status:</b> Das regelmäßige Abrufen Ihrer eMails wurde für folgende Adressen aktiviert:<p>";
 		$i=0;
 		foreach ($entries as $zugangsdaten) {

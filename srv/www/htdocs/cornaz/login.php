@@ -2,11 +2,11 @@
 # CorNAz
 # Script zur Manipulation der Fetchmail Steuerdatei .fetchmailrc
 # Author Stefan Schaefer email: st-schaefer@fsproductions.de
-# (c) FSP Computer & Netzwerke May 2008
+# (c) FSP Computer & Netzwerke May 2008,2014
 # License: GPLv3
 
 //Konfiguration einbinden
-include ("./inc/config.inc.php");
+include ("/etc/invis/portal/config.php");
 
 //Session
 session_start();
@@ -26,13 +26,13 @@ $_SESSION["corpassword"] = $corpassword;
 
 
 # Login am IMAP-Server
-$login = @imap_open("{localhost:993/ssl/novalidate-cert}INBOX", $corusername, $corpassword);
+$login = @imap_open("{localhost:143/tls/novalidate-cert}INBOX", $corusername, $corpassword);
 if ($login == false) {
 	echo "<p><center><b>$corprogram</b></center><p>";
 	echo "<hr size=\"1\" noshade width=\"300\" center><p>";
 	echo "<center>Unbekannter Benutzername oder falsches Passwort</center><p>";
-	echo "<center><a href=\"$corwebserver" . "cornaz\">Zurück zur Startseite</a></center><p>";
+	echo "<center><a href=\"$COR_WEBSERVER" . "cornaz\">Zurück zur Startseite</a></center><p>";
 	echo "<hr size=\"1\" noshade width=\"300\" center><p>";
 } else {
-	header("Location: $corwebserver" . "cornaz/base.php");
+	header("Location: $COR_WEBSERVER" . "cornaz/base.php");
 }

@@ -5,16 +5,15 @@
 	$info = "<p><b>Sie befinden sich auf der Haupseite von CorNAz.</b><br>
 	Diese Seite ist die Schaltzentrale für alle Funktionen des Programms.</p>";
 	site_info($margin, $info);
-	//$localaddress="$corusername@$corlocalmaildomain";
 	// Status ausgeben
-	$ditcon=ldap_connect("$corldaphost");
+	$ditcon=ldap_connect("$LDAP_SERVER");
 	# LDAP Protokoll auf Version 3 setzen
 	if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
     		echo "Kann das Protokoll nicht auf Version 3 setzen";
 	# Am LDAP per SimpleBind anmelden
 	if ($ditcon) {
     		// bind mit passendem dn für aktulisierenden Zugriff
-		$dn=("uid=$corusername,$corbasedn");
+		$dn=("uid=$corusername,$BASE_DN_USER");
 		$r=ldap_bind($ditcon,$dn, "$corpassword");
 		$filter="(&(fspMainMailAddress=*)(fspLocalMailAddress=$corusername*))";
 		$justthese = array("fspMainMailAddress");
@@ -24,44 +23,40 @@
 	}
 	$mainsendaddress = $entries[0]["fspmainmailaddress"][0];
 	$margin = "Status";
-	$info = "<font size=\"-1\"><b>Sie sind angemeldet als Benutzer: <font color=\"#EE4000\">$corusername</font><br>Ihre lokale Mail-Adresse lautet: <font color=\"#EE4000\">$corusername@$corlocalmaildomain</font><br>Ihre derzeitige Absendeadresse lautet: <font color=\"#EE4000\">$mainsendaddress</font><br>Ihr aktueller Status ist: <font color=\"#EE4000\">$status</font></b></font><hr>";
+	$info = "<font size=\"-1\"><b>Sie sind angemeldet als Benutzer: <font color=\"#EE4000\">$corusername</font><br>Ihre lokale Mail-Adresse lautet: <font color=\"#EE4000\">$corusername@$DOMAIN</font><br>Ihre derzeitige Absendeadresse lautet: <font color=\"#EE4000\">$mainsendaddress</font><br>Ihr aktueller Status ist: <font color=\"#EE4000\">$status</font></b></font><hr>";
 
 	site_info($margin, $info);
 
 	// Schaltflächenleiste 1 für Funktionen
 	$margin = "Funktionen";
 	$script = "base.php";
-	$val1 = array("   Abwesend   ", "exabsent.php", "lightgrey");
+	$val1 = array("Abwesend", "exabsent.php", "lightgrey");
 	$val2 = array("Urlaubsbeginn", "invacationmsg.php", "lightgrey");
 	$val3 = array("Konto hinzufügen", "increateacc.php", "lightgrey");
-	$val4 = array("Filter anlegen", "infilterstep1.php", "lightgrey");
-	$val_n = array($val1,$val2,$val3,$val4);
-	button_row_n($val_n, $margin, $script);
+	//$val4 = array("Filter anlegen", "infilterstep1.php", "lightgrey");
+	//$val_n = array($val1,$val2,$val3,$val4);
+	$val_n = array($val1,$val2,$val3);
+	button_row_n($val_n,$margin,$script);
 
 	// Schaltflächenleiste 2 für Funktionen
-	$margin = "&nbsp;";
+	$margin = "<font color=\"$COR_BG_COLOR\">Funktionen</font>";
 	$script = "base.php";
-	$val1 = array("   Anwesend   ", "expresent.php", "lightgrey");
-	$val2 = array(" Urlaubsende ", "exvacend.php", "lightgrey");
+	$val1 = array("Anwesend", "expresent.php", "lightgrey");
+	$val2 = array("Urlaubsende", "exvacend.php", "lightgrey");
 	$val3 = array("Konto entfernen", "indeleteacc.php", "lightgrey");
-	$val4 = array("Filter löschen", "indeletefilter.php", "lightgrey");
-	$val_n = array($val1,$val2,$val3,$val4);
-	button_row_n($val_n, $margin, $script);
+	//$val4 = array("Filter löschen", "indeletefilter.php", "lightgrey");
+	//$val_n = array($val1,$val2,$val3,$val4);
+	$val_n = array($val1,$val2,$val3);
+	button_row_n($val_n,$margin,$script);
 
 	$margin = "";
 	$info = "<hr>";
 	site_info($margin, $info);
 
-	// Verbindung zum LDAP Server aufbauen
-	//$ditcon=ldap_connect("$corldaphost");
-	// LDAP Protokoll auf Version 3 setzen
-	//if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
-    	//	echo "Kann das Protokoll nicht auf Version 3 setzen";
 	// Am LDAP per SimpleBind anmelden
 	if ($ditcon) {
     	// bind mit passendem dn für aktulisierenden Zugriff
-    		//echo $basedn;
-		$dn=("uid=$corusername,$corbasedn");
+		$dn=("uid=$corusername,$BASE_DN_USER");
     		$r=ldap_bind($ditcon,$dn,"$corpassword");
 		$filter="(&(fspExtMailServer=*)(fspLocalMailAddress=$corusername*))";
 		//$filter="(fspLocalMailAddress=$username*)";
@@ -92,7 +87,7 @@ foreach ($entries as $val) {
 	$margin = ("&nbsp;");
 	$inhalt_s1 = array("<input type=submit value=Auswählen>","60");
 	$inhalt_s2 = array("<input type=hidden name=account value=$Adresse><input type=hidden name=localaddress value=$localaddress>","10");
-	$inhalt_s3 = array("Account: <font color=\"#EE4000\"><b>$Adresse</b></font> - $Server - $extuser<p>","600");
+	$inhalt_s3 = array("Account: <font color=\"#EE4000\"><b>$Adresse</b></font> - $Server - $extuser<p>","100%");
 	$val_n = array($inhalt_s1, $inhalt_s2, $inhalt_s3);
 	table_row_n($val_n, $margin);
 	$i++;

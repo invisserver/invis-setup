@@ -1,21 +1,21 @@
 <?php
-# Ausgewaehlte Accounts werden geloescht.
+// Ausgewaehlte Accounts werden geloescht.
 
 $filter = $_POST["filter"];
 
-# Verbindung zum LDAP Server aufbauen
-$ditcon=ldap_connect("$corldaphost");  // Annahme: der LDAP Server befindet
-                               	    // sich auf diesem Host
-# LDAP Protokoll auf Version 3 setzen
+// Verbindung zum LDAP Server aufbauen
+$ditcon=ldap_connect("$LDAP_SERVER");
+
+// LDAP Protokoll auf Version 3 setzen
 if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
     echo "Kann das Protokoll nicht auf Version 3 setzen";
-# Am LDAP per SimpleBind anmelden
+// Am LDAP per SimpleBind anmelden
 if ($ditcon) {
     // bind mit passendem dn für aktulisierenden Zugriff
-    $dn=("uid=$corusername,$corbasedn");
+    $dn=("uid=$corusername,$BASE_DN_USER");
     $r=ldap_bind($ditcon,$dn,"$corpassword");
 	// Löschen eines Mail-Accounts
-	$dn2 = ("fspMailFilterName=$filter,uid=$corusername,$corbasedn");
+	$dn2 = ("fspMailFilterName=$filter,uid=$corusername,$BASE_DN_USER");
 	ldap_delete($ditcon, $dn2);
     ldap_close($ditcon);
 } else {

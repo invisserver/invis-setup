@@ -14,26 +14,26 @@ if ($status == "Abwesend") {
 	Wechseln Sie auf der CorNAz-Hauptseite zunächst Ihren Status auf \"Anwesend\".</p><hr size=\"1\" noshade width=\"300\" center>";
 	site_info($margin, $info);
 } else {
-	#Info Zeile
+	// Info Zeile
 	$margin = "Urlaub";
-	$info = "Hier können Sie eine Abwesenheitsnachricht für <font color=\"#EE4000\">$corusername@$corlocalmaildomain</font> neu oder aus einer vorhandenen Vorlage erstellen. <p>
+	$info = "Hier können Sie eine Abwesenheitsnachricht für <font color=\"#EE4000\">$corusername@$DOMAIN</font> neu oder aus einer vorhandenen Vorlage erstellen. <p>
 	<font size=\"-1\"><b>Tipp:</b><br>
 	Wenn Sie im Text Ihrer Antwort \"\$SUBJECT\" eingeben, wird an
 	dieser Stelle automatisch die Betreffzeile der zu beantwortenden Mail eingefügt.
 	 Bei der Verwendung von \"\$SUBJECT\" ist unbedingt darauf zu achten, dass
 	\$SUBJECT vollständig in Großbuchstaben geschrieben und es in Anführungszeichen gesetzt ist!<br><b>Beispiel:</b> <font color=\"#EE4000\">Ich habe Ihre Mail betreffend \"\$SUBJECT\" erhalten....</font></font>";
 	site_info($margin, $info);
-	#Formular oeffnen
+	//Formular oeffnen
 	$script = "./base.php";
 	open_form($script);
 
-	# Eingabezeilen
+	// Eingabezeilen
 	$margin = ("Betreff");
 	$inhalt_s1 = array("<b>Betreff:</b> <br> <input type=\"text\" size=\"80\" name=\"mysubject\" value=\"$mysubject\">","100");
 	$val_n = array($inhalt_s1);
 	table_row_n($val_n, $margin);
 
-	# Eingabezeilen
+	// Eingabezeilen
 	$margin = ("Text");
 	$inhalt_s1 = array("<b>Nachrichtentext:</b> <br> <Textarea name=\"mymessage\" cols=\"104\" rows=\"8\">$mymessage</Textarea>","100");
 	$val_n = array($inhalt_s1);
@@ -41,11 +41,11 @@ if ($status == "Abwesend") {
 
 	echo "<input type=\"hidden\" name=\"file\" value=\"exvacationmsg.php\" />\n";
 
-	# Submit und Reset
+	// Submit und Reset
 	$val = "Urlaubsbeginn";
 	submit_row($val);
 
-	#Formular schliessen
+	// Formular schliessen
 	close_form();
 
 	# Dateien Laden
@@ -61,7 +61,7 @@ if ($status == "Abwesend") {
 	table_row_n($val_n, $margin);
 	
 	// Geladenen Nachrichtentext löschen.
-	session_unregister("mailsubject");
-	session_unregister("mailbody");
+//	session_unregister("mailsubject");
+//	session_unregister("mailbody");
 }
 ?>

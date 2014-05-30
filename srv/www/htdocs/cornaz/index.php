@@ -6,12 +6,12 @@
 # License: GPLv3
 
 include ("./inc/html.inc.php");
-include ("./inc/config.inc.php");
+include ("/etc/invis/portal/config.php");
 
 session_start();
 session_name("cornaz");
 
-$version = "0.9.9";
+$version = "0.9.10";
 $corprogram = "+++ CorNAz $version +++";
 $_SESSION["corprogram"] = $corprogram;
 $sitename = "CorNAz";
@@ -19,7 +19,7 @@ $sitename = "CorNAz";
 # Oeffnen der neuen Seite
 $sitename = "eMail Accounts verwalten";
 
-site_head($corprogram, $sitename, $corbgcolor);
+site_head($corprogram, $sitename, $COR_BG_COLOR);
 
 #Info Zeile
 $margin = "";
@@ -40,6 +40,6 @@ unpw($margin);
 $val = ("Anmelden");
 submit_row($val);
 close_form();
-$corwebserverlink = "<a href=\"$corwebserver\">invis Portal</a>";
+//$corwebserverlink = "<a href=\"$COR_WEBSERVER\">invis Portal</a>";
 
-site_end( "&nbsp;", $corfooter, $corwebserverlink );
+site_end( "&nbsp;", $PORTAL_FOOTER, "&nbsp;" );

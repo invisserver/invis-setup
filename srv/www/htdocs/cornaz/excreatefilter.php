@@ -29,7 +29,7 @@ if ($component == "body") {
 // Anlegen eines Filters im LDAP Verzeichnis
 
 # Verbindung zum LDAP Server aufbauen
-$ditcon=ldap_connect("$corldaphost");  // Annahme: der LDAP Server befindet
+$ditcon=ldap_connect("$LDAP_SERVER");  // Annahme: der LDAP Server befindet
                                	    // sich auf diesem Host
 # LDAP Protokoll auf Version 3 setzen
 if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
@@ -38,7 +38,7 @@ if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
 # Am LDAP per SimpleBind anmelden
 if ($ditcon) {
     // bind mit passendem dn für aktulisierenden Zugriff
-    $dn=("uid=$corusername,$corbasedn");
+    $dn=("uid=$corusername,$BASE_DN_USER");
     $r=ldap_bind($ditcon,$dn, "$corpassword");
 	// Daten vorbereiten
     $filter["fspMailFilterName"]="$filtername";

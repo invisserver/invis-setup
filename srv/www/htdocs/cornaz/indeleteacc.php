@@ -4,15 +4,14 @@
 # aus dem LDAP Verzeichnis und listet sie auf. Sie koennen
 # dann die gewünschte Adresse auswählen.
 	# Verbindung zum LDAP Server aufbauen
-	$ditcon=ldap_connect("$corldaphost");
+	$ditcon=ldap_connect("$LDAP_SERVER");
 	# LDAP Protokoll auf Version 3 setzen
 	if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
     		echo "Kann das Protokoll nicht auf Version 3 setzen";
 	# Am LDAP per SimpleBind anmelden
 	if ($ditcon) {
     	// bind mit passendem dn für aktulisierenden Zugriff
-    		//echo $basedn;
-		$dn=("uid=$corusername,$corbasedn");
+		$dn=("uid=$corusername,$BASE_DN_USER");
     		$r=ldap_bind($ditcon,$dn,"$corpassword");
 		$filter="(&(fspExtMailServer=*)(fspLocalMailAddress=$corusername*))";
 		//$filter="(fspLocalMailAddress=$username*)";
@@ -42,7 +41,7 @@
 		$margin = ("Löschen?");
 		$inhalt_s1 = array("<input type=submit value=Löschen>","70");
 		$inhalt_s2 = array("<input type=hidden name=account value=$Adresse>User: <b>$corusername</b>","100");
-		$inhalt_s3 = array("Account: <b>$Adresse</b> - $Server - $extuser<p>","600");
+		$inhalt_s3 = array("Account: <b>$Adresse</b> - $Server - $extuser<p>","80%");
 		$val_n = array($inhalt_s1, $inhalt_s2, $inhalt_s3);
 		table_row_n($val_n, $margin);
 		$i++;

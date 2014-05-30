@@ -25,5 +25,5 @@ fclose($filehandle);
 $_SESSION['mailsubject'] = $mailsubject;
 $_SESSION['mailbody'] = $mailbody;
 
-header ("Location: $corwebserver" . "cornaz/base.php?file=invacationmsg.php");
+header ("Location: $COR_WEBSERVER" . "cornaz/base.php?file=invacationmsg.php");
 ?>

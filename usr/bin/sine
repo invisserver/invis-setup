@@ -1972,10 +1972,10 @@ webserver() {
     clear
     windowtitle="Web Server"
     waitinfobox "Ihr Webserver sowie das invis-Portal werden eingerichtet.
-Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/config.php vorgenommen werden." "Webserver-Konfiguration"
+Individuelle Konfigurationen des Portals können in /etc/invis/portal/config.php vorgenommen werden." "Webserver-Konfiguration"
     fqdn=`getconfdata "FQDN" "2"`
     masterpw=`getconfdata "MasterPW" "2"`
-    path="/srv/www/htdocs/portal"
+    path="/etc/invis/portal"
     cp $path/config.php.dist $path/config.php
     file="config.php"
     strings="master-secret%$masterpw"
@@ -2006,6 +2006,9 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     strings="usedgroupware%$groupware"
     changevalues $path $file "$strings"
 
+    # Link fuer Portal-Konfiguration anlegen
+    ln -s $path/$file /srv/www/htdocs/portal/config.php
+    
     # auch in invis.conf anpassen
     path="/etc/invis/"
     file="invis.conf"
@@ -2077,17 +2080,17 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     fi
 
     # Konfigurationsdaten ermitteln.
-    domain=`getconfdata "Domain" "2"`
-    ldaphost="localhost"
-    basedn=`getconfdata "baseDN" "2"`
-    path="/srv/www/htdocs/cornaz/inc"
-    file="config.inc.php"
-    strings="i6-maildomain%$domain"
-    changevalues $path $file "$strings"
-    strings="i6-ldaphost%$ldaphost"
-    changevalues $path $file "$strings"
-    strings="i6-basedn%$basedn"
-    changevalues $path $file "$strings"
+    #domain=`getconfdata "Domain" "2"`
+    #ldaphost="localhost"
+    #basedn=`getconfdata "baseDN" "2"`
+    #path="/srv/www/htdocs/cornaz/inc"
+    #file="config.inc.php"
+    #strings="i6-maildomain%$domain"
+    #changevalues $path $file "$strings"
+    #strings="i6-ldaphost%$ldaphost"
+    #changevalues $path $file "$strings"
+    #strings="i6-basedn%$basedn"
+    #changevalues $path $file "$strings"
 
     # Sysconfig Datei bearbeiten
     cp $cfilesdir/mailserver/fetchmail/fetchmail /etc/sysconfig/
@@ -2097,7 +2100,10 @@ Individuelle Konfiguratiionen des Portals können in /srv/www/htdocs/portal/conf
     changevalues $path $file "$strings"
 
     # Dummy fetchmailrc anlegen.
-    echo 'poll pop.example.com protocol pop3 user dummy pass . is junk here' > /var/lib/cornaz/build/.fetchmailrc
+    fetchmailrc="/var/lib/cornaz/build/.fetchmailrc"
+    echo 'poll pop.example.com protocol pop3 user dummy pass . is junk here' > $fetchmailrc
+    chown wwwrun.www $fetchmailrc
+    chmod 0660 $fetchmailrc
     
     ##RPM
     #Dateirechte anpassen -- testen, wenn notwendig, dann ins specfile

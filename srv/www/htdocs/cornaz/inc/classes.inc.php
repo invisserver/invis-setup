@@ -31,10 +31,10 @@ class mailprovider {
 	}
 
 	# Einen vorhandenen Schneeball auslesen	
-	function readmailprovider($mpvendor,$ldapbinddn,$password,$basedn,$ldaphost) {
+	function readmailprovider($mpvendor,$ldapbinddn,$password,$LDAP_SUFFIX,$LDAP_SERVER) {
 	# Am LDAP per SimpleBind anmelden
 	# Verbindung zum LDAP Server aufbauen
-		$ditcon=ldap_connect("$ldaphost");
+		$ditcon=ldap_connect("$LDAP_SERVER");
 		# LDAP Protokoll auf Version 3 setzen
 		if (!ldap_set_option($ditcon, LDAP_OPT_PROTOCOL_VERSION, 3))
     			echo "Kann das Protokoll nicht auf Version 3 setzen";
@@ -43,7 +43,7 @@ class mailprovider {
    		$r=ldap_bind($ditcon,$ldapbinddn,$password);
 		$filter="(fspMailProviderVendor=$mpvendor)";
 		$justthese = array("fspMailProviderVendor", "fspMailProviderDescription", "fspMailProviderUserName", "fspMailProviderPOP", "fspMailProviderIMAP", "fspMailProviderPOPSSL", "fspMailProviderIMAPSSL" );
-		$sr=ldap_search($ditcon, $basedn, $filter, $justthese);
+		$sr=ldap_search($ditcon, $LDAP_SUFFIX, $filter, $justthese);
 		$entries = ldap_get_entries($ditcon, $sr);
 		//print $entries["count"]." Einträge gefunden<p>";
 		ldap_close($ditcon);

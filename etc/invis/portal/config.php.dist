@@ -36,6 +36,7 @@ $USER_PW_MIN_LENGTH = '8'; // 0 = Check disabled
 $USER_PW_MIN_STRENGTH = '80'; // 0 = Check disabled, 100 = Max
 
 // LDAP
+$LDAP_TLS = "no"; //wird bisher nur von cornaz verwendet
 $LDAP_SERVER = 'ldap://localhost';
 $LDAP_SUFFIX = "dc=".$DOMAIN_PARTS[1] .",dc=". $DOMAIN_PARTS[2];
 
@@ -66,4 +67,13 @@ $STATUS_WATCH_DIRS = array('/home', '/srv', '/var');
 
 // Bitte folgende Zeile von den Kommentarzeichen befreien, wenn udevsync zur Datensicherung verwendet wird.
 //$STATUS_BACKUP_TIMER = 3;
+
+//CorNAz
+$COR_MY_LOGO = '/srv/www/htdocs/portal/images/invis-logo.png';
+$COR_BG_COLOR = '#FAFAFA';
+$COR_WEBSERVER = '/';
+$COR_PATH = '/var/lib/cornaz';
+$COR_LOCAL_IMAP_SERVER = "localhost";
+$COR_FETCHMAILRC_BUILD = "$COR_PATH/build/.fetchmailrc";
+
 ?>

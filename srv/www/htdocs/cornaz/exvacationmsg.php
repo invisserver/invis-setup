@@ -2,37 +2,41 @@
 
 $mysubject = $_POST['mysubject'];
 $mymessage = $_POST['mymessage'];
-#Strings bereinigen
+// Strings bereinigen
 $subject = stripslashes($mysubject);
 $message = stripslashes($mymessage);
 
-# Erzeugen einer privaten Urlaubsantwort
+// Erzeugen einer privaten Urlaubsantwort
 $margin = "Ihre Abwesenheitsnachricht";
-	$info = "<p><hr size=\"1\" noshade width=\"300\" center></p><center><b>Ihr Betreff / Subject lautet:</b><p>$subject<p></center><center><b>Ihre Nachricht lautet:</b><p>$message<p></center><hr size=\"1\" noshade width=\"300\" center>";
-	site_info($margin, $info);
+$vorgang = "Sie treten Ihren Urlaub <b>an</b>. Wirklich?";
+$info = "<p><hr size=\"1\" noshade width=\"300\" center>$vorgang</p><center><b>Ihr Betreff / Subject lautet:</b><p>$subject<p></center><center><b>Ihre Nachricht lautet:</b><p>$message<p></center><hr size=\"1\" noshade width=\"300\" center>";
+site_info($margin, $info);
 
-# Erzeugen der Datei
-$datei = "/var/lib/cornaz/vacation/$corusername.msg";
-	if (!file_exists ("/var/lib/cornaz/vacation/$corusername.msg")) {
-		$fp = fopen ($datei, "w");
-		$inhalt = utf8_decode("Subject: $mysubject\n$mymessage");
-		fputs ($fp, "$inhalt");
-		fclose($fp);
+// Erzeugen der Datei
+$datei = "$COR_PATH/vacation/$corusername.msg";
 
-	} else {
-		if (!is_writeable($datei)){
-		echo "pech gehabt - Datei in Bearbeitung<p>";
-	} else {
-		$fp = fopen ($datei, "w");
-		$inhalt = utf8_decode("Subject: $mysubject\n$mymessage");
-		fputs ($fp, "$inhalt");
-		fclose($fp);
-	}}
-	$datei = "/var/lib/cornaz/vacation/$corusername.forward";
-	$vorgang = "Sie treten Ihren Urlaub <b>an</b>. Wirklich?";
-	$fp = fopen ($datei, "w");
-	$inhalt = "\\$corusername, \"|/usr/bin/vacation $corusername\"";
+// nachfolgender Code nicht schoen aber selten...
+if (!file_exists ("$datei")) {
+	$fp = fopen ($datei, "w+");
+	$inhalt = utf8_decode("Subject: $mysubject\n$mymessage");
 	fputs ($fp, "$inhalt");
 	fclose($fp);
-	exec ("sudo /var/lib/cornaz/bin/holiday");
+
+} else {
+	if (!is_writeable($datei)){
+	echo "pech gehabt - Datei in Bearbeitung<p>";
+} else {
+	$fp = fopen ($datei, "w+");
+	$inhalt = utf8_decode("Subject: $mysubject\n$mymessage");
+	fputs ($fp, "$inhalt");
+	fclose($fp);
+}}
+
+$datei = "$COR_PATH/vacation/$corusername.forward";
+$fp = fopen ($datei, "w");
+$inhalt = "\\$corusername, \"|/usr/bin/vacation $corusername\"";
+fputs ($fp, "$inhalt");
+fclose($fp);
+exec ("sudo $COR_PATH/bin/holiday");
+
 ?>

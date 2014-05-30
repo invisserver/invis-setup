@@ -14,8 +14,8 @@ if ( $mpvendor == "sonstiger" ) {
 	// Alle Mailprovider aus LDAP holen
 	$mp = new mailprovider();
 	$mpproto = $_REQUEST['proto'];
-	$ldapbinddn = "uid=$corusername,$corbasedn";
-	$result = $mp->readmailprovider($mpvendor,$ldapbinddn,$corpassword,$basedn,$corldaphost);
+	$ldapbinddn = "uid=$corusername,$BASE_DN_USER";
+	$result = $mp->readmailprovider($mpvendor,$ldapbinddn,$corpassword,$LDAP_SUFFIX,$LDAP_SERVER);
 	$text1 = "Gewählter Mailprovider: <font color=\"#EE4000\"><b>$mpvendor</b></font>";
 	$text3 = "Schema der Benutzerkennung für den gewählten Mailprovider: <font color=\"#EE4000\"><b>$mp->mpusername</b></font>";
 	if ( $mpproto == "imap" ) {
@@ -49,7 +49,7 @@ if ( $mpvendor == "sonstiger" ) {
 
 #Info Zeile
 $margin = "Mail Account";
-$info = "Über diese Seite können Sie Ihren Server veranlassen weitere externe Postfächer abzurufen.<br> Alle darin eingehenden Mails werden Ihrem lokalen Postfach <font color=\"#EE4000\">$corusername@$corlocalmaildomain</font> zugeordnet.<p>
+$info = "Über diese Seite können Sie Ihren Server veranlassen weitere externe Postfächer abzurufen.<br> Alle darin eingehenden Mails werden Ihrem lokalen Postfach <font color=\"#EE4000\">$corusername@$DOMAIN</font> zugeordnet.<p>
 	<b>Zur Einrichtung benötigen Sie folgende Informationen:</b><br>
 	Ihre eMail-Adresse, die Benutzerkennung für das Postfach und das zugehörige Passwort.<p>
 	<b>Zusatzinformationen:</b><br>$text1<br>
@@ -64,10 +64,10 @@ open_form($script);
 
 $margin = ("Zugangsdaten");
 $inhalt_s1 = array("externe eMail-Adresse: <br> <input type=\"text\" size=\"30\" name=\"extaddress\">","100");
-$inhalt_s2 = array("Server: <br> <input type= \"text\" name=\"mailserver\" value=\"$mailserver\" size=\"20\">","100");
+$inhalt_s2 = array("Server: <br> <input type= \"text\" name=\"mailserver\" value=\"$mailserver\" size=\"25\">","100");
 $inhalt_s3 = array("Protokoll: <br> $code ","40");
-$inhalt_s4 = array("Benutzerkennung: <br> <input type=\"text\" size=\"15\" name=\"kennung\">","100");
-$inhalt_s5 = array("Passwort: <br> <input type=\"password\" size=\"12\" name=\"extpasswd\">","100");
+$inhalt_s4 = array("Benutzerkennung: <br> <input type=\"text\" size=\"30\" name=\"kennung\">","100");
+$inhalt_s5 = array("Passwort: <br> <input type=\"password\" size=\"20\" name=\"extpasswd\">","100");
 $val_n = array($inhalt_s1, $inhalt_s2, $inhalt_s3, $inhalt_s4, $inhalt_s5);
 table_row_n($val_n, $margin);
 

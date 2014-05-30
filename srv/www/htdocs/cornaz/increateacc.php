@@ -2,7 +2,7 @@
 //Eingabeformular für neuen Mail-Account
 #Info Zeile
 $margin = "Mail Account";
-$info = "Über diese Seite können Sie Ihren Server veranlassen weitere externe Postfächer abzurufen.<br> Alle darin eingehenden Mails werden Ihrem lokalen Postfach <font color=\"#EE4000\">$corusername@$corlocalmaildomain</font> zugeordnet.<p>
+$info = "Über diese Seite können Sie Ihren Server veranlassen weitere externe Postfächer abzurufen.<br> Alle darin eingehenden Mails werden Ihrem lokalen Postfach <font color=\"#EE4000\">$corusername@$DOMAIN</font> zugeordnet.<p>
 	<b>Im ersten Schritt benötigen Sie lediglich den Namen Ihres Mailproviders.</b><p>
 	<font color=\"#EE4000\">Ist Ihr Mailprovider nicht in der vorgegebenen Liste enthalten wählen Sie <b>\"sonstiger\"</b> aus.</font>";
 site_info($margin, $info);
@@ -10,8 +10,8 @@ site_info($margin, $info);
 // Alle Mailprovider aus LDAP holen
 $mp = new mailprovider();
 $mpvendor = "*";
-$ldapbinddn = "uid=$corusername,$corbasedn";
-$result = $mp->readmailprovider($mpvendor,$ldapbinddn,$corpassword,$basedn,$corldaphost);
+$ldapbinddn = "uid=$corusername,$BASE_DN_USER";
+$result = $mp->readmailprovider($mpvendor,$ldapbinddn,$corpassword,$LDAP_SUFFIX,$LDAP_SERVER);
 
 foreach ( $result as $mp ) {
     $mailproviders[] = $mp['fspmailprovidervendor'][0];
@@ -39,7 +39,7 @@ table_row_n($val_n, $margin);
 
 // Checkbox erzeugen
 $val1=array("<input type=\"checkbox\" name=\"proto\" value=\"imap\">", "20");
-$val2=array("<font size=\"-1\">IMAP bevorzugen, wenn der Porvider dies anbietet. (Infos dazu siehe Handbuch S. 16)</font>", "500");
+$val2=array("<font size=\"-1\">IMAP bevorzugen, wenn der Porvider dies anbietet.</font>", "500");
 $val_n=array($val1, $val2);
 table_row_n($val_n, $margin);
 
