@@ -126,7 +126,7 @@ elseif ($CMD == 'backup_info') {
 	$last = intval($file_backup[0]);
 	$diff_days = floor(($now - $last) / (60 * 60 * 24));
 
-	echo '<b>Backup:</b><br>';
+	echo '<b>Datensicherung:</b><br>';
 	echo '<span style="font-size: 0.9em;"> Zeit: ' . date('d.m.Y, H:i', $last) . '</span><br />';
 	// Stefan -- Multiline Results added.
 	// Jetzt Zeilen 2 bis X in der Status-Datei durchgehen.
@@ -141,10 +141,10 @@ elseif ($CMD == 'backup_info') {
 	// Nächstes Backup 
 	if ($diff_days > $STATUS_BACKUP_TIMER) {
 		$overdue = ($diff_days - $STATUS_BACKUP_TIMER);
-		echo "<span style='font-size: 0.8em; color: red; font-weight: bold;'>Backup $overdue Tage überfällig!</span>";
+		echo "<span style='font-size: 0.8em; color: red; font-weight: bold;'>Datensicherung $overdue Tage überfällig!</span>";
 		}
 	else
-		echo "<span style='font-size: 0.8em;'>Nächstes Backup in <u>" . ($STATUS_BACKUP_TIMER - $diff_days) . "</u> Tagen</span>";
+		echo "<span style='font-size: 0.8em;'>Nächste Datensicherung in <u>" . ($STATUS_BACKUP_TIMER - $diff_days) . "</u> Tagen</span>";
 	echo "<br/>";
 
 	// Ist die Dasiplatte voll?

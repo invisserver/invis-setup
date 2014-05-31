@@ -25,7 +25,7 @@ site_head($corprogram, $sitename, $COR_BG_COLOR);
 $margin = "";
 $info = "<p><b>Dieses Programm dient zur Verwaltung Ihrer eMail Konten.</b></p>
 	<p>Sie können Ihren Server anweisen eMails aus externen Postfächern abzurufen,<br>
-	Urlaubsbenachritigungen erstellen sowie externe Konten hinzufügen oder entfernen.</p>
+	Urlaubsbenachrichtigungen erstellen sowie externe Konten hinzufügen oder entfernen.</p>
 	<p>Zugang erhalten Sie mit Ihren System-Zugangsdaten.</p>";
 
 site_info($margin, $info);
