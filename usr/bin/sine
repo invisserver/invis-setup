@@ -2017,6 +2017,12 @@ Individuelle Konfigurationen des Portals können in /etc/invis/portal/config.php
     # Putty bereitstellen
     cp $cfilesdir/putty/putty.exe /srv/www/htdocs/portal/
     
+    # Testen, ob php5 Modul aktiviert ist,
+    
+    if [[ ! `a2enmod -l |grep php5` ]]; then
+	a2enmod php5
+    fi
+    
     # Proxy-Module einrichten
     a2enmod headers
     #a2enmod xml2enc
