@@ -2961,8 +2961,9 @@ dokuwiki() {
     tar -xzf $getpath -C /srv/www/htdocs/dokuwiki/lib/tpl/ 2>&1 |pgbox
 
     # Encrypt Password Plugin
-    wget http://www.werbeagentur-willers.de/download/dokuwiki-plugins/encryptedpasswords.zip
-    getpath=`find $setupdir -name "encrypted*.zip"`
+    wget https://github.com/ssahara/dw-plugin-encryptedpasswords/archive/master.zip
+    getpath=`find $setupdir -name "master.zip"`
+            
     unzip $getpath -d /srv/www/htdocs/dokuwiki/lib/plugins/ 2>&1 |pgbox
 
     chown -R wwwrun:www /srv/www/htdocs/dokuwiki
