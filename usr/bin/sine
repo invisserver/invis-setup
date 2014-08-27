@@ -2030,6 +2030,7 @@ Individuelle Konfigurationen des Portals können in /etc/invis/portal/config.php
     a2enmod proxy_http
     a2enmod proxy_html
     a2enmod socache_shmcb
+    a2enmod version
     cp -a /etc/apache2/conf.d/mod_proxy_html.conf.in /etc/apache2/conf.d/mod_proxy_html.conf
     
     # Stammzertifikat der Server-CA bereitstellen
