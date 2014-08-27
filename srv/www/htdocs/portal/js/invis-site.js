@@ -54,7 +54,7 @@ function initUserblock() {
 			$('userblock').insert("<br /><span style='font-size: 0.95em;'>Ihr Passwort läuft in " + cookie.PWD_EXPIRE + " Tagen ab</span>");
 	}
 	else {
-		var a = new Element("a").update("Anmelden");
+		var a = new Element("a").update("<span style='font-size: 1.5em;'>Anmelden</span>");
 		a.setStyle({'cursor': 'pointer'});
 		a.observe("click", showLogin);
 		$('userblock').insert(a);
