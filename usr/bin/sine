@@ -230,7 +230,15 @@ check() {
         mv /etc/default/grub /etc/default/grub.opensuse
         cp $cfilesdir/grub/grub /etc/default/
         grub2-mkconfig -o /boot/grub2/grub.cfg  2>&1| tee -a $setupdir/sine.log | pgbox 25 110 
-
+	
+	# Grub2 auf allen Festplattne installieren, die Teil des RAID-Verbundes md0 sind
+	if [[ -z `cat /proc/mdstat | grep "md0"` ]]; then
+	    for device in `mdadm -D /dev/md0 |grep "/dev/sd" |tr "\t" " "| tr -s " " |cut -d " " -f8 |cut -d "1" -f1`; do
+		echo "Grub2 wird im Master-Boot-Record von Festplatte $device installiert." 2>&1| tee -a $setupdir/sine.log | pgbox 25 110
+		grub2-install $device 2>&1| tee -a $setupdir/sine.log | pgbox 25 110
+	    done
+	fi
+	
 	# Modul check beendet
         writeprepstat "quest"
 	waitbox "check" "quest"
