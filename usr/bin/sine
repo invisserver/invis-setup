@@ -1046,6 +1046,9 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     # Konfiguration fuer Notfall-Internetzugang via Handy und T-Mobile (Teathering)
     cp $cfilesdir/invis/wvd_tmobile.conf /etc/invis 2>&1| tee -a $setupdir/sine.log
 
+    # Zeitzoneneinstellung des Servers ermitteln
+    timezone=`date +%Z`
+
     # PHP ini-Dateien anpassen
     cp $cfilesdir/webserver/apache2/php.ini /etc/php5/apache2/ 2>&1| tee -a $setupdir/sine.log
     path="/etc/php5/apache2"
@@ -1053,9 +1056,15 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     strings="i6lib%$libdir"
     changevalues $path $file "$strings"
 
+    strings="UTC%$timezone"
+    changevalues $path $file "$strings"
+
     cp $cfilesdir/webserver/fcgid/php.ini /etc/php5/fastcgi/
     path="/etc/php5/fastcgi"
-    strings="i6lib%$libdir"
+    strings="i6libdir%$libdir"
+    changevalues $path $file "$strings"
+
+    strings="UTC%$timezone"
     changevalues $path $file "$strings"
 
     # Workaround fuer fastcgi php.ini Bug
