@@ -1524,7 +1524,7 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	"sogo"|"roundcube" )
 	    # Dovecot einrichten 
     	    pgsubtitle="Dovecot IMAP wird installiert und eingerichtet"
-	    zypper -n install -n dovecot22 2>&1| tee -a $setupdir/sine.log | pgbox
+	    zypper -n install -n dovecot 2>&1| tee -a $setupdir/sine.log | pgbox
 	    zyppercheck ${PIPESTATUS[0]}
 	    cp -r $cfilesdir/mailserver/dovecot/* /etc/dovecot/ 2>&1| tee -a $setupdir/sine.log
 	    path="/etc/dovecot/conf.d"
