@@ -896,6 +896,11 @@ sysprep() {
 	rpmkeyimporter
         pgsubtitle="Repository-Cache wird aktualisiert"
         zypper refresh 2>&1| tee -a $setupdir/sine.log | pgbox
+        
+        # Suse Samba libraries entfernen wegen sssd
+        pgsubtitle="openSUSE Samba Pakete werden restlos entfernt"
+	zypper -n remove -n `cat $setupdir/zypper-package-lists/smbpacktoremove` 2>&1| tee -a $setupdir/sine.log | pgbox
+
 	zypper -n install -n `cat $setupdir/zypper-package-lists/sernet_samba` 2>&1| tee -a $setupdir/sine.log | pgbox
 	
 	# Sernet Samba Startoption anpassen
