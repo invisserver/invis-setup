@@ -1,0 +1,16 @@
+yast2-samba-server
+samba-winbind-32bit
+samba-libs-32bit
+libtevent-util0
+libnetapi0
+libgensec0
+libdcerpc-binding0
+libpdb0
+libsamba-credentials0
+libsamba-hostconfig0
+libsamba-util0
+libsamdb0
+libsmbclient-raw0
+libsmbconf0
+libsmbldap0
+samba-libs

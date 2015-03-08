@@ -2123,7 +2123,7 @@ Individuelle Konfigurationen des Portals können in /etc/invis/portal/config.php
 
     # Sysconfig Datei bearbeiten
     cp $cfilesdir/mailserver/fetchmail/fetchmail /etc/sysconfig/
-    path="/etc/sysconfig/fetchmail"
+    path="/etc/sysconfig"
     file="fetchmail"
     strings="localdomain%$domain"
     changevalues $path $file "$strings"

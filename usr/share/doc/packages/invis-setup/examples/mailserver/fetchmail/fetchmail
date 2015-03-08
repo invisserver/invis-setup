@@ -44,7 +44,7 @@ FETCHMAIL_USER="fetchmail"
 # to change FETCHMAIL_USER to root. Consult your MDA documentation for
 # more.
 #
-FETCHMAIL_EXPERT_OPTIONS="localdomain"
+FETCHMAIL_EXPERT_OPTIONS="-D localdomain"
 
 ## Type:        string
 ## Default:     "/etc/fetchmailrc"
