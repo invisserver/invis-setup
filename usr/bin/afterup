@@ -1,6 +1,6 @@
 #!/bin/bash
 # Kleines Script welches potentielle Probleme nach einem Update behebt.
-# (C) 2009,2011,2012,2014 Stefan Schaefer -- invis-server.org
+# (C) 2009,2011,2012,2014.2015 Stefan Schaefer -- invis-server.org
 # Questions: stefan@invis-server.org
 # License: GPLv3
 # V 1.2
@@ -33,7 +33,7 @@ fi
 
 #Anpassen der Besitzrechte der Freigaben
 chown -R root:"Domain Users" /srv/shares/aktuell
-chown -R root:"Domain Users" /srv/shares/archiv
+chown -R root:"Archiv" /srv/shares/archiv
 chown -R root:"Domain Users" /srv/shares/gruppen
 chown -R root:"Domain Users" /srv/shares/projekte
 chown -R root:"Domain Users" /srv/shares/media

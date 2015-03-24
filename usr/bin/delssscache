@@ -1,0 +1,17 @@
+#!/bin/bash
+# Script zum Löschen der Cache-DB des SSS Daemons
+# (c) 2015 Stefan Schäfer - stefan@invis-server.org
+# License GPLv3
+
+cachedir="/var/lib/sss/db"
+
+## sssd stoppen
+systemctl stop sssd.service
+
+# DB loeschen
+rm -f $cachedir/*
+
+## sssd starten
+systemctl start sssd.service
+
+getent passwd

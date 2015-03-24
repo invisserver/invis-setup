@@ -1,25 +1,27 @@
 #!/bin/bash
-# Mini Script zum automatischen Löschen eines Home-Verzeichnisses
+# Mini Script zur Vorbereitung der aumatischen Archivierung
+# von Verzeichnissen geloeschter Benutzer oder Gruppen
 # (c) 2009 Daniel T. Bender invis-server.org
-# (c) 2009,2013 Stefan Schäfer invis-server.org
+# (c) 2009,2013,2015 Stefan Schäfer invis-server.org
 # License: GPLv3
-# Questions: http://forum.invis-server.org
-archivdir="/srv/shares/archiv"
+# Questions: http://wiki.invis-server.org
+
+rendir() {
+	if [[ -d $1 ]]; then
+	    mv $1 "$1.archiv"
+	fi
+}
+
+USR=$1
+# Zu durchsuchende Verzeichnisse
+folders=("/home/$USR" "/var/lib/samba/profiles/$USR" "/srv/shares/portal/downloads/$USR" "/srv/shares/portal/uploads/$USR" "/srv/shares/gruppen/$USR")
 
 if [ $# -eq 1 ]; then
-	USR=$1;
-	DIR=/home/$USR;
 	#Verzeichnis sichern
-	tar -czf $archivdir/$USR-Home.tar.gz $DIR
-	rm -rf $DIR;
-	profiledir="/var/lib/samba/profiles/$USR*"
-	tar -czf $archivdir/$USR-Profile.tar.gz $profiledir
-	rm -rf $profiledir
-	portaldir=/srv/shares/portal/downloads/$USR
-	tar -czf $archivdir/$USR-Portal.tar.gz $portaldir
-	rm -rf $portaldir
-	rm -f "/srv/shares/service/winscripts/mvlib$USR.cmd"
-	sss_cache -UG
+    for dir in ${folders[*]}; do
+	rendir $dir
+    done
+    sss_cache -UG
 else
 	echo "Usage: $0 {username}";
 fi

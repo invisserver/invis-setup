@@ -949,6 +949,11 @@ function groupDelete($conn, $cn) {
 	global $BASE_DN_GROUP;
 	$ok = delete($conn, "cn=$cn,$BASE_DN_GROUP");
 	return ($ok)?0:array(ldap_errno($conn) => ldap_error($conn));
+	
+	if ($ok) {
+		shell_exec("sudo /usr/bin/deletehome $cn;");
+	}
+
 }
 
 // host delete

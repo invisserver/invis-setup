@@ -1901,6 +1901,9 @@ samba() {
 
     # Anlegen der Gruppe Verwaltung
     smbldap-groupadd -a mobilusers 2>&1| tee -a $setupdir/sine.log |pgbox
+    
+    # Anlegen der Gruppe Archiv
+    smbldap-groupadd -a Archiv 2>&1| tee -a $setupdir/sine.log |pgbox
 
     pgsubtitle="Es wird ein Benutzkonto für den Domänen Administrator \"domadmin\" angelegt."
     # Anlegen des Domaenenadministrators
@@ -1914,7 +1917,7 @@ samba() {
     sss_cache -UG
 
     #Anpassen der Besitzrechte der Freigaben
-    chown -R root:"Domain Users" /srv/shares/archiv 2>&1| tee -a $setupdir/sine.log
+    chown -R root:"Archiv" /srv/shares/archiv 2>&1| tee -a $setupdir/sine.log
     chown -R root:"Domain Users" /srv/shares/gruppen 2>&1| tee -a $setupdir/sine.log
     chown -R root:"Domain Users" /srv/shares/projekte 2>&1| tee -a $setupdir/sine.log
     chown -R root:"Domain Users" /srv/shares/media 2>&1| tee -a $setupdir/sine.log
