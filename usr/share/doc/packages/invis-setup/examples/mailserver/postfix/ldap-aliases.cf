@@ -1,0 +1,9 @@
+server_host = 127.0.0.1
+search_base = ou=Users,ou=Benutzerverwaltung,dc=invis-net,dc=loc
+version = 3
+bind = yes
+bind_dn = uid=admin,ou=Benutzerverwaltung,dc=invis-net,dc=loc
+bind_pw = admin-secret
+scope = sub
+query_filter = (&(objectClass=user)(otherMailbox=%s))
+result_attribute = mail

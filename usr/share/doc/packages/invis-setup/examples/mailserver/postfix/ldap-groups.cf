@@ -1,0 +1,10 @@
+server_host = 127.0.0.1
+search_base = ou=Users,ou=Benutzerverwaltung,dc=invis-net,dc=loc
+version = 3
+bind = yes
+bind_dn = uid=admin,ou=Benutzerverwaltung,dc=mail-net,dc=loc
+bind_pw = admin-secret
+query_filter = (&(objectclass=group)(mail=%s))
+leaf_result_attribute = mail
+special_result_attribute = member
+

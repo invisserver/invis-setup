@@ -1645,26 +1645,19 @@ esac
     strings="i5-net.loc%$domain"
     changevalues $path $file "$strings"
     postmap $path/$file
+
+    files=(s-canonical r-canonical ldap-users.cf ldap-aliases.cf ldap-groups.cf)
+
+    for datei in ${files[*]}; do
+    #file="s-canonical.cf"
+	basedn=`getconfdata "baseDN" "2"`
+	strings="dc=invis-net,dc=loc%$basedn"
+	changevalues $path $datei "$strings"
     
-    file="s-canonical.cf"
-    basedn=`getconfdata "baseDN" "2"`
-    strings="dc=i5-net,dc=loc%$basedn"
-    changevalues $path $file "$strings"
-    
-    adminpw=`getconfdata "AdminPW" "2"`
-    strings="admin-secret%$adminpw"
-    changevalues $path $file "$strings"
-
-    file="r-canonical.cf"
-    basedn=`getconfdata "baseDN" "2"`
-    strings="dc=i5-net,dc=loc%$basedn"
-    changevalues $path $file "$strings"
-
-    adminpw=`getconfdata "AdminPW" "2"`
-    strings="admin-secret%$adminpw"
-    changevalues $path $file "$strings"
-
-
+	adminpw=`getconfdata "LDAPAdminPW" "2"`
+	strings="admin-secret%$adminpw"
+	changevalues $path $datei "$strings"
+    done
 
     # Mailman einrichten ????
     clear

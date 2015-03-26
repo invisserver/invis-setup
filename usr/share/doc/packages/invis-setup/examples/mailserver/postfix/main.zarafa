@@ -167,8 +167,8 @@ inet_interfaces = $myhostname, localhost
 #
 # See also below, section "REJECTING MAIL FOR UNKNOWN LOCAL USERS".
 #
-#mydestination = $myhostname, localhost.$mydomain, localhost
-mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+mydestination = $myhostname, localhost.$mydomain, localhost
+#mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
 #mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain,
 #	mail.$mydomain, www.$mydomain, ftp.$mydomain
 
@@ -470,9 +470,6 @@ in_flow_delay = 1s
 #
 #mailbox_transport = lmtp:unix:/file/name
 #mailbox_transport = cyrus
-## FSP -- Stefan Schaefer -- 14.08.2011 -- Anpassung an Zarafa
-mailbox_transport = zarafa:
-zarafa_destination_recipient_limit = 1
 
 # The fallback_transport specifies the optional transport in master.cf
 # to use for recipients that are not found in the UNIX passwd database.
@@ -669,9 +666,25 @@ readme_directory = /usr/share/doc/packages/postfix-doc/README_FILES
 mailbox_size_limit = 0
 message_size_limit = 162400000
 
+## Zarafa, old-style
+#mailbox_transport = zarafa:
+#zarafa_destination_recipient_limit = 1
+
 # Zugriff auf Zarafas Benutzerdatenbank und Mail-Aliase
-virtual_alias_maps = mysql:/etc/postfix/zarafa-users.cf,
+# Zarafa old-style
+#virtual_alias_maps = mysql:/etc/postfix/zarafa-users.cf,
+#		     hash:/etc/postfix/virtual
+
+## Zarafa, new-style
+virtual_mailbox_domains = invis-net.loc
+
+virtual_mailbox_maps = ldap:/etc/postfix/ldap-users.cf
+
+virtual_alias_maps = ldap:/etc/postfix/ldap-aliases.cf,
+		     ldap:/etc/postfix/ldap-groups.cf,
 		     hash:/etc/postfix/virtual
+
+virtual_transport = lmtp:127.0.0.1:2003
 
 # Unbekannt verzogen
 relocated_maps = hash:/etc/postfix/relocated
@@ -691,8 +704,8 @@ broken_sasl_auth_clients = yes
 smtpd_tls_security_level = may
 
 # Mailannahme verschluesseln
-smtpd_tls_key_file = /etc/ssl/private/i5-key.pem
-smtpd_tls_cert_file = /etc/ssl/certs/i5-cert.pem
+smtpd_tls_key_file = /etc/ssl/private/mail-key.pem
+smtpd_tls_cert_file = /etc/ssl/certs/mail-cert.pem
 smtpd_tls_CA_file = /etc/ssl/certs/cacert.pem
 
 ## FSP
@@ -709,8 +722,8 @@ smtp_tls_security_level = may
 smtp_tls_CApath = /etc/ssl/certs
 
 #Stefan: Nur fuer gegenseitige Ueberpruefung notwendig
-#smtp_tls_key_file = /etc/ssl/private/i5-key.pem
-#smtp_tls_cert_file = /etc/ssl/certs/i5-cert.pem
+#smtp_tls_key_file = /etc/ssl/private/mail-key.pem
+#smtp_tls_cert_file = /etc/ssl/certs/mail-cert.pem
 #smtp_tls_CA_file = /etc/ssl/certs/cacert.pem
 
 
@@ -725,7 +738,3 @@ canonical_maps=hash:/etc/postfix/canonical
 
 ## Virenscanner
 content_filter=smtp-amavis:[127.0.0.1]:10024
-
- 
- 
- 
