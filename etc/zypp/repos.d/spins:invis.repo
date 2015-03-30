@@ -1,7 +1,0 @@
-[spins_invis]
-name=Production Project for the openSUSE Invis Server Spin (openSUSE_13.1)
-type=rpm-md
-baseurl=http://download.opensuse.org/repositories/spins:/invis/openSUSE_13.1/
-gpgcheck=1
-gpgkey=http://download.opensuse.org/repositories/spins:/invis/openSUSE_13.1/repodata/repomd.xml.key
-enabled=1

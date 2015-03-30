@@ -192,7 +192,7 @@ check() {
 	
 	# Neuere Pakete aus spins_invis Repo beziehen
         pgsubtitle="Distributions-Upgrade wird durchgeführt" 
-        zypper -n dup --from spins_invis 2>&1| tee -a $setupdir/sine.log | pgbox
+        zypper -n dup --from spins_invis_common 2>&1| tee -a $setupdir/sine.log | pgbox
         zyppercheck ${PIPESTATUS[0]}
 
 	# Patterns
