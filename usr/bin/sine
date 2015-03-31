@@ -131,32 +131,44 @@ zyppercheck() {
 
 chkservice() {
     systemctl --system daemon-reload
-    if [[ -n $2 ]]; then
-	    pgsubtitle="$1-Daemon wird aus der Runlevelkonfiguration entfernt"
-	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl disable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
-	    else
-    		chkconfig --del "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
-    	    fi
-	    pgsubtitle="$1-Daemon wird gestoppt"
-    	    service "$1" stop 2>&1| tee -a $setupdir/sine.log | pgbox
-    else
-	if [[ `chkconfig $1|tr -s " "|cut -d " " -f2` != "on" ]];then 
-    	    pgsubtitle="$1-Daemon wird in die Runlevelkonfiguration eingetragen"
-	    if [[ ! -f "/etc/init.d/$1" ]]; then
-		systemctl enable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
-	    else
-    		chkconfig --add "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
-    	    fi
-	fi
-    	pgsubtitle="$1-Daemon wird neu gestartet"
-    	# Dank des sonderbaren init-Scripts von Avira, laesst sich die Ausgabe nicht mit dialog wiedergeben, daher klassisch.
-    	if [[ $1 != "avguard" ]]; then
-    	    service "$1" restart 2>&1|pgbox
-    	else
-    	    service "$1" restart
+    case "$2" in
+    "d")
+	pgsubtitle="$1-Daemon wird aus der Runlevelkonfiguration entfernt"
+	if [[ ! -f "/etc/init.d/$1" ]]; then
+	    systemctl disable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
+	else
+    	    chkconfig --del "$1" 2>&1| tee -a $setupdir/sine.log | pgbox
     	fi
-    fi
+	pgsubtitle="$1-Daemon wird gestoppt"
+    	service "$1" stop 2>&1| tee -a $setupdir/sine.log | pgbox
+    	;;
+    "r")
+	pgsubtitle="$1-Daemon wird neu geladen."
+	if [[ ! -f "/etc/init.d/$1" ]]; then
+	    systemctl reload $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
+	else
+    	    service "$1" reload 2>&1| tee -a $setupdir/sine.log | pgbox
+    	fi
+    	;;
+    "")
+	if [[ ! -f "/etc/init.d/$1" ]]; then
+	    if [[ `systemctl is-enabled "$1.service"` != "enabled" ]]; then
+		systemctl enable $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
+	    fi
+	    pgsubtitle="$1-Daemon wird neu gestartet"
+	    systemctl restart $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
+	else
+	    if [[ `chkconfig $1 |tr -s " "|cut -d " " -f 2` == "off" ]]; then
+		chkconfig -a $1
+	    fi
+    	    if [[ $1 != "avguard" ]]; then
+    		service "$1" restart 2>&1|pgbox
+    	    else
+    		service "$1" restart
+    	    fi
+	fi   
+	;;
+esac
 }
 
 # Passwoerter sicher aendern
