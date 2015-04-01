@@ -1743,7 +1743,6 @@ samba() {
     ddns=`getconfdata "DDNS" "2"`
     cp $cfilesdir/fileserver/samba/smb.conf /etc/samba 2>&1| tee -a $setupdir/sine.log
     # Scriptvorlage fuer das Verschieben der Windows-Bibliotheken kopieren
-    cp $cfilesdir/fileserver/service/Win_Scripts/movelibdirs.cmd /etc/invis/templates/ 2>&1| tee -a $setupdir/sine.log
     unix2dos /etc/invis/templates/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
     unix2dos /srv/shares/service/Win_Scripts/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
     unix2dos /srv/shares/service/Win_Timeserver/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
@@ -1806,10 +1805,6 @@ samba() {
     
     # Verzeichnis fuer Windows-Batch-Scripts anlegen
     mkdir -p -m 2775 /srv/shares/service/winscripts 2>&1| tee -a $setupdir/sine.log
-    
-    # Service Dateien kopieren
-    cp -r $cfilesdir/fileserver/service/* /srv/shares/service 2>&1| tee -a $setupdir/sine.log
-    chmod -R g+w /srv/shares/service 2>&1| tee -a $setupdir/sine.log
     
     # Setzen des LDAP Zugangspasswort
     pgsubtitle="Samba erhält das LDAP-Administrationspasswort"
