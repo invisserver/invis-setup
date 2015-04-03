@@ -2849,7 +2849,7 @@ webcdwriter() {
 	echo "/dev/sr0 /media/cdrom0	udf,iso9660 noauto,utf8 0 0" >> /etc/fstab
 
 	# cdwserver ins Runlevel-Konzept integrieren und starten
-	cp $setupdir/CDWserver/CDWserver /etc/init.d
+	cp $cfilesdir/CDWserver/CDWserver /etc/init.d
 	chkservice "CDWserver"
     else
 	msgbox "WebCDWriter Installation übersprungen" "$windowtitle"
