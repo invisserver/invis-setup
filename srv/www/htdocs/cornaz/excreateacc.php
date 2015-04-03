@@ -43,7 +43,11 @@ if ($ditcon) {
     $dn2 = ("fspExtMailAddress=$extaddress,$dn");
     // hinzufügen der Daten zum Verzeichnis
     $r=ldap_add($ditcon, $dn2, $account);
-
+    if ($COR_ZARAFA_ALIAS) {
+	$zarafaAlias["zarafaAliases"]="$extaddress";
+	$r=ldap_mod_add($ditcon, $dn, $zarafaAlias);
+    }
+    
 	$filter="(&(fspMainMailAddress=*)(fspLocalMailAddress=$corusername*))";
 	$sr=ldap_search($ditcon, $dn, $filter);
 	$entries = ldap_get_entries($ditcon, $sr);
@@ -57,6 +61,10 @@ if ($ditcon) {
     		$dn2 = ("fspLocalMailAddress=$luser,$dn");
     		// hinzufügen der neuen primär Adresse
     		$r=ldap_add($ditcon, $dn2, $account2);
+    		if ($COR_ZARAFA_MAIN_MAIL) {
+		    $zarafaMainMail["mail"]="$extaddress";
+		    $r=ldap_mod_replace($ditcon, $dn, $zarafaMainMail);
+		}
 	}
 	ldap_close($ditcon);
 } else {

@@ -15,6 +15,10 @@ if ($ditcon) {
 	// Loeschen eines Mail-Accounts
 	$dn2 = ("fspExtMailAddress=$account,uid=$corusername,$BASE_DN_USER");
 	ldap_delete($ditcon, $dn2);
+	if ($COR_ZARAFA_ALIAS) {
+	    $zarafaAlias["zarafaAliases"] = "$account";
+	    ldap_mod_del($ditcon, $dn, $zarafaAlias);
+	}
     ldap_close($ditcon);
 } else {
     echo "Verbindung zum LDAP Server nicht möglich!";

@@ -38,6 +38,10 @@ if ($ditcon) {
     	    // hinzufügen der neuen primär Adresse
     	    $r=ldap_add($ditcon, $dn3, $account2);
 	}
+	if ($COR_ZARAFA_MAIN_MAIL) {
+	    $zarafaMainMail["mail"]="$mainaccount";
+	    $r=ldap_mod_replace($ditcon, $dn, $zarafaMainMail);
+	}
 
     ldap_close($ditcon);
 } else {

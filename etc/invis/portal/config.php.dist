@@ -75,5 +75,7 @@ $COR_WEBSERVER = '/';
 $COR_PATH = '/var/lib/cornaz';
 $COR_LOCAL_IMAP_SERVER = "localhost";
 $COR_FETCHMAILRC_BUILD = "$COR_PATH/build/.fetchmailrc";
+$COR_ZARAFA_ALIAS = true; // Zarafa Alias setzen/loeschen
+$COR_ZARAFA_MAIN_MAIL = true; // Zarafa Hauptadresse setzen/loeschen
 
 ?>
