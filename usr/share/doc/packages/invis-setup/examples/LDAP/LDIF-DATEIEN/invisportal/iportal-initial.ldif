@@ -132,7 +132,7 @@ iPortEntryName: Etherpad
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/etherpad/
 iPortEntryDescription: Das Etherpad Lite ist eine Form der Textverarbeitung, die es mehreren Benutzern erlaubt, gleichzeitig, an verschiedenen Rechnern an einem Text zu arbeiten.
-iPortEntryActive: TRUE
+iPortEntryActive: FALSE
 iPortEntryPosition: Lokal
 iPortEntryButton: Etherpad Lite
 iPortEntryPriv:	user
@@ -184,7 +184,7 @@ iPortEntryName: Mailman
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/mailman/listinfo
 iPortEntryDescription: Mailing-Listen sind das eMail Pendant zum klassischen Serienbrief. Über diese Schaltfläche können Sie vorhandene Mailinglisten abonnieren.
-iPortEntryActive: TRUE
+iPortEntryActive: FALSE
 iPortEntryPosition: Lokal
 iPortEntryButton: Mailing-Listen
 iPortEntryPriv:	guest
@@ -197,7 +197,7 @@ iPortEntryName: Mailmanadmin
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/mailman/admin
 iPortEntryDescription: Mailinglisten sind das eMail Pendant zum klassischen Serienbrief. Über diese Schaltfläche können Sie neue Mailinglisten einrichten.
-iPortEntryActive: TRUE
+iPortEntryActive: FALSE
 iPortEntryPosition: Administration
 iPortEntryButton: Mailinglisten
 iPortEntryPriv:	admin
@@ -254,19 +254,6 @@ iportentryssl: FALSE
 iportentryurl: [servername]/vbphp
 objectclass: top
 objectclass: iPortEntry
-
-# Swat
-dn: iPortEntryName=Swat,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
-objectClass: top
-objectClass: iPortEntry
-iPortEntryName: Swat
-iPortEntrySSL: FALSE
-iPortEntryURL: [servername]:901
-iPortEntryDescription: Samba ist für die zentrale Benutzerverwaltung, die Datei- und Druck-Server-Freigaben für Windows-Clients verantwortlich. Swat ist das zugehörige Administrationstool. Nutzen Sie Swat bitte nur nach Rücksprache mit dem Lieferanten Ihres invis-Servers.
-iPortEntryActive: FALSE
-iPortEntryPosition: Administration
-iPortEntryButton: Samba Administration
-iPortEntryPriv:	admin
 
 # Webmin
 dn: iPortEntryName=Webmin,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
@@ -612,10 +599,10 @@ iPortEntryButton: Telepolis
 iPortEntryPriv:	guest
 
 # invis Projekt
-dn: iPortEntryName=invis Server,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+dn: iPortEntryName=invisServer,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
 objectClass: iPortEntry
-iPortEntryName: invis Server
+iPortEntryName: invisServer
 iPortEntrySSL: FALSE
 iPortEntryURL: www.invis-server.org
 iPortEntryDescription: invis Server im Internet
@@ -625,25 +612,25 @@ iPortEntryLinkRubrik: invis
 iPortEntryButton: invis Server
 iPortEntryPriv:	guest
 
-# invis Forum
-dn: iPortEntryName=invis Forum,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+# invis Blog
+dn: iPortEntryName=invisBlog,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
 objectClass: iPortEntry
-iPortEntryName: invis Forum
+iPortEntryName: invisBlog
 iPortEntrySSL: FALSE
-iPortEntryURL: forum.invis-server.org
-iPortEntryDescription: invis Server Support Forum
+iPortEntryURL: blog.invis-server.org
+iPortEntryDescription: invis Server Blog
 iPortEntryActive: TRUE
 iPortEntryPosition: Internet
 iPortEntryLinkRubrik: invis
-iPortEntryButton: invis Forum
+iPortEntryButton: invis Blog
 iPortEntryPriv:	guest
 
 # invis Wiki
-dn: iPortEntryName=invis Wiki,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+dn: iPortEntryName=invisWiki,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
 objectClass: iPortEntry
-iPortEntryName: invis Wiki
+iPortEntryName: invisWiki
 iPortEntrySSL: FALSE
 iPortEntryURL: wiki.invis-server.org
 iPortEntryDescription: invis Server Dokumentations-Wiki
