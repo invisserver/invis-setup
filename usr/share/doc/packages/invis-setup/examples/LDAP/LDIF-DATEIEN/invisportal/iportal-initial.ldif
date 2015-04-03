@@ -132,7 +132,7 @@ iPortEntryName: Etherpad
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/etherpad/
 iPortEntryDescription: Das Etherpad Lite ist eine Form der Textverarbeitung, die es mehreren Benutzern erlaubt, gleichzeitig, an verschiedenen Rechnern an einem Text zu arbeiten.
-iPortEntryActive: TRUE
+iPortEntryActive: FALSE
 iPortEntryPosition: Lokal
 iPortEntryButton: Etherpad Lite
 iPortEntryPriv:	user
@@ -184,7 +184,7 @@ iPortEntryName: Mailman
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/mailman/listinfo
 iPortEntryDescription: Mailing-Listen sind das eMail Pendant zum klassischen Serienbrief. Über diese Schaltfläche können Sie vorhandene Mailinglisten abonnieren.
-iPortEntryActive: TRUE
+iPortEntryActive: FALSE
 iPortEntryPosition: Lokal
 iPortEntryButton: Mailing-Listen
 iPortEntryPriv:	guest
@@ -197,7 +197,7 @@ iPortEntryName: Mailmanadmin
 iPortEntrySSL: FALSE
 iPortEntryURL: [servername]/mailman/admin
 iPortEntryDescription: Mailinglisten sind das eMail Pendant zum klassischen Serienbrief. Über diese Schaltfläche können Sie neue Mailinglisten einrichten.
-iPortEntryActive: TRUE
+iPortEntryActive: FALSE
 iPortEntryPosition: Administration
 iPortEntryButton: Mailinglisten
 iPortEntryPriv:	admin
