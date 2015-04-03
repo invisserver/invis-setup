@@ -28,7 +28,6 @@ chmod 1777 /var/lib/samba/profiles
 
 if [[ -f /sbin/mount.cifs ]]; then
     chmod u+s /sbin/mount.cifs
-    #chmod u+s /sbin/umount.cifs
 fi
 
 #Anpassen der Besitzrechte der Freigaben
@@ -44,8 +43,9 @@ chown root:"Domain Users" /srv/shares/portal/uploads
 chown domadmin:"Domain Users" /srv/shares/portal/downloads
 
 # Zugriffsrechte auf Private-Key Verzeichnis bereinigen
-chown .pkeys /etc/ssl/private
+chown -R .pkeys /etc/ssl/private
 chmod g+rx /etc/ssl/private
+chmod g+r /etc/ssl/private/*
 
 # Wenn vorhanden Rechte auf nagios check_icmp bereinigen
 if [[ -f /usr/lib/nagios/plugins/check-icmp ]]; then
