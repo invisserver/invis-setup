@@ -2,10 +2,23 @@
 # Script zur Erzeugung von Schlüsseln für den Web- und Mailserver
 # Dieses Script ersetzt die Scripts "mailserverkeys" und
 # "webserverkeys"
-# Version 0.9
-# (C) 2011,2013,2014 by Stefan Schäfer / invis-server.org
+# Version 0.10
+# (C) 2011-2015 by Stefan Schäfer / invis-server.org
 # License: GPLv3
-# Questions: http://forum.invis-server.org
+# Questions: info@invis-server.org
+
+# Dieses Programm ist freie Software. Sie können es unter den Bedingungen der 
+# GNU General Public License, wie von der Free Software Foundation veröffentlicht,
+# weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder
+# (nach Ihrer Option) jeder späteren Version.
+
+# Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen
+# von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite 
+# Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. 
+# Details finden Sie in der GNU General Public License.
+
+# Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem 
+# Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>. 
 
 #Konfigurationsdaten
 conffile="/etc/invis/invis.conf"
@@ -92,7 +105,7 @@ elif [[ $stype == "ldap" ]]; then
     mv ./invis-server.crt /etc/ssl/certs/ldap-cert.pem
     mv ./invis-server.key /etc/ssl/private/ldap-key.pem
     chown root.root /etc/ssl/private/ldap-key.pem
-    chmod 0600 /etc/ssl/private/ldap-key.pem
+    chmod 0640 /etc/ssl/private/ldap-key.pem
 else
     # Dadurch steht kein Klartext mehr im Zertifikat
     /usr/bin/openssl x509 -in server-cert.pem -out invis-server.crt
