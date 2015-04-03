@@ -255,19 +255,6 @@ iportentryurl: [servername]/vbphp
 objectclass: top
 objectclass: iPortEntry
 
-# Swat
-dn: iPortEntryName=Swat,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
-objectClass: top
-objectClass: iPortEntry
-iPortEntryName: Swat
-iPortEntrySSL: FALSE
-iPortEntryURL: [servername]:901
-iPortEntryDescription: Samba ist für die zentrale Benutzerverwaltung, die Datei- und Druck-Server-Freigaben für Windows-Clients verantwortlich. Swat ist das zugehörige Administrationstool. Nutzen Sie Swat bitte nur nach Rücksprache mit dem Lieferanten Ihres invis-Servers.
-iPortEntryActive: FALSE
-iPortEntryPosition: Administration
-iPortEntryButton: Samba Administration
-iPortEntryPriv:	admin
-
 # Webmin
 dn: iPortEntryName=Webmin,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
@@ -612,10 +599,10 @@ iPortEntryButton: Telepolis
 iPortEntryPriv:	guest
 
 # invis Projekt
-dn: iPortEntryName=invis Server,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+dn: iPortEntryName=invisServer,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
 objectClass: iPortEntry
-iPortEntryName: invis Server
+iPortEntryName: invisServer
 iPortEntrySSL: FALSE
 iPortEntryURL: www.invis-server.org
 iPortEntryDescription: invis Server im Internet
@@ -625,25 +612,25 @@ iPortEntryLinkRubrik: invis
 iPortEntryButton: invis Server
 iPortEntryPriv:	guest
 
-# invis Forum
-dn: iPortEntryName=invis Forum,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+# invis Blog
+dn: iPortEntryName=invisBlog,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
 objectClass: iPortEntry
-iPortEntryName: invis Forum
+iPortEntryName: invisBlog
 iPortEntrySSL: FALSE
-iPortEntryURL: forum.invis-server.org
-iPortEntryDescription: invis Server Support Forum
+iPortEntryURL: blog.invis-server.org
+iPortEntryDescription: invis Server Blog
 iPortEntryActive: TRUE
 iPortEntryPosition: Internet
 iPortEntryLinkRubrik: invis
-iPortEntryButton: invis Forum
+iPortEntryButton: invis Blog
 iPortEntryPriv:	guest
 
 # invis Wiki
-dn: iPortEntryName=invis Wiki,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+dn: iPortEntryName=invisWiki,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
 objectClass: iPortEntry
-iPortEntryName: invis Wiki
+iPortEntryName: invisWiki
 iPortEntrySSL: FALSE
 iPortEntryURL: wiki.invis-server.org
 iPortEntryDescription: invis Server Dokumentations-Wiki
