@@ -1,19 +1,31 @@
 #!/bin/bash
 # invis 9.2 Server Setup Script
-# Version R3
-# (c) August 2008 by Stefan Schäfer / FSP Computer & Netzwerke
-# (c) 2009, 2010, 2011, 2012, 2013 by Stefan Schäfer / invis-server.org / stefan@invis-server.org
+# Version R4
+# (c) August 2008 Stefan Schäfer / FSP Computer & Netzwerke
+# (c) 2009-2015 Stefan Schäfer / invis-server.org / stefan@invis-server.org
+# (c) 2013,2014 Dimitri Asarowski / invis-server.org / dimitri@invis-server.org
+# (c) 2013-2015 Ingo Göppert / invis-server.org / ingo@invis-server.org
+
 # License: GPLv3
 # Questions: http://forum.invis-server.org
-# Dieses Script führt alle zur Installation eines invis Servers notwendigen 
-# Konfigurationsschritte aus.
 
-# Wenn nicht bereits geschehen wird ein Setup-Verzeichnis angelegt. Darein
-# wird das Archiv mit den Konfigurationsdateien entpackt und dessen Unterverzeichnis 
-# in /cfiles umbenannt.
-# Wenn alles funktioniert hat, wird im Setup-Verzeichnis eine Kontrolldatei mit dem 
-# Inhalt "check" angelegt. Die Kontrolldatei enthält immer den nächsten auszuführenden
-# Setup-Schritt.
+# Dieses Script führt alle zur Installation eines invis Servers Classic 
+# notwendigen Konfigurationsschritte aus.
+# Das Script sine nutzt /var/lib/sine als Arbeitsverzeichnis, hier sind 
+# von sine verwendete Kontroll-, Variablen- und Protokolldateien zu finden.
+
+# Dieses Programm ist freie Software. Sie können es unter den Bedingungen der 
+# GNU General Public License, wie von der Free Software Foundation veröffentlicht,
+# weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder
+# (nach Ihrer Option) jeder späteren Version.
+
+# Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen
+# von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite 
+# Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. 
+# Details finden Sie in der GNU General Public License.
+
+# Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem 
+# Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>. 
 
 # Setup-Verzeichnis einlesen
 setupdir="/var/lib/sine"
@@ -159,7 +171,7 @@ chkservice() {
 	    systemctl restart $1.service 2>&1| tee -a $setupdir/sine.log | pgbox
 	else
 	    if [[ `chkconfig $1 |tr -s " "|cut -d " " -f 2` == "off" ]]; then
-		chkconfig -a $1
+		chkconfig -a $1 2>&1| tee -a $setupdir/sine.log | pgbox
 	    fi
     	    if [[ $1 != "avguard" ]]; then
     		service "$1" restart 2>&1|pgbox
