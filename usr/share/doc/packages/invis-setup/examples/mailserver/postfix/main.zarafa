@@ -299,7 +299,7 @@ mynetworks = 192.168.220.0/24, 192.168.166.0/24 127.0.0.0/8
 # list this system as their primary or backup MX host. See the
 # permit_mx_backup restriction description in postconf(5).
 #
-relay_domains = $mydestination, hash:/etc/postfix/relay
+#relay_domains = $mydestination, hash:/etc/postfix/relay
 
 # INTERNET OR INTRANET
 

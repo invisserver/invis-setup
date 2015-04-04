@@ -1085,7 +1085,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     strings="i6lib%$libdir"
     changevalues $path $file "$strings"
 
-    strings="UTC%$timezone"
+    strings="CEST%$timezone"
     changevalues $path $file "$strings"
 
     cp $cfilesdir/webserver/fcgid/php.ini /etc/php5/fastcgi/
@@ -1947,10 +1947,13 @@ samba() {
     chown domadmin:"Domain Users" /srv/shares/portal/downloads 2>&1| tee -a $setupdir/sine.log
 
     #Printer-Scripts kopieren
-    find /usr/share/doc/packages/ -type f -name smb*.pl -exec cp '{}' /usr/bin/ \; 2>&1| tee -a $setupdir/sine.log
-    chown root:"Domain Admins" /usr/bin/*printer.pl 2>&1| tee -a $setupdir/sine.log
-    chmod ug+x /usr/bin/*printer.pl 2>&1| tee -a $setupdir/sine.log
-
+    sambapakete=`getconfdata "SambaPakete" "2"`
+    if [[ $sambapakete == "opensuse" ]]; then
+	find /usr/share/doc/packages/ -type f -name smb*.pl -exec cp '{}' /usr/bin/ \; 2>&1| tee -a $setupdir/sine.log
+	chown root:"Domain Admins" /usr/bin/*printer.pl 2>&1| tee -a $setupdir/sine.log
+	chmod ug+x /usr/bin/*printer.pl 2>&1| tee -a $setupdir/sine.log
+    fi
+    
     #Verzeichnisrechte anpassen - Profilverzeichnisse
     chown root:"Domain Users" /var/lib/samba/profiles 2>&1| tee -a $setupdir/sine.log
     chmod 1777 /var/lib/samba/profiles 2>&1| tee -a $setupdir/sine.log
@@ -1974,10 +1977,6 @@ Benutzer lassen sich bequem über das invis Portal anlegen." "Samba Installation
     # Samba-Server starten und in Runlevel eintragen
     # Sambaversion pruefen
     if [[ $whichsamba == "sernet" ]]; then
-	path="etc/default"
-	file="sernet-samba"
-	strings="none%classic"
-	changevalues $path $file "$strings"
 	chkservice "sernet-samba-nmbd"
 	chkservice "sernet-samba-smbd"
     else
@@ -2536,18 +2535,17 @@ case "$whichimap" in
 	zyppercheck ${PIPESTATUS[0]}
 	
 	# Datenbank anlegen
-	rcmdbpass=`mkdbsilent roundcube roundcube a`
+	rcmdbpass=`mkdbsilent roundcubemail roundcube a`
 
 	# Konfigurationsdateien kopieren und anpassen
 	path="/etc/roundcubemail/"
-	cp $cfilesdir/roundcubemail/* $path
-	file="db.inc.php"
-	strings="rcmdbpass%$rcmdbpass"
+	#cp $cfilesdir/roundcubemail/* $path
+	file="config.inc.php"
+	strings="roundcube:pass%roundcube:$rcmdbpass"
 	changevalues $path $file "$strings"
 
 	domain=`getconfdata "Domain" "2"`
-	file="main.inc.php"
-	strings="invis-net.loc%$domain"
+	strings="Roundcube Webmail%$domain Webmail"
 	changevalues $path $file "$strings"
 
 	writeprepstat "erp"
