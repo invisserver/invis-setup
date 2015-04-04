@@ -2536,6 +2536,7 @@ case "$whichimap" in
 	
 	# Datenbank anlegen
 	rcmdbpass=`mkdbsilent roundcubemail roundcube a`
+	mysql -u root --password=$rcmdpass roundcubemail < /usr/share/doc/packages/roundcubemail/SQL/mysql.initial.sql
 
 	# Konfigurationsdateien kopieren und anpassen
 	path="/etc/roundcubemail/"
