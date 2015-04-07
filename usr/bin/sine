@@ -1656,7 +1656,7 @@ esac
         smtpun=`getconfdata "SMTPRUN" "2"`
         smtppw=`getconfdata "SMTPRPW" "2"`
 	echo "$mailrelay:$smtpport		$smtpun:$smtppw" >> /etc/postfix/sasl_passwd
-	/usr/sbin/postmap /etc/postfix/sasl_passwd
+	postmap /etc/postfix/sasl_passwd 2>&1| tee -a $setupdir/sine.log
     fi
     
     # canonical-files anpassen
@@ -1668,7 +1668,7 @@ esac
     domain=`getconfdata "Domain" "2"`
     strings="i5-net.loc%$domain"
     changevalues $path $file "$strings"
-    postmap $path/$file
+    postmap $path/$file 2>&1| tee -a $setupdir/sine.log
 
     files=(s-canonical.cf r-canonical.cf ldap-users.cf ldap-aliases.cf ldap-groups.cf)
 
@@ -1758,7 +1758,7 @@ samba() {
     unix2dos /etc/invis/templates/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
     unix2dos /srv/shares/service/Win_Scripts/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
     unix2dos /srv/shares/service/Win_Timeserver/*.cmd 2>&1| tee -a $setupdir/sine.log | pgbox
-    unix2dos /srv/shares/service/VPN-Clients/Windows/vpn-client.ovpn
+    unix2dos /srv/shares/service/VPN-Clients/Windows/vpn-client.ovpn 2>&1| tee -a $setupdir/sine.log | pgbox
 
     # invisconnect-Script anpassen
     path="/srv/shares/service/VPN-Clients/Linux"
@@ -1896,7 +1896,7 @@ samba() {
     smbldappw root #| tee -a $setupdir/sine.log
 
     # Grouppe fuer Maildummies anlegen
-    smbldap-groupadd -a -g 600 maildummies
+    smbldap-groupadd -a -g 600 maildummies 2>&1| tee -a $setupdir/sine.log |pgbox
 
     # Mailkonto für SPAM-Mails einrichten
     smbldap-useradd -g 600 -m -s /bin/false -c "Spam-Mail Konto" junk 2>&1| tee -a $setupdir/sine.log
@@ -2043,7 +2043,7 @@ Individuelle Konfigurationen des Portals können in /etc/invis/portal/config.php
     changevalues $path $file "$strings"
 
     # Link fuer Portal-Konfiguration anlegen
-    ln -s $path/$file /srv/www/htdocs/portal/config.php
+    ln -s $path/$file /srv/www/htdocs/portal/config.php 2>&1| tee -a $setupdir/sine.log |pgbox
     
     # auch in invis.conf anpassen
     path="/etc/invis/"
@@ -2121,19 +2121,6 @@ Individuelle Konfigurationen des Portals können in /etc/invis/portal/config.php
 
     fi
 
-    # Konfigurationsdaten ermitteln.
-    #domain=`getconfdata "Domain" "2"`
-    #ldaphost="localhost"
-    #basedn=`getconfdata "baseDN" "2"`
-    #path="/srv/www/htdocs/cornaz/inc"
-    #file="config.inc.php"
-    #strings="i6-maildomain%$domain"
-    #changevalues $path $file "$strings"
-    #strings="i6-ldaphost%$ldaphost"
-    #changevalues $path $file "$strings"
-    #strings="i6-basedn%$basedn"
-    #changevalues $path $file "$strings"
-
     # Sysconfig Datei bearbeiten
     cp $cfilesdir/mailserver/fetchmail/fetchmail /etc/sysconfig/
     path="/etc/sysconfig"
@@ -2147,11 +2134,6 @@ Individuelle Konfigurationen des Portals können in /etc/invis/portal/config.php
     chown wwwrun.www $fetchmailrc
     chmod 0660 $fetchmailrc
     
-    ##RPM
-    #Dateirechte anpassen -- testen, wenn notwendig, dann ins specfile
-    #chown -R wwwrun:root /var/lib/cornaz
-    #chown -R wwwrun:www /srv/www/htdocs/cornaz
-
     # fetchcopy ausfuehren
     /var/lib/cornaz/bin/fetchcopy				2>&1|tee -a $setupdir/sine.log |pgbox
     chmod 0700 /var/lib/cornaz/inuse/.fetchmailrc		2>&1|tee -a $setupdir/sine.log |pgbox
@@ -2869,8 +2851,8 @@ openvpn() {
 	zypper -n install -n openvpn 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
 
-	unix2dos $cfilesdir/openvpn/vpn-client.ovpn
-	unix2dos $cfilesdir/openvpn/jowi_openvpnmanager/vpn-client-management.ovpn
+	unix2dos $cfilesdir/openvpn/vpn-client.ovpn  2>&1| tee -a $setupdir/sine.log | pgbox
+	unix2dos $cfilesdir/openvpn/jowi_openvpnmanager/vpn-client-management.ovpn 2>&1| tee -a $setupdir/sine.log | pgbox
 
 	# openVPN Key-Center einrichten
 	domain=`getconfdata "Domain" "2"`
