@@ -2510,7 +2510,7 @@ case "$whichimap" in
 	
 	# Datenbank anlegen
 	rcmdbpass=`mkdbsilent roundcubemail roundcube a`
-	mysql -u roundcube --password=$rcmdpass roundcubemail < /usr/share/doc/packages/roundcubemail/SQL/mysql.initial.sql
+	mysql -u roundcube --password=$rcmdbpass roundcubemail < /usr/share/doc/packages/roundcubemail/SQL/mysql.initial.sql
 
 	# Konfigurationsdateien kopieren und anpassen
 	path="/etc/roundcubemail/"
@@ -2971,8 +2971,8 @@ dokuwiki() {
     else
 	msgbox "Wenn Sie es sich zu einem späteren Zeitpunkt anders überlegen, können Sie diesen Schritt durch erneutes Aufrufen des Setup-Scripts mit dem Parameter \"dokuwiki\" wiederholen." "Dokuwiki Installation übersprungen"
     fi
-    writeprepstat "etherpad"
-    waitbox "dokuwiki" "etherpad"
+    writeprepstat "virtualbox"
+    waitbox "dokuwiki" "virtualbox"
 }
 
 etherpad() {
@@ -2998,9 +2998,9 @@ etherpad() {
 	strings="dbuserpw%$etherpaddbuserpw"
 	changevalues $confdir $file "$strings"
 	chkservice "etherpad-lite"
-	service etherpad-lite stop
-	mysql -u root -p < $cfilesdir/etherpad/charset.sql
-	service etherpad-lite start
+	#service etherpad-lite stop
+	#mysql -u root -p < $cfilesdir/etherpad/charset.sql
+	#service etherpad-lite start
     else
 	msgbox "Etherpad-Lite Installation übersprungen" "$windowtitle"
     fi
