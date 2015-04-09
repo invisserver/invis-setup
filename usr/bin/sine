@@ -2633,6 +2633,7 @@ dann sinnvoll, wenn lediglich mit einer Kivitendo Datenbank gearbeitet wird."  1
 	    # Hier Datenbank installation einfügen
 	    wawipass=`mkdbsilent wawision1 wawision a`
 	    msgbox "Datenbank für waWision wurde angelegt.\n\nDatenbank: wawision1\nBenutzer: wawision\nPasswort: $wawipass\n\nNotieren Sie sich bitte diese Daten. Sie werden beim ersten Zugriff auf waWision benötigt." "$windowtitle"
+	    chkservice apache2 r
 	    writeprepstat "faxgate"
 	    waitbox "erp" "faxgate"
 	else
