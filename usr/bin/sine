@@ -595,7 +595,6 @@ Geben Sie bitte Ihre Zugangsdaten für das Enterprise-Samba Repository ein." 18 
 Wählen Sie die von Ihnen bevorzugte ERP-Software (Warenwirtschaftssystem) aus." 14 85 5 \
 	Kivitendo "Konzentriert sich auf Handel und Finanzbuchhaltung, wenig modular." off\
 	waWision "Moderne ERP Lösung für Handel und Dienstleistung inkl. Webshop-Schnittstelle." on\
-	OpenERP "Modern und Modular (noch nicht implementiert)" off\
 	Keine "Sie verwenden ein eigenes System" off\
 	2>$setupdir/sine_temp
 	whicherp=`cat $setupdir/sine_temp`
@@ -1366,14 +1365,7 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	    ;;
     esac
 
-    if [[ $whicherp == "openerp" ]]; then
-	strings="LXTRUE%FALSE"
-	changevalues $path $file "$strings"
-	strings="OPENERPTRUE%TRUE"
-	changevalues $path $file "$strings"
-	strings="WAWISIONTRUE%FALSE"
-	changevalues $path $file "$strings"
-    elif [[ $whicherp == "wawision" ]]; then
+    if [[ $whicherp == "wawision" ]]; then
 	strings="LXTRUE%FALSE"
 	changevalues $path $file "$strings"
 	strings="OPENERPTRUE%FALSE"
@@ -2198,7 +2190,7 @@ postgresqlserver() {
     chown -R postgres:postgres /var/lib/pgsql/ 2>&1 |tee -a $setupdir/sine.log
     # Postgresql neu starten
 
-    yesno "Soll PostgreSQL automatisch gestartet werden? (Ist nur notwendig, wenn OpenERP oder Kivitendo installiert wird.)" "Runlevel Eintrag für PostgreSQL wird konfiguriert."
+    yesno "Soll PostgreSQL automatisch gestartet werden? (Ist nur notwendig, wenn Kivitendo installiert wird.)" "Runlevel Eintrag für PostgreSQL wird konfiguriert."
     pgsqlrl=${?}
     if [[ $pgsqlrl == "1" ]]; then
 #	/etc/init.d/postgresql stop 2>&1 |tee -a $setupdir/sine.log |pgbox 
@@ -2649,42 +2641,6 @@ dann sinnvoll, wenn lediglich mit einer Kivitendo Datenbank gearbeitet wird."  1
 	fi
 	;;
 
-    "openerp")
-	# PostgreSQL in RL eintragen, wenn noch nicht geschehen
-	srvon=`chkconfig postgresql|grep " on"`
-	if [[ -z $srvon ]]; then chkservice "postgresql"; fi
-	## OpenERP
-	cd $setupdir
-	clear
-	windowtitle="OpenERP Installation"
-	dialog --backtitle "$dialogtitle" --title "$windowtitle"  --exit-label "Weiter" --textbox "$setupdir/infofiles/openerp.txt" 38 90 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie OpenERP installieren?" 0 0
-	cont=${?}
-
-	if [[ $cont == "0" ]]; then
-
-	    ## Hier OpenERP Installation und Konfiguration
-	    windowtitle="OpenERP Installation"
-	
-	    pgsubtitle="Benötigte Software wird installiert"
-	    zypper -n install -n `cat $setupdir/zypper-package-lists/openerp` 2>&1 | tee -a $setupdir/sine.log | pgbox
-
-	    msgbox "Es wird ein Postgresql-Benutzer - openerp - für OpenERP angelegt. 
-Vergessen Sie bitte nicht das hierbei von Ihnen zu vergebende Passwort. ;-)" "$windowtitle"
-	    sudo -u postgres createuser -d -P openerp
-	    sudo -u postgres createdb --encoding=utf-8 --owner openerp openerp
-
-	    # Dienste ins RL-Konzept aufnehmen
-	    chkservice openerp-server
-	    chkservice openerp-web
-
-	    writeprepstat "faxgate"
-	    waitbox "erp" "faxgate"
-	else
-	    msgbox "OpenERP Installation übersprungenen" "$windowtitle"
-	    writeprepstat "faxgate"
-	    waitbox "erp" "faxgate"
-	fi 
-	;;
     *)
         msgbox "Keine ERP Software gewünscht" "$windowtitle"
 	writeprepstat "faxgate"
@@ -3033,7 +2989,7 @@ etherpad() {
 	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zypper -n install nodejs etherpad-lite 2>&1 | tee -a $setupdir/sine.log | pgbox
 	zyppercheck ${PIPESTATUS[0]}
-	npm install -g node-inspector 2>&1 | tee -a $setupdir/sine.log | pgbox
+	#npm install -g node-inspector 2>&1 | tee -a $setupdir/sine.log | pgbox
 	confdir="/var/lib/etherpad-lite"
 	file="settings.json"
 	mv $confdir/$file $confdir/$file.orig
