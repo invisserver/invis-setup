@@ -1,0 +1,7 @@
+Die Datei usvstat ist eine Demo-Datei, mit der sich die USV Daten-Anzeige im
+invis-Portal anzeigen laesst.
+
+Zum Testen eindach die Datei nach /var/spool/results/usv kopieren und den
+Wert $STATUS_APCUPSD in der invis-Portal Konfiguration auf "true" setzen.
+
+Das Ergebnis laesst sich auf der Status-Seite des Portals betrachten.

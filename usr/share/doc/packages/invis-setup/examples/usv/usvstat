@@ -1,0 +1,7 @@
+Label:Smart-UPS 1000
+Normal: ONLINE
+Normal:100.0 %
+Normal:230.4 VAC
+Warning:95.3 %
+Fault:55.0&deg; C
+Warning:7.0 min.

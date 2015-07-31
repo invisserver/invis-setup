@@ -7,6 +7,10 @@ MAILTO=/dev/null
 # alle 10 Minuten
 */10 * * * * root /usr/bin/inetcheck
 
+# USV abfragen
+# alle 3 Minuten
+*/3 * * * * root /usr/bin/getusvvalues > /dev/null 2>&1
+
 # ownCloud Synchronisation
 # alle 5 Minuten
 */5 * * * * root /usr/bin/ocsync > /dev/null 2>&1

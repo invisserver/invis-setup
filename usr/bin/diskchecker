@@ -93,7 +93,6 @@ done
 oldsent=`find $directory/sent -ctime +3 2> /dev/null`
 
 # Wenn ein Alarm vor ueber drei Tagen oder noch gar nicht gesendet wurde $sent auf 1 setzen 
- 
 if [[ $oldsent != "" || ! -f $directory/sent ]]; then
     sent=1
 fi
@@ -108,4 +107,12 @@ fi
 if [[ ! -f $directory/alarm ]]; then
     rm $directory/sent 2> /dev/null
 fi
+
+# Freien Platz auf evtl. vorhandenen PVs finden
+
+if [[ ! `pvscan -v 2>&1 |grep "No matching physical volumes found"` ]]; then
+    freespace=`pvscan -v 2>&1 |grep PV|tr -s " "|cut -d "[" -f2 | cut -d "/" -f2|cut -d " " -f2-3`
+    echo "pvfree $freespace" >> $directory/status
+fi
+
 

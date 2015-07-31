@@ -39,25 +39,32 @@ new Ajax.PeriodicalUpdater(
 <?php 
 if (isset($STATUS_BACKUP_TIMER))
 	echo "new Ajax.PeriodicalUpdater('backup_info', 'script/status.php', { method: 'post', frequency: 60, parameters: {c: 'backup_info'}});";
+
+if (isset($STATUS_APCUPSD))
+	echo "new Ajax.PeriodicalUpdater('usv_status', 'script/status.php', { method: 'post', frequency: 60, parameters: {c: 'usv_status'}});";
 ?>
+
+
+
 </script>
 
-<h3><u>Serverstatistiken</u></h3>
+<!-- <h3><u>Serverstatistiken</u></h3> -->
 
 <table width="100%" border="0">
 	<tr>
 		<!-- left -->
-		<td valign="top" align="left" rowspan="2" width="35%">
+		<td valign="top" align="left" rowspan="2" width="27%">
 			<span id="basic_info"></span>
 			<span id="hd_info"></span>
 		</td>
 		
 		<!-- right -->
 		<td valign="top" align="left">
-			<table width="100%">
+			<table rowspan="2" width="100%">
 				<tr>
-					<?php if (isset($STATUS_BACKUP_TIMER)) echo '<td valign="top"><span id="backup_info"></span></td>'; ?>
 					<td valign="top"><span id="inet_info"></span></td>
+					<?php if (isset($STATUS_BACKUP_TIMER)) echo '<td valign="top"><span id="backup_info"></span></td>'; ?>
+					<?php if ($STATUS_APCUPSD == true) echo '<td valign="top"><span id="usv_status"></span></td>'; ?>
 				</tr>
 			</table>
 			<span id="capacity_info"></span>

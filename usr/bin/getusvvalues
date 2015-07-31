@@ -1,0 +1,47 @@
+#!/bin/bash
+# Script zur Datenextraktion aus APCUPSD CGI-Script
+# Version 0.99
+# (c) 2015 Stefan Schäfer / invis-server.org
+
+# Das Script setzt einen laufenden apcupsd voraus.
+
+# License: GPLv3
+# Questions: info@invis-server.org
+
+# Dieses Programm ist freie Software. Sie können es unter den Bedingungen der 
+# GNU General Public License, wie von der Free Software Foundation veröffentlicht,
+# weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder
+# (nach Ihrer Option) jeder späteren Version.
+
+# Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen
+# von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite 
+# Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. 
+# Details finden Sie in der GNU General Public License.
+
+# Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem 
+# Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>. 
+
+# CGI-Path - Commandline binary des apcupsd
+cgi="/srv/www/cgi-bin/multimon.cgi"
+
+# Ergebnispfad
+resultpath="/var/spool/results/usv"
+
+# Ergebnisdatei
+resultfile="$resultpath/usvstat"
+
+# Verzeichnis anlegen, wenn nicht vorhanden
+if [[ ! -d $resultpath ]]; then
+    mkdir -p $resultpath
+fi
+
+# Nur ausführen, wenn apcupsd laeuft
+if [[ `pgrep apcupsd` ]]; then
+
+    # Werte und Farben ermitteln
+    $cgi |grep -v "host="| grep ^"<td"|cut -d "\"" -f2 > /tmp/usvdata1
+    $cgi |grep -v "host="| grep ^"<td"|cut -d ">" -f2 |cut -d "<" -f1 > /tmp/usvdata2
+
+    paste -d ":" /tmp/usvdata1 /tmp/usvdata2 > $resultfile
+    
+fi
