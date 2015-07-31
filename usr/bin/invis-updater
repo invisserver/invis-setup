@@ -1,0 +1,144 @@
+#!/bin/bash
+# Script zur automatischen Update-Installation
+# Version 0.99
+# (c) 2015 Stefan Schäfer / invis-server.org
+
+# License: GPLv3
+# Questions: info@invis-server.org
+
+# Dieses Script installiert alle als unkritisch anzusehenden Sicherheits- 
+# aktualisierungen und startet automatisch alle zugehoerigen Dienste neu.
+# Ausgenommen von den Aktualisierungen sind Kernel-Updates sowie Updates 
+# der SQL Dienste MariaDB und PostgreSQL.
+
+# Dieses Programm ist freie Software. Sie können es unter den Bedingungen der 
+# GNU General Public License, wie von der Free Software Foundation veröffentlicht,
+# weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder
+# (nach Ihrer Option) jeder späteren Version.
+
+# Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen
+# von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite 
+# Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. 
+# Details finden Sie in der GNU General Public License.
+
+# Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem 
+# Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>. 
+
+workingdir="/var/lib/sine/updater"
+updlist="$workingdir/updates.lst"
+
+# Arrays fuer kritische Updates erzeugen
+criticalstatic=("kernel" "VirtualBox")
+criticalmariadb=(`zypper search mariadb|grep ^i|tr -d " "|cut -d "|" -f2 |tr "\n" " "`)
+criticalpostgres=(`zypper search postgres|grep ^i|tr -d " "|cut -d "|" -f2|tr "\n" " "`)
+# Einzel-Arrays zusammen fuehren
+critical=( "${criticalstatic[@]}" "${criticalmariadb[@]}" "${criticalpostgres[@]}" )
+
+# Arbeitsverzeichnis anlegen
+if [[ ! -d $workingdir ]]; then
+    mkdir -p $workingdir
+fi
+
+# Update-Liste initialisieren
+zypper lu|grep ^v|tr -d " "|cut -d "|" -f3 > $updlist
+
+# Kritische Updates aus Liste entfernen
+for exclude in ${critical[@]}; do
+    cat $updlist | grep -v $exclude > $workingdir/updates.new.lst
+    mv $workingdir/updates.new.lst $updlist
+done 
+
+# Updates installieren
+if (( `cat $updlist|wc -l` > 0 )); then
+    zypper -n up `cat $updlist`
+else
+    exit
+fi
+
+# Afterup laufen lassen
+afterup
+
+# Neuzustartende Dienste ermitteln
+daemons1=(`zypper ps|grep ^[0-9]|tr -d " "|cut -d "|" -f6|sort -u|grep ^[a-z,A-Z]`)
+
+commands=(`zypper ps|grep ^[0-9]|tr -d " "|cut -d "|" -f5|sort -u|grep ^[a-z,A-Z]`)
+
+logins=(`zypper ps|grep ^[0-9]|tr -d " "|cut -d "|" -f4|sort -u|grep ^[a-z,A-Z]`)
+
+for command in ${commands[@]}; do
+    if [[ $command =~ (qmgr|pichup|cleanup) ]]; then
+	echo "postfix" >> $workingdir/daemons
+    fi
+
+    if [[ $command =~ (smbd|winbindd|samba) ]]; then
+	if [[ `ls -l /etc/init.d/sernet*` ]]; then
+	    echo "sernet-samba-nmbd" >> $workingdir/daemons
+	    echo "sernet-samba-smbd" >> $workingdir/daemons
+	else
+	    echo "nmbd" >> $workingdir/daemons
+	    echo "smbd" >> $workingdir/daemons
+	fi
+    fi
+
+    if [[ $command =~ (httpd2-[a-zA-Z]*) ]]; then
+	echo "apache2" >> $workingdir/daemons
+    fi
+
+    if [[ $command =~ (dbus-[a-zA-Z]*) ]]; then
+	echo "dbus" >> $workingdir/daemons
+    fi
+
+    if [[ $command =~ (systemd[-]*[a-zA-Z]*) ]]; then
+	echo "systemd" >> $workingdir/daemons
+    fi
+
+    if [[ $command =~ (sssd[_]*[a-zA-Z]*) ]]; then
+	echo "sssd" >> $workingdir/daemons
+    fi
+done
+
+for login in ${logins[@]}; do
+    if [[ $login == "vscan" ]]; then
+	echo "amavis"  >> $workingdir/daemons
+    fi
+    if [[ $login == "postgres" ]]; then
+	echo "postgresql"  >> $workingdir/daemons
+    fi
+    if [[ $login == "cyrus" ]]; then
+	echo "cyrus"  >> $workingdir/daemons
+    fi
+    if [[ $login == "ldap" ]]; then
+	echo "ldap"  >> $workingdir/daemons
+    fi
+    if [[ $login == "mysql" ]]; then
+	echo "mysql"  >> $workingdir/daemons
+    fi
+done
+
+# Liste neu zu startender Dienste erstellen
+daemons=( ${daemons1[@]} `cat $workingdir/daemons | sort -u | tr "\n" " "` )
+
+# Dienste neu starten
+for daemon in ${daemons[@]}; do
+    case $daemon in
+	systemd)
+		systemctl daemon-reexec
+		systemctl restart systemd-logind
+		systemctl restart systemd-udevd
+		systemctl restart systemd-journald
+		;;
+	mysql)
+		zarafa=`systemctl is-enabled zarafa-server.service 2> /dev/null`
+		if [[ $zarafa == "enabled" ]]; then
+		    systemctl stop zarafa-server.service
+		    systemctl restart $daemon.service
+		    systemctl start zarafa-server.service
+		else
+		    systemctl restart $daemon.service
+		fi
+		;;
+	*)
+		systemctl restart $daemon.service
+		;;
+    esac
+done
