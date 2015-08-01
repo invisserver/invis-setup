@@ -1,8 +1,8 @@
-[sernet-samba-4.1]
-name=SerNet Samba 4.1 Packages (suse-13.1)
+[sernet-samba-4.2]
+name=SerNet Samba 4.2 Packages (suse-13.1)
 type=rpm-md
-baseurl=https://USERNAME:ACCESSKEY@download.sernet.de/packages/samba/4.1/suse/13.1/
+baseurl=https://USERNAME:ACCESSKEY@download.sernet.de/packages/samba/4.2/suse/13.1/
 gpgcheck=1
-gpgkey=https://USERNAME:ACCESSKEY@download.sernet.de/packages/samba/4.1/suse/13.1/repodata/repomd.xml.key
+gpgkey=https://USERNAME:ACCESSKEY@download.sernet.de/packages/samba/4.2/suse/13.1/repodata/repomd.xml.key
 enabled=1
 

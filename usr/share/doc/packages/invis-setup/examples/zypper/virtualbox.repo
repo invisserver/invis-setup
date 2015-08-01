@@ -1,6 +1,6 @@
 [virtualbox]
-name=VirtualBox for openSUSE 12.3
-baseurl=http://download.virtualbox.org/virtualbox/rpm/opensuse/12.3
+name=VirtualBox for openSUSE 13.1
+baseurl=http://download.virtualbox.org/virtualbox/rpm/opensuse/13.1
 type=yum
 enabled=1
 priority=120
