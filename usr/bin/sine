@@ -1278,6 +1278,11 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	strings="targetOrganization%$organization"
 	changevalues $path $file "$strings"
 
+	ddnsname=`getconfdata "OCPORT" "2"`
+	ocport=`getconfdata "OCPORT" "2"`
+	strings="server-fqdn-ocport%$ddnsname:$ocport"
+	changevalues $path $file "$strings"
+
 	strings="descriptionText%Basisknoten des LDAP-Verzeichnisses von $organization"
         changevalues $path $file "$strings"
 	

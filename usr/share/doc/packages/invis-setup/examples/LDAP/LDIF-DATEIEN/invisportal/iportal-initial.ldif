@@ -98,6 +98,19 @@ iPortEntryPosition: Lokal
 iPortEntryButton: Warenwirtschaft
 iPortEntryPriv:	user
 
+# ownCloud
+dn: iPortentryName=ownCloud,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
+objectClass: top
+objectClass: iPortEntry
+iPortEntryName: ownCloud
+iPortEntrySSL: TRUE
+iPortEntryURL: server-fqdn-ocport
+iPortEntryDescription: ownCloud ist eine freie Software für das Vorhalten von Daten (Filehosting) in einer eigenen privaten Cloud
+iPortEntryActive: FALSE
+iPortEntryPosition: Lokal
+iPortEntryButton: Cloud Computing
+iPortEntryPriv:	user
+
 # OpenERP
 dn: iPortEntryName=OpenERP,ou=iPortal,ou=Informationen,dc=invis-net,dc=loc
 objectClass: top
