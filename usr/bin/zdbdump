@@ -17,6 +17,13 @@ getconfdata() {
     grep -i "$2" $1 | cut -d ":" -f $3
 }
 
+
+# Wird Zarafa genutzt?
+groupware=`getconfdata $conffile "usedGroupware" "2"`
+if [[ ! $groupware == "zarafa" ]]; then
+    exit
+fi
+
 # Modify the variables below to your need
 
 # Mysql Credentials

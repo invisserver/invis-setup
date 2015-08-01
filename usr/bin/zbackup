@@ -22,6 +22,12 @@ changevalues() {
     mv $1/$2.new $1/$2
 }
 
+# Wird Zarafa genutzt?
+groupware=`getconfdata $conffile "usedGroupware" "2"`
+if [[ ! $groupware == "zarafa" ]]; then
+    exit
+fi
+
 # Pfade aus Konfiguration einlesen
 dasidir=`getconfdata $conffile "DasiDir" "2"`
 zbutarget=`getconfdata $conffile "zBuTarget" "2"`
