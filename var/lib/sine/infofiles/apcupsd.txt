@@ -1,0 +1,4 @@
+Apcupsd ist ein Systemdienst, um eine USV (unterbrechungsfreie Stromversorgung, englisch: UPS) des Herstellers APC
+zu konfigurieren und den angeschlossenen invis-Server bei einem Stromausfall geordnet herunterzufahren.
+
+Status-Seiten lassen sich über invis-Portal abrufen.

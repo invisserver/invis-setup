@@ -1,0 +1,18 @@
+ownCloud ist eine freie Software für das Vorhalten von Daten (Filehosting) in einer eigenen privaten 
+Cloud. Bei Einsatz eines entsprechenden Clients wird dieser automatisch mit einem lokalen Verzeichnis 
+synchronisiert. Dadurch kann von mehreren Rechnern auf einen konsistenten Datenbestand zugegriffen 
+werden. Das Projekt wurde ins Leben gerufen, um eine freie Alternative zu kommerziellen Anbietern 
+eines Cloud-Service zu schaffen. Im Gegensatz zu kommerziellen Speicherdiensten kann ownCloud auf einem 
+privaten Server ohne Zusatzkosten installiert werden. Somit können gerade bei sensiblen Daten 
+die Bedenken gegenüber einer Datenweitergabe und der damit einhergehenden Abgabe der Kontrolle 
+über die Daten zerstreut werden.
+
+ownCloud kann über eine Weboberfläche angesprochen werden. Dadurch ist der Client nicht an ein bestimmtes 
+Betriebssystem gebunden. Aber auch andere Anwendungen, wie beispielsweise Dateimanager oder Groupwares, 
+können die ownCloud über eine Schnittstelle ansprechen und Dateien und Daten lokal bereitstellen.
+
+ownCloud-Desktop-Clients gibt es für OS X, Windows, Linux, BSD und anderen unixoiden Betriebssystemen. 
+Es existieren ebenfalls Apps für die mobilen Betriebssysteme Android, iOS und Fire OS.
+
+Um ownCloud nutzen zu können benötigen Sie einen gültigen DDNS Namen oder eine feste IP-Adresse
+über den bzw. die Sie Ihren Server vom Internet aus erreichen können.

@@ -1,6 +1,6 @@
 #!/bin/bash
-# invis 9.2 Server Setup Script
-# Version R4
+# invis 9.3 Server Setup Script
+# Version R5
 # (c) August 2008 Stefan Schäfer / FSP Computer & Netzwerke
 # (c) 2009-2015 Stefan Schäfer / invis-server.org / stefan@invis-server.org
 # (c) 2013,2014 Dimitri Asarowski / invis-server.org / dimitri@invis-server.org
@@ -32,7 +32,7 @@ setupdir="/var/lib/sine"
 cfilesdir="/usr/share/doc/packages/invis-setup/examples"
 
 # Setup-Dialog Titel
-dialogtitle="invis Server 9.2 Setup"
+dialogtitle="invis Server 9.3 Setup"
 dialogshorthelp="Cursor- ([Auf]/[Ab]) und Tabulatortaste zur Navigation, Leertaste zum auswählen und Enter-Taste zum Bestätigen verwenden."
 
 # zentrales invis Konfigurationsverzeichnis anlegen & Konfig-Datei kopieren
@@ -730,9 +730,9 @@ Sollen alte Dateien und Verzeichnisse automatisch aus der Transfer-Freigabe gel�
 
     yesno "Sollen Cronjobs für regelmäßige Virenscanns der Fileserver-Verzeichnisse eingerichtet werden?" "Regelmäßige Virenscans der Serverfreigaben"
     avcron=${?}
-
-    yesno "Soll Ihr Server ein beliebiges Verzeichnis im Hintergrund mit einem ownCloud Konto synchronisieren?" "ownCloud Synchronisation"
-    owncloudsync=${?}
+# Wird dank ownCloud Integration und Server zu Server Sync nicht mehr benötigt.
+#    yesno "Soll Ihr Server ein beliebiges Verzeichnis im Hintergrund mit einem ownCloud Konto synchronisieren?" "ownCloud Synchronisation"
+#    owncloudsync=${?}
 
     ok=0
     if [[ $owncloudsync == "0" ]]; then
@@ -784,17 +784,24 @@ Geben Sie bitte den Hostnamen bzw. die IP-Adresse Ihres ownCloud Servers, sowie 
     done
     fi
 #---# Ende der Fragestunde
-
+ 
     sshport=`freeports`
     httpsport=`freeports`
+    ocport=`freeports`
+    # Doppelte Portbelegung verhindern
     while [[ $sshport == $httpsport ]]; do
 	httpsport=`freeports`
     done
- 
+
+    while [[ $ocport == $httpsport || $ocport == $sshport ]]; do
+	ocport=`freeports`
+    done
+
     msgbox "Für den externen Zugriff auf Server per SSH oder HTTPS wurden per Zufallsgenerator vom Standard abweichende Ports ermittelt. Dies erhöht die Sicherheit des Servers.\n\n
 Notieren Sie sich bitte die folgenden Ports in Ihrem Protokoll:\n\n
 SSH Port: $sshport\n\n
 HTTPS Port: $httpsport\n\n
+ownCloud Port: $ocport\n\n
 Aus Ihrem lokalen Netz heraus kann für SSH weiter Port 22 verwendet werden." "SSH und HTTPS Port"
 
     # Alle Daten in Kontrolldatei Schreiben
@@ -2232,7 +2239,12 @@ firewall() {
     httpsport=`getconfdata "HTTPSPORT" "2"`
     strings="httpsport%$httpsport"
     changevalues $path $file "$strings"
-    
+
+    # OwnCloud-Port einfuegen
+    ocport=`getconfdata "OCPORT" "2"`
+    strings="ocport%$httpsport"
+    changevalues $path $file "$strings"
+
     # SSH Port ändern
     cp $cfilesdir/ssh/sshd_config /etc/ssh
     path="/etc/ssh"
@@ -2972,8 +2984,8 @@ dokuwiki() {
     else
 	msgbox "Wenn Sie es sich zu einem späteren Zeitpunkt anders überlegen, können Sie diesen Schritt durch erneutes Aufrufen des Setup-Scripts mit dem Parameter \"dokuwiki\" wiederholen." "Dokuwiki Installation übersprungen"
     fi
-    writeprepstat "virtualbox"
-    waitbox "dokuwiki" "virtualbox"
+    writeprepstat "owncloud"
+    waitbox "dokuwiki" "owncloud"
 }
 
 etherpad() {
@@ -3007,6 +3019,65 @@ etherpad() {
     fi
     writeprepstat "virtualbox"
     waitbox "etherpad" "virtualbox"
+}
+
+owncloud() {
+    cd $setupdir
+    clear
+    windowtitle="ownCloud Installation"
+
+    dialog --backtitle "$dialogtitle" --title "$windowtitle" --exit-label "Weiter" --textbox "$setupdir/infofiles/owncloud.txt" 0 0 --and-widget --backtitle "$dialogtitle" --title "$windowtitle"  --defaultno --yesno "Möchten Sie ownCloud installieren?" 0 0
+    cont=${?}
+
+    # Weitermachen?
+    if [[ $cont == "0" ]]; then
+	pgsubtitle="Software wird installiert"
+	zypper refresh 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zypper -n install owncloud 2>&1 | tee -a $setupdir/sine.log | pgbox
+	zyppercheck ${PIPESTATUS[0]}
+	# Hier Datenbank installation einfügen
+	ocpass=`mkdbsilent owncloud owncloud a`
+
+	## Apache vorbereiten
+	# Flag OWNCLOUD setzen
+	a2enflag OWNCLOUD
+	
+	# HTTPS-owncloud-Port ändern
+	ocport=`getconfdata "OCPORT" "2"`
+
+	file="listen.conf"
+	path="/etc/apache2"
+	strings="ocport%$ocport"
+	changevalues $path $file "$strings"
+
+	# Apache vHost Konfiguration fuer ownCloud kopieren und anpassen
+	cp $cfilesdir/webserver/owncloud_vh.conf /etc/apache2/vhosts.d/
+	file="owncloud_vh.conf"
+	path="/etc/apache2/vhosts.d"
+	strings="ocport%$ocport"
+	changevalues $path $file "$strings"
+
+	ddnsname=`getconfdata "DDNS" "2"`
+	strings="dummy.invis-server.org%$ddnsname"
+	changevalues $path $file "$strings"
+
+	# Original owncloud-Konfig ueberschreiben
+	echo "# invis-Server Dummy File -> to prevent updates" > "/etc/apache2/conf.d/onwncloud.conf"
+
+	msgbox "Datenbank für ownCloud wurde angelegt.\n\nDatenbank: owncloud\nBenutzer: owncloud\nPasswort: $ocpass\n\nNotieren Sie sich bitte diese Daten. Sie werden beim ersten Zugriff auf ownCloud benötigt." "$windowtitle"
+	chkservice apache2 r
+	
+	# Gruppe "owncloud" anlegen
+	samba-tool group add --description="Gruppe zur Beschränkung der ownCloud Nutzer" owncloud 2>&1| tee -a $setupdir/sine.log | pgbox
+
+	# ownCloud im Portal aktivieren
+	swpestat ownCloud TRUE 2>&1 | tee -a $setupdir/sine.log | pgbox
+	
+    else
+	msgbox "ownCloud Installation übersprungen" "$windowtitle"
+    fi
+    writeprepstat "virtualbox"
+    waitbox "owncloud" "virtualbox"
 }
 
 virtualbox() {
@@ -3125,7 +3196,7 @@ if [[ -z `which dialog 2>/dev/null` ]]; then
     zyppercheck ${PIPESTATUS[0]}
 fi
 
-if [[ $prepstat == "ready" ]] && [[ $1 == "monitoring" || $1 == "groupware" || $1 == "erp" || $1 == "faxgate" || $1 == "webcdwriter" || $1 == "openvpn" || $1 == "dokuwiki" || $1 == "etherpad" || $1 == "virtualbox" ]]; then
+if [[ $prepstat == "ready" ]] && [[ $1 == "monitoring" || $1 == "groupware" || $1 == "erp" || $1 == "faxgate" || $1 == "webcdwriter" || $1 == "openvpn" || $1 == "dokuwiki" || $1 == "etherpad" || $1 == "owncloud" || $1 == "virtualbox" ]]; then
 	echo $1
 	sleep 1
 	$1

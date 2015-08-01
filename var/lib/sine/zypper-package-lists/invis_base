@@ -22,3 +22,5 @@ phpPgAdmin
 phpldapadmin
 shellinabox
 dos2unix
+apcupsd
+apcupsd-cgi
