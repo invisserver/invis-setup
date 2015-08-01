@@ -288,7 +288,7 @@ FW_PROTECT_FROM_INT="yes"
 # Note: this setting has precedence over FW_SERVICES_ACCEPT_*
 #
 ## invis-server.org - Port 1194 = openvpn
-FW_SERVICES_EXT_TCP="443 sshport httpsport 1194"
+FW_SERVICES_EXT_TCP="443 sshport httpsport ocport 1194"
 
 ## Type:	string
 #
