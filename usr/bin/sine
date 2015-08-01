@@ -847,6 +847,7 @@ Aus Ihrem lokalen Netz heraus kann für SSH weiter Port 22 verwendet werden." "S
 
     echo "SSHPORT:$sshport" >> $setupdir/invis_confdata
     echo "HTTPSPORT:$httpsport" >> $setupdir/invis_confdata
+    echo "OCPORT:$ocport" >> $setupdir/invis_confdata
     echo "AV:$av" >> $setupdir/invis_confdata
     if [[ $avcron == "0" ]]; then
         echo "AVCRON:j" >> $setupdir/invis_confdata
@@ -1278,7 +1279,7 @@ Das verlangte Passwort ist dass Passwort Ihrer SSL-Zertifizierungsstelle (CA)." 
 	strings="targetOrganization%$organization"
 	changevalues $path $file "$strings"
 
-	ddnsname=`getconfdata "OCPORT" "2"`
+	ddnsname=`getconfdata "DDNS" "2"`
 	ocport=`getconfdata "OCPORT" "2"`
 	strings="server-fqdn-ocport%$ddnsname:$ocport"
 	changevalues $path $file "$strings"
