@@ -1091,7 +1091,7 @@ Beantworten Sie die Fragen gewissenhaft. Die meisten Vorgabewerte können Sie ü
     strings="i6lib%$libdir"
     changevalues $path $file "$strings"
 
-    strings="CEST%$timezone"
+    strings="UTC%$timezone"
     changevalues $path $file "$strings"
 
     cp $cfilesdir/webserver/fcgid/php.ini /etc/php5/fastcgi/
@@ -2493,9 +2493,19 @@ case "$whichimap" in
 	strings="London%Berlin"
 	changevalues $path $file "$strings"
 
-	strings="en_EN%de_DE.UTF-8"
+	strings="en_GB%de_DE.UTF-8"
 	changevalues $path $file "$strings"
     
+	path="/etc/zarafa/webapp"
+	file="config.php"
+    
+	strings="London%Berlin"
+	changevalues $path $file "$strings"
+
+	strings="en_GB%de_DE.UTF-8"
+	changevalues $path $file "$strings"
+
+
 	# Zarafa-Schluessel erzeugen
 	mkzarafakey
     
