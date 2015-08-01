@@ -3083,7 +3083,7 @@ owncloud() {
 	chkservice apache2 r
 	
 	# Gruppe "owncloud" anlegen
-	samba-tool group add --description="Gruppe zur Beschränkung der ownCloud Nutzer" owncloud 2>&1| tee -a $setupdir/sine.log | pgbox
+	smbldap-groupadd -a owncloud 2>&1| tee -a $setupdir/sine.log |pgbox
 
 	# ownCloud im Portal aktivieren
 	swpestat ownCloud TRUE 2>&1 | tee -a $setupdir/sine.log | pgbox
